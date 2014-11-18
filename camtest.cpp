@@ -91,7 +91,9 @@ private:
 
 	static void on_change(int value, void *data) {
 		auto that = static_cast<Trackbar *>(data);
-		that->cap_.set(that->prop_, value / static_cast<double>(STEPS));
+		double new_value = value / static_cast<double>(STEPS);
+		cerr << "setting new value " << new_value << endl;
+		that->cap_.set(that->prop_, value);
 	}
 
 public:
@@ -105,11 +107,16 @@ public:
 };
 
 
-int main(int, char **) {
+int main(int argc, char * argv[]) {
 	const string WIN_MAIN("main");
 	const string WIN_CTRL("ctrl");
+	vector<string> args(argv, argv + argc);
+	int index = 0;
+	if (argc > 1) {
+		index = stoi(args[1]);
+	}
 
-	VideoCapture cap(0); // open the default camera
+	VideoCapture cap(index); // open the default camera
 
 	if(!cap.isOpened()) { // check if we succeeded
 		cerr << "Cannot open device." << endl;
@@ -119,7 +126,7 @@ int main(int, char **) {
 
 	/* Prepare GUI */
 	typedef unique_ptr<Trackbar> Trackbar_ptr;
-	namedWindow(WIN_MAIN, WINDOW_AUTOSIZE | WINDOW_OPENGL);
+	namedWindow(WIN_MAIN, WINDOW_AUTOSIZE);
 	namedWindow(WIN_CTRL, WINDOW_AUTOSIZE);
 	SizeTrackbar sizeTrackbar(cap, WIN_CTRL);
 	vector<Trackbar_ptr> trackbars;
@@ -140,6 +147,10 @@ int main(int, char **) {
 	for(;;) {
 		Mat frame;
 		cap >> frame; // get a new frame from camera
+		if (frame.size[0] == 0 || frame.size[1] == 0) {
+			cerr << "Invalid frame" << endl;
+			continue;
+		}
 		cerr << "\r" << fpsm.sample();
 
 		imshow(WIN_MAIN, frame);
