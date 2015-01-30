@@ -4,11 +4,13 @@ project(dove-eye)
 
 find_package(OpenCV REQUIRED)
 
-add_executable(calibration main.cc)
-target_link_libraries(calibration dove-eye)
+file(GLOB SOURCES src/*.cc)
+
+add_library(dove-eye ${SOURCES})
+target_link_libraries(dove-eye ${OpenCV_LIBS})
 
 
-include_directories(${CMAKE_SOURCE_DIR}/lib/include)
+include_directories(./include)
 
 if(WIN32)
         include_directories(${OpenCV_INCLUDE_DIRS})

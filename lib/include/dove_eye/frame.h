@@ -5,10 +5,10 @@
 
 #include <opencv2/opencv.hpp>
 
-namespace DoveEye {
+namespace dove_eye {
 
 struct Frame {
-  typedef uint32_t Timestamp;
+  typedef int64_t Timestamp;
   
   Timestamp timestamp;
   cv::Mat data;

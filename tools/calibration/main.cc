@@ -2,34 +2,43 @@
 #include <unistd.h>
 #include <vector>
 
-#include <dove_eye/video_provider.h>
+#include <dove_eye/file_video_provider.h>
 
 #include "dove_eye/time_calibration.h"
 
 using std::string;
 using std::vector;
-using DoveEye::TimeCalibration;
-using DoveEye::FileVideoProvider;
+using dove_eye::TimeCalibration;
+using dove_eye::FileVideoProvider;
 
 int CalibrateTime(const vector<string> &filenames) {
-    TimeCalibration calibration;
-    vector<TimeCalibration::ValueType> result;
-    
-    for(auto filename: filenames) {
-        FileVideoProvider provider(filename);
-        calibration.Reset();
-        
-        while(!calibration.MeasureFrame(provider.GetFrame()));
-        result.push_back(calibration.result());        
+  TimeCalibration calibration;
+  vector<TimeCalibration::ResultType> result;
+
+  for (auto filename : filenames) {
+    FileVideoProvider provider(filename);
+    calibration.Reset();
+
+    for (auto frame : provider) {
+      if (calibration.MeasureFrame(frame)) {
+        break;
+      }
     }
-    
-    // TODO store result           
+
+    if (calibration.state() == TimeCalibration::kReady) {
+      std::cout << filename << ": " << calibration.result() << std::endl;
+    } else {
+      std::cout << filename << ": NA" << std::endl;
+    }
+  }
+
+  // TODO store serialized result           
 }
 
 int main(int argc, char* argv[]) {
-    string usage = "Usage: %0 [-t|-c]";
-    
-    return CalibrateTime({"foo.mp4", "test.mkv"});
-    
+  string usage = "Usage: %0 [-t|-c]";
+
+  return CalibrateTime(vector<string>(argv + 1, argv + argc));
+
 }
 
