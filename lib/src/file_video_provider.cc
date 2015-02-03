@@ -14,16 +14,21 @@ FileVideoIterator::FileVideoIterator() : valid_(false) {
 }
 
 FileVideoIterator::FileVideoIterator(std::string filename) :
- videoCapture_(filename) {
-  valid_ = videoCapture_.isOpened();
+ videoCapture_(new VideoCapture(filename)) {
+  valid_ = videoCapture_->isOpened();
   frameNo_ = 0;
+  if (valid_) {
+    framePeriod_ = 1 / videoCapture_->get(CV_CAP_PROP_FPS);
+    operator++(); // load first frame
+  }
+  
 }
 
 FileVideoIterator& FileVideoIterator::operator++() {
-  valid_ = videoCapture_.grab();
-  // TODO get framerate from codec information
-  frame_.timestamp = frameNo_ * 33; // 33 ms per frame
-  valid_ = valid_ && videoCapture_.retrieve(frame_.data);
+  valid_ = videoCapture_->grab();
+  valid_ = valid_ && videoCapture_->retrieve(frame_.data);
+  frame_.timestamp = frameNo_ * framePeriod_;
+  ++frameNo_;
 }
 
 Frame FileVideoIterator::operator*() const {
@@ -35,10 +40,15 @@ bool FileVideoIterator::operator==(const FileVideoIterator& rhs) {
 }
 
 FileVideoProvider::FileVideoProvider(std::string filename) :
- begin_(filename),
+ filename_(filename),
  end_() {
 
 }
+
+FileVideoIterator FileVideoProvider::begin() {
+  return FileVideoIterator(filename_);
+}
+
 
 
 

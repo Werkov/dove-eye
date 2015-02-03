@@ -2,19 +2,23 @@
 #define	DOVE_EYE_VIDEO_PROVIDER_H_
 
 #include <chrono>
-#include <opencv2/opencv.hpp>
+#include <memory>
 #include <string>
 
+#include <opencv2/opencv.hpp>
+
 #include <dove_eye/frame.h>
+
+#include <iostream>
 
 namespace dove_eye {
 
 class FileVideoIterator {
  public:
   FileVideoIterator();
-
+  
   FileVideoIterator(std::string filename);
-
+  
   Frame operator*() const;
 
   FileVideoIterator &operator++();
@@ -26,19 +30,18 @@ class FileVideoIterator {
   }
 
  private:
-  //TODO can videoCapture be copied?
-  cv::VideoCapture videoCapture_;
+  // We share VideoCapture object among copies.
+  std::shared_ptr<cv::VideoCapture> videoCapture_;
   bool valid_;
   Frame frame_;
   int frameNo_;
+  double framePeriod_;
 };
 
 class FileVideoProvider {
  public:
-
-  inline FileVideoIterator &begin() {
-    return begin_;
-  }
+  // Creates a new iterator, all copies share the state.
+  FileVideoIterator begin();
 
   inline FileVideoIterator &end() {
     return end_;
@@ -47,7 +50,7 @@ class FileVideoProvider {
   FileVideoProvider(std::string filename);
 
  private:
-  FileVideoIterator begin_;
+  std::string filename_;
   FileVideoIterator end_;
 };
 
