@@ -21,7 +21,7 @@ class Synchronizer {
   SynchronizerIterator end_;
 };
 
-} // namespace DoveEye
+} // namespace dove_eye
 
 #endif	/* DOVE_EYE_SYNCHRONIZER_H_ */
 

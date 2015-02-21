@@ -18,9 +18,17 @@ struct Frameset {
   Frameset(const CameraIndex size) : size(size) {
 
   }
+
+  inline Frame &operator[](const CameraIndex cam) {
+    return frames[cam];
+  }
+
+  inline const Frame &operator[](const CameraIndex cam) const {
+    return frames[cam];
+  }
 };
 
-} // namespace DoveEye
+} // namespace dove_eye
 
 #endif	/* DOVE_EYE_FRAMESET_H_ */
 

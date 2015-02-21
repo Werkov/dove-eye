@@ -14,7 +14,7 @@ struct Frame {
   cv::Mat data;
 };
 
-} // namespace DoveEye
+} // namespace dove_eye
 
 #endif	/* DOVE_EYE_FRAME_H_ */
 

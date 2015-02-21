@@ -5,10 +5,12 @@
 #include <opencv2/opencv.hpp>
 
 #include <dove_eye/camera_calibration.h>
+#include <dove_eye/chessboard_pattern.h>
 #include <dove_eye/file_video_provider.h>
 #include <dove_eye/time_calibration.h>
 
 using dove_eye::CameraCalibration;
+using dove_eye::ChessboardPattern;
 using dove_eye::FileVideoProvider;
 using dove_eye::TimeCalibration;
 
@@ -30,7 +32,7 @@ int CalibrateTime(const vector<string> &filenames) {
     }
 
     if (calibration.state() == TimeCalibration::kReady) {
-      std::cout << filename << ": " << calibration.result() << std::endl;
+      std::cout << filename << ": " << calibration.Result() << std::endl;
     } else {
       std::cout << filename << ": NA" << std::endl;
     }
@@ -42,7 +44,9 @@ int CalibrateTime(const vector<string> &filenames) {
 
 int CalibrateCameras(const vector<string> &filenames) {
   cv::namedWindow("test");
-  CameraCalibration calibration(filenames.size());
+  // TODO this works, consider adding virtual dtor to CalibrationPattern though
+  ChessboardPattern pattern(6, 9, 0.026); // inner corners, 26 mm
+  CameraCalibration calibration(filenames.size(), pattern);
   for (auto filename : filenames) {
 
     FileVideoProvider provider(filename);

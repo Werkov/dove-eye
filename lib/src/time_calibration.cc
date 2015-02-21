@@ -22,7 +22,7 @@ void TimeCalibration::Reset() {
   processingSum_ = 0;
 }
 
-TimeCalibration::ResultType TimeCalibration::result() {
+TimeCalibration::ResultType TimeCalibration::Result() {
   assert(state_ == kReady);
   return processingSum_ / frames_;
 }

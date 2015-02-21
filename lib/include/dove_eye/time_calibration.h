@@ -24,7 +24,7 @@ class TimeCalibration {
 
   void Reset();
 
-  ResultType result();
+  ResultType Result();
 
   inline MeasurementState state() {
     return state_;
@@ -39,7 +39,7 @@ class TimeCalibration {
   Frame::Timestamp DetectTime(const cv::Mat &data);
 };
 
-} // namespace DoveEye
+} // namespace dove_eye
 
 #endif	/* DOVE_EYE_TIME_CALIBRATION_H_ */
 
