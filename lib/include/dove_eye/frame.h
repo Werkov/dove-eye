@@ -9,6 +9,7 @@ namespace dove_eye {
 
 struct Frame {
   typedef double Timestamp;
+  typedef double TimestampDiff;
   
   Timestamp timestamp;
   cv::Mat data;

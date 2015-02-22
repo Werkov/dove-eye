@@ -1,5 +1,6 @@
 #include "dove_eye/camera_calibration.h"
 
+#include <cassert>
 #include <vector>
 
 #include <dove_eye/logging.h>
@@ -23,9 +24,14 @@ CameraCalibration::CameraCalibration(const CameraIndex cameraCount,
 bool CameraCalibration::MeasureFrameset(const Frameset &frameset) {
   // FIXME So far only camcalib from the first camera.
   const int cam = 0;
+  assert(cam < cameraCount_);
   bool result = false;
   Point2Vector imagePoints;
 
+  DEBUG("measuring\n");
+  if(!frameset.IsValid(cam)) {
+    return result;
+  }
   switch (cameraStates_[cam]) {
     case kUnitialized:
     case kCollecting:

@@ -1,6 +1,7 @@
 #ifndef DOVE_EYE_FRAMESET_H_
 #define	DOVE_EYE_FRAMESET_H_
 
+#include <cassert>
 #include <cstdint>
 
 #include <opencv2/opencv.hpp>
@@ -11,21 +12,45 @@ namespace dove_eye {
 
 typedef size_t CameraIndex;
 
-struct Frameset {
-  const CameraIndex size;
-  Frame *frames;
+/*
+ * Represents set of frames of the scene for each camera.
+ * Not all camera frames may be present.
+ *
+ * \note Limited to kMaxSize cameras.
+ */
+class Frameset {
+ public:
+  static const CameraIndex kMaxSize = 4;
 
-  Frameset(const CameraIndex size) : size(size) {
-
+  Frameset(const CameraIndex size) :
+   size_(size),
+   validity_() {
+    assert(size_ < kMaxSize);
   }
 
   inline Frame &operator[](const CameraIndex cam) {
-    return frames[cam];
+    assert(cam < size_);
+    return frames_[cam];
   }
 
   inline const Frame &operator[](const CameraIndex cam) const {
-    return frames[cam];
+    assert(cam < size_);
+    return frames_[cam];
   }
+
+  inline void SetValid(const CameraIndex cam, const bool value = true) {
+    assert(cam < size_);
+    validity_[cam] = value;
+  }
+
+  inline bool IsValid(const CameraIndex cam) const {
+    assert(cam < size_);
+    return validity_[cam];
+  }
+ private:
+  const CameraIndex size_;
+  Frame frames_[kMaxSize];
+  bool validity_[kMaxSize];
 };
 
 } // namespace dove_eye
