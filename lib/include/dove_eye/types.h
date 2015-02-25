@@ -9,6 +9,8 @@ namespace dove_eye {
 typedef std::vector<cv::Point2f> Point2Vector;
 typedef std::vector<cv::Point3f> Point3Vector;
 
+typedef int CameraIndex;
+
 };
 
 #endif /* DOVE_EYE_TYPES_H_ */

@@ -133,7 +133,8 @@ class FramesetAggregator {
       for(int i = 0; i < aggregator_.width(); ++i) {
         Frame lastFrame;
         bool hasFrame = false;
-        while (queues_[i].front().timestamp < windowStart_) {
+        while (!queues_[i].empty() &&
+               queues_[i].front().timestamp < windowStart_) {
           lastFrame = queues_[i].front();
           hasFrame = true;
           queues_[i].pop();

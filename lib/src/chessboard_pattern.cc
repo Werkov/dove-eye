@@ -18,8 +18,12 @@ ChessboardPattern::ChessboardPattern(const int rows, const int columns,
 }
 
 bool ChessboardPattern::Match(const cv::Mat &image, Point2Vector &points) const {
-  bool result = findChessboardCorners(image, size_, points);
-  // TODO consider refinment with cornerSubPix
+  bool result = findChessboardCorners(image, size_, points,
+    cv::CALIB_CB_ADAPTIVE_THRESH | 
+    cv::CALIB_CB_NORMALIZE_IMAGE | 
+    cv::CALIB_CB_FAST_CHECK);
+
+  // TODO consider refinement with cornerSubPix
   return result;
 }
 
