@@ -19,11 +19,11 @@ FrameIterator FileVideoProvider::end() {
 /* Iterator */
 
 FileVideoProvider::Iterator::Iterator(const FileVideoProvider &provider) :
- videoCapture_(new cv::VideoCapture(provider.filename_)) {
-  valid_ = videoCapture_->isOpened();
-  frameNo_ = 0;
+ video_capture_(new cv::VideoCapture(provider.filename_)) {
+  valid_ = video_capture_->isOpened();
+  frame_no_ = 0;
   if (valid_) {
-    framePeriod_ = 1 / videoCapture_->get(CV_CAP_PROP_FPS);
+    frame_period_ = 1 / video_capture_->get(CV_CAP_PROP_FPS);
     /* NOTE: This cannot be used for camera capture (would block) */
     MoveNext(); // load first frame
   }
@@ -35,10 +35,10 @@ Frame FileVideoProvider::Iterator::GetFrame() const {
 }
 
 void FileVideoProvider::Iterator::MoveNext() {
-  valid_ = videoCapture_->grab();
-  valid_ = valid_ && videoCapture_->retrieve(frame_.data);
-  frame_.timestamp = frameNo_ * framePeriod_;
-  ++frameNo_;
+  valid_ = video_capture_->grab();
+  valid_ = valid_ && video_capture_->retrieve(frame_.data);
+  frame_.timestamp = frame_no_ * frame_period_;
+  ++frame_no_;
 }
 
 }

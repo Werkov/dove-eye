@@ -16,11 +16,11 @@ class ChessboardPattern : public CalibrationPattern {
   bool Match(const cv::Mat &image, Point2Vector &points) const override;
 
   const Point3Vector & ObjectPoints() const override {
-    return objectPoints_;
+    return object_points_;
   }
 
  private:
-  Point3Vector objectPoints_;
+  Point3Vector object_points_;
   cv::Size size_;
 };
 

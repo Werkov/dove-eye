@@ -35,11 +35,11 @@ class FileVideoProvider : public VideoProvider {
    private:
     Iterator(const Iterator &);
     /* Unique ownership, cannot copy the iterator anyway. */
-    std::unique_ptr<cv::VideoCapture> videoCapture_;
+    std::unique_ptr<cv::VideoCapture> video_capture_;
     bool valid_;
     Frame frame_;
-    int frameNo_;
-    double framePeriod_;
+    int frame_no_;
+    double frame_period_;
   };
 
   std::string filename_;

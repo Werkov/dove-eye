@@ -6,13 +6,13 @@ namespace dove_eye {
 
 ChessboardPattern::ChessboardPattern(const int rows, const int columns,
                                      const double squareSize) :
- objectPoints_(rows * columns),
+ object_points_(rows * columns),
  size_(columns, rows) {
   for (int row = 0; row < rows; ++row) {
     for (int col = 0; col < columns; ++col) {
       // FIXME check transposition of coords and zeroness of z
-      objectPoints_[col + row * columns].x = squareSize * col;
-      objectPoints_[col + row * columns].y = squareSize * row;
+      object_points_[col + row * columns].x = squareSize * col;
+      object_points_[col + row * columns].y = squareSize * row;
     }
   }
 }

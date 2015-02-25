@@ -18,7 +18,7 @@ class BlockingPolicy {
 
   BlockingPolicy(ProvidersContainer &&providers) :
    providers_(std::move(providers)),
-   currentCam_(0),
+   current_cam_(0),
    initialized_(false),
    iterators_(providers_.size()),
    ends_(providers_.size()) {
@@ -34,9 +34,9 @@ class BlockingPolicy {
     }
     
     int attempts = 0;
-    while (iterators_[currentCam_] == ends_[currentCam_] &&
+    while (iterators_[current_cam_] == ends_[current_cam_] &&
            attempts < providers_.size()) {
-      currentCam_ = (currentCam_ + 1) % providers_.size();
+      current_cam_ = (current_cam_ + 1) % providers_.size();
       attempts += 1;
     }
     
@@ -45,12 +45,12 @@ class BlockingPolicy {
       return false;
     }
 
-    frame = *iterators_[currentCam_];
-    cam = currentCam_;
+    frame = *iterators_[current_cam_];
+    cam = current_cam_;
 
-    ++iterators_[currentCam_];
+    ++iterators_[current_cam_];
     /* round-robin on cameras */
-    currentCam_ = (currentCam_ + 1) % providers_.size();
+    current_cam_ = (current_cam_ + 1) % providers_.size();
     
     return true;
   }
@@ -59,7 +59,7 @@ class BlockingPolicy {
   typedef std::vector<FrameIterator> Iterators;
 
   ProvidersContainer providers_;
-  CameraIndex currentCam_;
+  CameraIndex current_cam_;
   bool initialized_;
   Iterators iterators_;
   Iterators ends_;  
@@ -81,7 +81,7 @@ class FramesetAggregator {
     Iterator(Aggregator &aggregator, bool valid = true) :
      aggregator_(aggregator),
      valid_(valid),
-     windowStart_(0),
+     window_start_(0),
      queues_(aggregator.width()),
      frameset_(aggregator.width()) {
     }
@@ -93,7 +93,7 @@ class FramesetAggregator {
     Iterator &operator++() {
       Frame frame;
       CameraIndex cam;
-      if (!aggregator_.frameReader_.GetFrame(frame, cam)) {
+      if (!aggregator_.frame_reader_.GetFrame(frame, cam)) {
         valid_ = false;
         return *this;
       }
@@ -103,8 +103,8 @@ class FramesetAggregator {
 
       queues_[cam].push(frame);
 
-      if (frame.timestamp > windowStart_ + aggregator_.windowSize_) {
-        windowStart_ = frame.timestamp - aggregator_.windowSize_;
+      if (frame.timestamp > window_start_ + aggregator_.window_size_) {
+        window_start_ = frame.timestamp - aggregator_.window_size_;
         PrepareFrameset();
       }
 
@@ -125,24 +125,24 @@ class FramesetAggregator {
 
     Aggregator &aggregator_;
     bool valid_;
-    Frame::Timestamp windowStart_;
+    Frame::Timestamp window_start_;
     QueuesContainer queues_;
     Frameset frameset_;
 
     void PrepareFrameset() {
       for(int i = 0; i < aggregator_.width(); ++i) {
-        Frame lastFrame;
-        bool hasFrame = false;
+        Frame last_frame;
+        bool has_frame = false;
         while (!queues_[i].empty() &&
-               queues_[i].front().timestamp < windowStart_) {
-          lastFrame = queues_[i].front();
-          hasFrame = true;
+               queues_[i].front().timestamp < window_start_) {
+          last_frame = queues_[i].front();
+          has_frame = true;
           queues_[i].pop();
         }
 
-        if (hasFrame) {
+        if (has_frame) {
           frameset_.SetValid(i);
-          frameset_[i] = lastFrame;
+          frameset_[i] = last_frame;
         } else {
           /* 
            * FIXME Think about this, set to invalid, however, last frame still
@@ -156,10 +156,10 @@ class FramesetAggregator {
 
   FramesetAggregator(typename FramePolicy::ProvidersContainer &&providers,
                      const OffsetsContainer &offsets,
-                     Frame::TimestampDiff windowSize) :
-   frameReader_(std::move(providers)),
+                     Frame::TimestampDiff window_size) :
+   frame_reader_(std::move(providers)),
    offsets_(offsets),
-   windowSize_(windowSize) {
+   window_size_(window_size) {
   }
 
   Iterator begin() {
@@ -175,9 +175,9 @@ class FramesetAggregator {
   }
 
  private:
-  FramePolicy frameReader_;
+  FramePolicy frame_reader_;
   OffsetsContainer offsets_;
-  Frame::TimestampDiff windowSize_;
+  Frame::TimestampDiff window_size_;
 
 };
 

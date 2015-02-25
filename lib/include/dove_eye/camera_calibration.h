@@ -21,15 +21,15 @@ class CameraCalibration {
   };
  
   struct CameraParameters {
-    cv::Mat cameraMatrix;
-    cv::Mat distortionCoefficients;
+    cv::Mat camera_matrix;
+    cv::Mat distortion_coefficients;
   };
 
   struct PairParameters {
-    cv::Mat essentialMatrix;
+    cv::Mat essential_matrix;
   };
   
-  CameraCalibration(const CameraIndex cameraCount,
+  CameraCalibration(const CameraIndex camera_count,
                     const CalibrationPattern &pattern);
   
   /** Search for pattern in frameset and use it for calibration.
@@ -50,19 +50,19 @@ class CameraCalibration {
   MeasurementState PairState(const CameraIndex index1, const CameraIndex index2);
   
  private:
-  const CameraIndex cameraCount_;
+  const CameraIndex camera_count_;
 
-  const int framesToCollect_ = 10;
+  const int frames_to_collect_ = 10;
 
   const CalibrationPattern &pattern_;
 
-  std::vector<std::vector<Point2Vector>> imagePoints_;
+  std::vector<std::vector<Point2Vector>> image_points_;
 
-  std::vector<MeasurementState> cameraStates_;
-  std::vector<CameraParameters> cameraParameters_;
+  std::vector<MeasurementState> camera_states_;
+  std::vector<CameraParameters> camera_parameters_;
 
-  std::vector<MeasurementState> pairStates_;
-  std::vector<PairParameters> pairParameters_;
+  std::vector<MeasurementState> pair_states_;
+  std::vector<PairParameters> pair_parameters_;
 
   CameraPair::PairArray pairs_;
 };

@@ -31,9 +31,9 @@ class TimeCalibration {
   }
  private:
   MeasurementState state_ = kUnitialized;
-  const int framesToCollect_ = 10;
+  const int frames_to_collect_ = 10;
   int frames_ = 0;
-  ResultType processingSum_ = 0;
+  ResultType processing_sum_ = 0;
 
   // TODO returned type (consider real clock)
   Frame::Timestamp DetectTime(const cv::Mat &data);

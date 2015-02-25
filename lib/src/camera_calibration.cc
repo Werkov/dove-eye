@@ -12,56 +12,56 @@ using std::vector;
 
 namespace dove_eye {
 
-CameraCalibration::CameraCalibration(const CameraIndex cameraCount,
+CameraCalibration::CameraCalibration(const CameraIndex camera_count,
                                      const CalibrationPattern &pattern) :
- cameraCount_(cameraCount),
+ camera_count_(camera_count),
  pattern_(pattern),
- imagePoints_(cameraCount),
- cameraStates_(cameraCount, kUnitialized),
- cameraParameters_(cameraCount),
- pairStates_(cameraCount, kUnitialized),
- pairParameters_(cameraCount),
- pairs_(CameraPair::GenerateArray(cameraCount)) {
+ image_points_(camera_count),
+ camera_states_(camera_count, kUnitialized),
+ camera_parameters_(camera_count),
+ pair_states_(camera_count, kUnitialized),
+ pair_parameters_(camera_count),
+ pairs_(CameraPair::GenerateArray(camera_count)) {
 
 }
 
 bool CameraCalibration::MeasureFrameset(const Frameset &frameset) {
-  assert(frameset.Size() == cameraCount_);
+  assert(frameset.Size() == camera_count_);
   bool result = true;
 
   /* 
    * First we search for pattern in each single camera,
    * when both camera from a pair are calibrated, we estimate pair parameters.
    */
-  for(CameraIndex cam = 0; cam < cameraCount_; ++cam) {
+  for(CameraIndex cam = 0; cam < camera_count_; ++cam) {
     if (!frameset.IsValid(cam)) {
-      result = result && (cameraStates_[cam] == kReady);
+      result = result && (camera_states_[cam] == kReady);
       continue;
     }
     
-    Point2Vector imagePoints;
+    Point2Vector image_points;
 
-    switch (cameraStates_[cam]) {
+    switch (camera_states_[cam]) {
       case kUnitialized:
       case kCollecting:
-        if (pattern_.Match(frameset[cam].data, imagePoints)) {
-          imagePoints_[cam].push_back(imagePoints);
-          cameraStates_[cam] = kCollecting;
+        if (pattern_.Match(frameset[cam].data, image_points)) {
+          image_points_[cam].push_back(image_points);
+          camera_states_[cam] = kCollecting;
         }
 
-        if (imagePoints_[cam].size() >= framesToCollect_) {
-          vector<Point3Vector> objectPoints(imagePoints_[cam].size(),
+        if (image_points_[cam].size() >= frames_to_collect_) {
+          vector<Point3Vector> object_points(image_points_[cam].size(),
               pattern_.ObjectPoints());
 
-          auto error = calibrateCamera(objectPoints, imagePoints_[cam],
+          auto error = calibrateCamera(object_points, image_points_[cam],
               frameset[cam].data.size(),
-              cameraParameters_[cam].cameraMatrix,
-              cameraParameters_[cam].distortionCoefficients,
+              camera_parameters_[cam].camera_matrix,
+              camera_parameters_[cam].distortion_coefficients,
               cv::noArray(), cv::noArray());
           DEBUG("Camera %i calibrated, reprojection error %f\n", cam, error);
 
-          cameraStates_[cam] = kReady;
-          imagePoints_[cam].clear(); /* Will use it for pair calibration */
+          camera_states_[cam] = kReady;
+          image_points_[cam].clear(); /* Will use it for pair calibration */
         }
 
         result = false;
@@ -78,55 +78,55 @@ bool CameraCalibration::MeasureFrameset(const Frameset &frameset) {
     auto cam1 = pair.cam1;
     auto cam2 = pair.cam2;
 
-    if (cameraStates_[cam1] != kReady || cameraStates_[cam2] != kReady) {
-      result = result && (pairStates_[pair.index] == kReady);
+    if (camera_states_[cam1] != kReady || camera_states_[cam2] != kReady) {
+      result = result && (pair_states_[pair.index] == kReady);
       continue;
     }
     if (!frameset.IsValid(cam1) || !frameset.IsValid(cam2)) {
-      result = result && (pairStates_[pair.index] == kReady);
+      result = result && (pair_states_[pair.index] == kReady);
       continue;
     }
 
-    Point2Vector imagePoints1, imagePoints2;
+    Point2Vector image_points1, image_points2;
     cv::Mat dummy_R, dummy_T;
 
-    switch (pairStates_[pair.index]) {
+    switch (pair_states_[pair.index]) {
       case kUnitialized:
       case kCollecting:
-        if (pattern_.Match(frameset[cam1].data, imagePoints1) &&
-            pattern_.Match(frameset[cam2].data, imagePoints2)) {
-          imagePoints_[cam1].push_back(imagePoints1);
-          imagePoints_[cam2].push_back(imagePoints2);
+        if (pattern_.Match(frameset[cam1].data, image_points1) &&
+            pattern_.Match(frameset[cam2].data, image_points2)) {
+          image_points_[cam1].push_back(image_points1);
+          image_points_[cam2].push_back(image_points2);
 
-          pairStates_[pair.index] = kCollecting;
+          pair_states_[pair.index] = kCollecting;
         }
         DEBUG("Matching pair %i, %i\n", cam1, cam2);
 
         /* We add frames in lockstep, thus read size from cam1 only. */
-        if (imagePoints_[cam1].size() >= framesToCollect_) {
+        if (image_points_[cam1].size() >= frames_to_collect_) {
           DEBUG("Calibrating pair %i, %i\n", cam1, cam2);
-          vector<Point3Vector> objectPoints(imagePoints_[cam1].size(),
+          vector<Point3Vector> object_points(image_points_[cam1].size(),
               pattern_.ObjectPoints());
 
           // FIXME Getting size more centrally probably.
-          auto error = stereoCalibrate(objectPoints, imagePoints_[cam1],
-              imagePoints_[cam2],
-              cameraParameters_[cam1].cameraMatrix,
-              cameraParameters_[cam1].distortionCoefficients,
-              cameraParameters_[cam2].cameraMatrix,
-              cameraParameters_[cam2].distortionCoefficients,
+          auto error = stereoCalibrate(object_points, image_points_[cam1],
+              image_points_[cam2],
+              camera_parameters_[cam1].camera_matrix,
+              camera_parameters_[cam1].distortion_coefficients,
+              camera_parameters_[cam2].camera_matrix,
+              camera_parameters_[cam2].distortion_coefficients,
               cv::Size(1, 1), /* not actually used as we already know camera matrix */
               dummy_R,
               dummy_T,
-              pairParameters_[pair.index].essentialMatrix, /* E */
+              pair_parameters_[pair.index].essential_matrix, /* E */
               cv::noArray()); /* F */
 
           DEBUG("Pair %i, %i calibrated, reprojection error %f\n", cam1, cam2,
                 error);
 
-          pairStates_[pair.index] = kReady;
-          imagePoints_[cam1].clear(); 
-          imagePoints_[cam2].clear();
+          pair_states_[pair.index] = kReady;
+          image_points_[cam1].clear(); 
+          image_points_[cam2].clear();
         }
 
         result = false;
