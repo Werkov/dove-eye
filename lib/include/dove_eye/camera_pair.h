@@ -16,6 +16,10 @@ struct CameraPair {
   CameraIndex index;
 
   static PairArray GenerateArray(const CameraIndex camera_count);
+
+  static CameraIndex Index(const CameraIndex camera_count,
+                                   const CameraIndex cam1,
+                                   const CameraIndex cam2);
 }
 
 ;

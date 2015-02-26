@@ -23,5 +23,21 @@ CameraPair::PairArray CameraPair::GenerateArray(const CameraIndex camera_count) 
   return result;
 }
 
+CameraIndex CameraPair::Index(const CameraIndex camera_count,
+                                      const CameraIndex cam1,
+                                      const CameraIndex cam2) {
+  /* <- cam1 ->
+   * c  .xxxx
+   * a  ..xxx
+   * m  ...xx
+   * 2  ....x
+   *    .....
+   *
+   * Area of trapezoid (arithmetic sequence) + row index shifted by cam2.
+   * Beware of zero-based indexing.
+   */
+  return (2 * camera_count - cam2 - 1) * (cam2 + 1) / 2 + (cam1 - cam2 - 1);
+}
+
 } // namespace dove_eye
 

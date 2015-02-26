@@ -1,6 +1,7 @@
 #ifndef DOVE_EYE_CAMERA_CALIBRATION_H_
 #define	DOVE_EYE_CAMERA_CALIBRATION_H_
 
+#include <cassert>
 #include <vector>
 
 #include <opencv2/opencv.hpp>
@@ -41,13 +42,43 @@ class CameraCalibration {
   // FIXME better for indvidual cameras/pairs
   void Reset();
 
-  CameraParameters CameraResult(const CameraIndex index);
+  CameraIndex camera_count() const {
+    return camera_count_;
+  }
 
-  PairParameters PairResult(const CameraIndex index);
+  const CameraParameters &camera_result(const CameraIndex cam) const {
+    assert(cam < camera_count());
+    assert(camera_state(cam) == kReady);
 
-  MeasurementState CameraState(const CameraIndex index);
+    return camera_parameters_[cam];
+  }
+
+  const PairParameters &pair_result(const CameraIndex cam1,
+                                    const CameraIndex cam2) const {
+    assert(cam1 < camera_count());
+    assert(cam2 < camera_count());
+    assert(pair_state(cam1, cam2) == kReady);
+
+    return pair_parameters_[CameraPair::Index(camera_count(), cam1, cam2)];
+  }
+
+  MeasurementState camera_state(const CameraIndex cam) const {
+    assert(cam < camera_count());
+
+    return camera_states_[cam];
+  }
   
-  MeasurementState PairState(const CameraIndex index1, const CameraIndex index2);
+  MeasurementState pair_state(const CameraIndex cam1,
+                              const CameraIndex cam2) const {
+    assert(cam1 < camera_count());
+    assert(cam2 < camera_count());
+
+    return pair_states_[CameraPair::Index(camera_count(), cam1, cam2)];
+  }
+
+  const CameraPair::PairArray &pairs() const {
+    return pairs_;
+  }
   
  private:
   const CameraIndex camera_count_;
