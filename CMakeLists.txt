@@ -5,9 +5,11 @@ project(dove-eye)
 if(WIN32)
 	# TODO add warnings switch
 else()
-	add_definitions("-Wall -Wno-sign-compare")
+	add_definitions("-std=c++11 -Wall -Wno-sign-compare")
 endif()
 
+add_subdirectory(gui)
 add_subdirectory(lib)
 add_subdirectory(tools/calibration)
+add_subdirectory(tools/dove_eye)
 

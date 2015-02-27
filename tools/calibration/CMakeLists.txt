@@ -12,6 +12,4 @@ include_directories(${CMAKE_SOURCE_DIR}/lib/include)
 
 if(WIN32)
         include_directories(${OpenCV_INCLUDE_DIRS})
-else()
-        add_definitions("-std=c++11")
 endif()

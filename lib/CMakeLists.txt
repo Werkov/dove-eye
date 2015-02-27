@@ -14,6 +14,4 @@ include_directories(./include)
 
 if(WIN32)
         include_directories(${OpenCV_INCLUDE_DIRS})
-else()
-        add_definitions("-std=c++11")
 endif()
