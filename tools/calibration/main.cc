@@ -113,20 +113,6 @@ int CalibrateCameras(const string &output, const vector<string> &filenames) {
   return 0;
 }
 
-int TestVideo(const vector<string> &filenames) {
-  cv::namedWindow("test");
-
-  for (auto filename : filenames) {
-    FileVideoProvider provider(filename);
-    for (auto frame : provider) {
-      cv::imshow("test", frame.data);
-      cv::waitKey(-1);
-    }
-  }
-
-
-  return 0;
-}
 
 static void PrintUsage(const string &name) {
   cout << "Usage: " << name << " [-t|-c] outfile video-file ..." << endl;
