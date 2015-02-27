@@ -8,6 +8,7 @@
 #include "dove_eye/frame.h"
 #include "dove_eye/frameset.h"
 #include "dove_eye/frame_iterator.h"
+#include "dove_eye/video_provider.h"
 
 
 namespace dove_eye {
@@ -79,8 +80,11 @@ class FramesetAggregator {
     typedef FramesetAggregator<FramePolicy> Aggregator;
 
    public:
+    Iterator() : Iterator(nullptr, false) {
+    }
+
     explicit Iterator(Aggregator *aggregator, bool valid = true)
-        : aggregator_(*aggregator),
+        : aggregator_(aggregator),
           valid_(valid),
           window_start_(0),
           queues_(aggregator->width()),
@@ -94,7 +98,7 @@ class FramesetAggregator {
     Iterator &operator++() {
       Frame frame;
       CameraIndex cam;
-      if (!aggregator_.frame_reader_.GetFrame(&frame, &cam)) {
+      if (valid_ && !aggregator_->frame_reader_.GetFrame(&frame, &cam)) {
         valid_ = false;
         return *this;
       }
@@ -103,12 +107,12 @@ class FramesetAggregator {
        * Apply offset,
        * see http://www.ms.mff.cuni.cz/~koutnym/wiki/dove_eye/calibration/time
        */
-      frame.timestamp -= aggregator_.offsets_[cam];
+      frame.timestamp -= aggregator_->offsets_[cam];
 
       queues_[cam].push(frame);
 
-      if (frame.timestamp > window_start_ + aggregator_.window_size_) {
-        window_start_ = frame.timestamp - aggregator_.window_size_;
+      if (frame.timestamp > window_start_ + aggregator_->window_size_) {
+        window_start_ = frame.timestamp - aggregator_->window_size_;
         PrepareFrameset();
       }
 
@@ -127,14 +131,14 @@ class FramesetAggregator {
     typedef std::queue<Frame> FrameQueue;
     typedef std::vector<FrameQueue> QueuesContainer;
 
-    Aggregator &aggregator_;
+    Aggregator *aggregator_;
     bool valid_;
     Frame::Timestamp window_start_;
     QueuesContainer queues_;
     Frameset frameset_;
 
     void PrepareFrameset() {
-      for (int i = 0; i < aggregator_.width(); ++i) {
+      for (int i = 0; i < aggregator_->width(); ++i) {
         Frame last_frame;
         bool has_frame = false;
         while (!queues_[i].empty() &&

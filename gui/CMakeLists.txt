@@ -2,7 +2,9 @@ cmake_minimum_required(VERSION 2.8.11)
 
 project(dove-eye)
 
+find_package(OpenCV)
 find_package(Qt5Widgets)
+
 
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -17,7 +19,9 @@ qt5_wrap_ui(UIC ${UI})
 
 add_library(gui ${SOURCES} ${UIC})
 
-target_link_libraries(gui Qt5::Widgets)
+include_directories(${CMAKE_SOURCE_DIR}/lib/include)
+
+target_link_libraries(gui Qt5::Widgets ${OpenCV_LIBS})
 
 
 

@@ -1,6 +1,7 @@
 #ifndef DOVE_EYE_FRAMESET_H_
 #define DOVE_EYE_FRAMESET_H_
 
+#include <algorithm>
 #include <cassert>
 #include <cstdint>
 
@@ -23,10 +24,50 @@ class Frameset {
 
   Frameset() = delete;
 
+  /*
+   * Because of the const member size_ we have to provide the Big Five
+   * methods for copying/moving.
+   */
+
   explicit Frameset(const CameraIndex size)
       : size_(size),
         validity_() {
     assert(size_ <= kMaxSize);
+  }
+
+  Frameset(const Frameset &other)
+      : size_(other.size_) {
+    assert(size_ == other.size_);
+
+    for (CameraIndex cam = 0; cam < size_; ++cam) {
+      frames_[cam] = other.frames_[cam];
+      validity_[cam] = other.validity_[cam];
+    }
+  }
+
+  Frameset(Frameset &&other)
+      : size_(other.size_) {
+    assert(size_ == other.size_);
+
+    for (CameraIndex cam = 0; cam < size_; ++cam) {
+      frames_[cam] = std::move(other.frames_[cam]);
+      validity_[cam] = other.validity_[cam];
+    }
+  }
+
+  inline Frameset &operator=(const Frameset &rhs) {
+    Frameset tmp(rhs);
+    *this = std::move(tmp);
+    return *this;
+  }
+
+  inline Frameset &operator=(Frameset &&rhs) {
+    assert(size_ == rhs.size_);
+
+    std::swap(frames_, rhs.frames_);
+    std::swap(validity_, rhs.validity_);
+
+    return *this;
   }
 
   inline Frame &operator[](const CameraIndex cam) {
