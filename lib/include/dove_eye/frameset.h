@@ -1,13 +1,13 @@
 #ifndef DOVE_EYE_FRAMESET_H_
-#define	DOVE_EYE_FRAMESET_H_
+#define DOVE_EYE_FRAMESET_H_
 
 #include <cassert>
 #include <cstdint>
 
 #include <opencv2/opencv.hpp>
 
-#include <dove_eye/frame.h>
-#include <dove_eye/types.h>
+#include "dove_eye/frame.h"
+#include "dove_eye/types.h"
 
 namespace dove_eye {
 
@@ -23,9 +23,9 @@ class Frameset {
 
   Frameset() = delete;
 
-  Frameset(const CameraIndex size) :
-   size_(size),
-   validity_() {
+  explicit Frameset(const CameraIndex size)
+      : size_(size),
+        validity_() {
     assert(size_ <= kMaxSize);
   }
 
@@ -61,5 +61,5 @@ class Frameset {
 
 } // namespace dove_eye
 
-#endif	/* DOVE_EYE_FRAMESET_H_ */
+#endif // DOVE_EYE_FRAMESET_H_
 

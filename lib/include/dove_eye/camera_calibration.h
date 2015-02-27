@@ -1,15 +1,15 @@
 #ifndef DOVE_EYE_CAMERA_CALIBRATION_H_
-#define	DOVE_EYE_CAMERA_CALIBRATION_H_
+#define DOVE_EYE_CAMERA_CALIBRATION_H_
 
 #include <cassert>
 #include <vector>
 
 #include <opencv2/opencv.hpp>
 
-#include <dove_eye/calibration_pattern.h>
-#include <dove_eye/camera_pair.h>
-#include <dove_eye/frameset.h>
-#include <dove_eye/types.h>
+#include "dove_eye/calibration_pattern.h"
+#include "dove_eye/camera_pair.h"
+#include "dove_eye/frameset.h"
+#include "dove_eye/types.h"
 
 namespace dove_eye {
 
@@ -20,7 +20,7 @@ class CameraCalibration {
     kCollecting,
     kReady
   };
- 
+
   struct CameraParameters {
     cv::Mat camera_matrix;
     cv::Mat distortion_coefficients;
@@ -29,10 +29,10 @@ class CameraCalibration {
   struct PairParameters {
     cv::Mat essential_matrix;
   };
-  
+
   CameraCalibration(const CameraIndex camera_count,
                     const CalibrationPattern &pattern);
-  
+
   /** Search for pattern in frameset and use it for calibration.
    *
    * \return True when calibration finished successfully, false otherwise.
@@ -67,7 +67,7 @@ class CameraCalibration {
 
     return camera_states_[cam];
   }
-  
+
   MeasurementState pair_state(const CameraIndex cam1,
                               const CameraIndex cam2) const {
     assert(cam1 < camera_count());
@@ -79,7 +79,7 @@ class CameraCalibration {
   const CameraPair::PairArray &pairs() const {
     return pairs_;
   }
-  
+
  private:
   const CameraIndex camera_count_;
 
@@ -100,5 +100,5 @@ class CameraCalibration {
 
 } // namespace dove_eye
 
-#endif	/* DOVE_EYE_CAMERA_CALIBRATION_H_ */
+#endif // DOVE_EYE_CAMERA_CALIBRATION_H_
 

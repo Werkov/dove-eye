@@ -1,18 +1,17 @@
 #include <iostream>
 #include <memory>
-#include <unistd.h>
 #include <vector>
 
 #include <opencv2/opencv.hpp>
 
-#include <dove_eye/camera_calibration.h>
-#include <dove_eye/chessboard_pattern.h>
-#include <dove_eye/file_video_provider.h>
-#include <dove_eye/frameset_aggregator.h>
-#include <dove_eye/logging.h>
-#include <dove_eye/time_calibration.h>
-#include <dove_eye/types.h>
-#include <dove_eye/video_provider.h>
+#include "dove_eye/camera_calibration.h"
+#include "dove_eye/chessboard_pattern.h"
+#include "dove_eye/file_video_provider.h"
+#include "dove_eye/frameset_aggregator.h"
+#include "dove_eye/logging.h"
+#include "dove_eye/time_calibration.h"
+#include "dove_eye/types.h"
+#include "dove_eye/video_provider.h"
 
 using cv::FileStorage;
 
@@ -55,7 +54,7 @@ int CalibrateTime(const vector<string> &filenames) {
     }
   }
 
-  // TODO store serialized result           
+  // TODO store serialized result
   return 0;
 }
 
@@ -86,13 +85,13 @@ int CalibrateCameras(const string &output, const vector<string> &filenames) {
       break;
     }
   }
-  
+
   FileStorage file_storage(output, FileStorage::WRITE);
   if (!file_storage.isOpened()) {
     ERROR("Cannot open file %s\n", output.c_str());
     return 1;
   }
-  
+
   file_storage << "camera_count" << calibration.camera_count();
   file_storage << "pair_count" << static_cast<int>(calibration.pairs().size());
 
@@ -118,7 +117,7 @@ int TestVideo(const vector<string> &filenames) {
   cv::namedWindow("test");
 
   for (auto filename : filenames) {
-    FileVideoProvider provider (filename);
+    FileVideoProvider provider(filename);
     for (auto frame : provider) {
       cv::imshow("test", frame.data);
       cv::waitKey(-1);
@@ -133,7 +132,7 @@ static void PrintUsage(const string &name) {
   cout << "Usage: " << name << " [-t|-c] outfile video-file ..." << endl;
 }
 
-}
+} // namespace
 
 int main(int argc, char* argv[]) {
   string name(argv[0]);
@@ -148,7 +147,7 @@ int main(int argc, char* argv[]) {
   if (string(argv[0]) == "-t") {
     ++argv;
     --argc;
-    
+
     return CalibrateTime(vector<string>(argv, argv + argc));
   } else if (string(argv[0]) == "-c") {
     ++argv;
@@ -159,6 +158,5 @@ int main(int argc, char* argv[]) {
     PrintUsage(name);
     return 1;
   }
-
 }
 

@@ -1,9 +1,9 @@
 #ifndef DOVE_EYE_SYNCHRONIZER_H_
-#define	DOVE_EYE_SYNCHRONIZER_H_
+#define DOVE_EYE_SYNCHRONIZER_H_
 
 #include <opencv2/opencv.hpp>
 
-#include <dove_eye/frame.h>
+#include "dove_eye/frame.h"
 
 /**
  * \see http://www.ms.mff.cuni.cz/~koutnym/wiki/dove_eye/calibration/time
@@ -23,5 +23,5 @@ class Synchronizer {
 
 } // namespace dove_eye
 
-#endif	/* DOVE_EYE_SYNCHRONIZER_H_ */
+#endif // DOVE_EYE_SYNCHRONIZER_H_
 

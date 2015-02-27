@@ -1,34 +1,34 @@
 #ifndef DOVE_EYE_FILE_VIDEO_PROVIDER_H_
-#define	DOVE_EYE_FILE_VIDEO_PROVIDER_H_
+#define DOVE_EYE_FILE_VIDEO_PROVIDER_H_
 
 #include <memory>
 #include <string>
 
 #include <opencv2/opencv.hpp>
 
-#include <dove_eye/video_provider.h>
+#include "dove_eye/video_provider.h"
 
 namespace dove_eye {
 
 class FileVideoProvider : public VideoProvider {
  public:
-  FileVideoProvider(const std::string &filename);
+  explicit FileVideoProvider(const std::string &filename);
 
   // Creates a new iterator, all copies share the state.
-  virtual FrameIterator begin() override;
+  FrameIterator begin() override;
 
-  virtual FrameIterator end() override;
+  FrameIterator end() override;
 
  private:
   class Iterator : public FrameIteratorImpl {
    public:
-    Iterator(const FileVideoProvider &provider);
-    
-    virtual Frame GetFrame() const override;
+    explicit Iterator(const FileVideoProvider &provider);
 
-    virtual void MoveNext() override;
-    
-    virtual bool IsValid() override {
+    Frame GetFrame() const override;
+
+    void MoveNext() override;
+
+    bool IsValid() override {
       return valid_;
     }
 
@@ -47,5 +47,5 @@ class FileVideoProvider : public VideoProvider {
 
 } // namespace dove_eye
 
-#endif	/* DOVE_EYE_FILE_VIDEO_PROVIDER_H_ */
+#endif // DOVE_EYE_FILE_VIDEO_PROVIDER_H_
 

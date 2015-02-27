@@ -30,4 +30,4 @@ TimeCalibration::ResultType TimeCalibration::Result() {
 Frame::Timestamp TimeCalibration::DetectTime(const cv::Mat& data) {
   return -1; // TODO implement
 }
-}
+} // namespace dove_eye

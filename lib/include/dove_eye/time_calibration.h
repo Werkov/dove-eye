@@ -1,9 +1,9 @@
 #ifndef DOVE_EYE_TIME_CALIBRATION_H_
-#define	DOVE_EYE_TIME_CALIBRATION_H_
+#define DOVE_EYE_TIME_CALIBRATION_H_
 
 #include <opencv2/opencv.hpp>
 
-#include <dove_eye/frame.h>
+#include "dove_eye/frame.h"
 
 /**
  * \see http://www.ms.mff.cuni.cz/~koutnym/wiki/dove_eye/calibration/time
@@ -29,6 +29,7 @@ class TimeCalibration {
   inline MeasurementState state() {
     return state_;
   }
+
  private:
   MeasurementState state_ = kUnitialized;
   const int frames_to_collect_ = 10;
@@ -41,5 +42,5 @@ class TimeCalibration {
 
 } // namespace dove_eye
 
-#endif	/* DOVE_EYE_TIME_CALIBRATION_H_ */
+#endif // DOVE_EYE_TIME_CALIBRATION_H_
 

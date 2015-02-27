@@ -3,9 +3,8 @@
 namespace dove_eye {
 
 /* Provider */
-FileVideoProvider::FileVideoProvider(const std::string &filename) :
- filename_(filename) {
-
+FileVideoProvider::FileVideoProvider(const std::string &filename)
+    : filename_(filename) {
 }
 
 FrameIterator FileVideoProvider::begin() {
@@ -18,8 +17,8 @@ FrameIterator FileVideoProvider::end() {
 
 /* Iterator */
 
-FileVideoProvider::Iterator::Iterator(const FileVideoProvider &provider) :
- video_capture_(new cv::VideoCapture(provider.filename_)) {
+FileVideoProvider::Iterator::Iterator(const FileVideoProvider &provider)
+    : video_capture_(new cv::VideoCapture(provider.filename_)) {
   valid_ = video_capture_->isOpened();
   frame_no_ = 0;
   if (valid_) {
@@ -27,7 +26,6 @@ FileVideoProvider::Iterator::Iterator(const FileVideoProvider &provider) :
     /* NOTE: This cannot be used for camera capture (would block) */
     MoveNext(); // load first frame
   }
-  
 }
 
 Frame FileVideoProvider::Iterator::GetFrame() const {
@@ -41,4 +39,4 @@ void FileVideoProvider::Iterator::MoveNext() {
   ++frame_no_;
 }
 
-}
+} // namespace dove_eye

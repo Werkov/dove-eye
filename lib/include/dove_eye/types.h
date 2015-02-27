@@ -1,5 +1,5 @@
 #ifndef DOVE_EYE_TYPES_H_
-#define	DOVE_EYE_TYPES_H_
+#define DOVE_EYE_TYPES_H_
 
 #include <vector>
 #include <opencv2/opencv.hpp>
@@ -13,5 +13,5 @@ typedef int CameraIndex;
 
 };
 
-#endif /* DOVE_EYE_TYPES_H_ */
+#endif // DOVE_EYE_TYPES_H_
 

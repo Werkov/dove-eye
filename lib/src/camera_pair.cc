@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include <dove_eye/calibration_pattern.h>
-#include <dove_eye/frameset.h>
+#include "dove_eye/calibration_pattern.h"
+#include "dove_eye/frameset.h"
 
 namespace dove_eye {
 
@@ -19,7 +19,7 @@ CameraPair::PairArray CameraPair::GenerateArray(const CameraIndex camera_count) 
       result[index].cam2 = cam2;
     }
   }
-  
+
   return result;
 }
 

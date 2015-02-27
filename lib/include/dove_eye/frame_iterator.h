@@ -1,11 +1,11 @@
 #ifndef DOVE_EYE_FRAME_ITERATOR_H_
-#define	DOVE_EYE_FRAME_ITERATOR_H_
+#define DOVE_EYE_FRAME_ITERATOR_H_
 
 #include <memory>
 
 #include <opencv2/opencv.hpp>
 
-#include <dove_eye/frame.h>
+#include "dove_eye/frame.h"
 
 namespace dove_eye {
 
@@ -16,7 +16,7 @@ class FrameIteratorImpl {
   virtual Frame GetFrame() const = 0;
 
   virtual void MoveNext() = 0;
-  
+
   virtual bool IsValid() = 0;
 };
 
@@ -26,8 +26,8 @@ class FrameIterator {
    * Takes ownership of the iterator and it's shared among copies of the
    * iterator.
    */
-  FrameIterator(FrameIteratorImpl *iterator = nullptr) :
-   iterator_(iterator) {
+  explicit FrameIterator(FrameIteratorImpl *iterator = nullptr)
+      : iterator_(iterator) {
   }
 
   Frame operator*() const {
@@ -51,11 +51,12 @@ class FrameIterator {
   inline bool operator!=(const FrameIterator &rhs) {
     return !operator==(rhs);
   }
+
  private:
   std::shared_ptr<FrameIteratorImpl> iterator_;
 };
 
 } // namespace dove_eye
 
-#endif	/* DOVE_EYE_FRAME_ITERATOR_H_ */
+#endif // DOVE_EYE_FRAME_ITERATOR_H_
 

@@ -3,7 +3,7 @@
 #include <cassert>
 #include <vector>
 
-#include <dove_eye/logging.h>
+#include "dove_eye/logging.h"
 
 using cv::calibrateCamera;
 using cv::Point3f;
@@ -13,38 +13,37 @@ using std::vector;
 namespace dove_eye {
 
 CameraCalibration::CameraCalibration(const CameraIndex camera_count,
-                                     const CalibrationPattern &pattern) :
- camera_count_(camera_count),
- pattern_(pattern),
- image_points_(camera_count),
- camera_states_(camera_count, kUnitialized),
- camera_parameters_(camera_count),
- pair_states_(camera_count, kUnitialized),
- pair_parameters_(camera_count),
- pairs_(CameraPair::GenerateArray(camera_count)) {
-
+                                     const CalibrationPattern &pattern)
+    : camera_count_(camera_count),
+      pattern_(pattern),
+      image_points_(camera_count),
+      camera_states_(camera_count, kUnitialized),
+      camera_parameters_(camera_count),
+      pair_states_(camera_count, kUnitialized),
+      pair_parameters_(camera_count),
+      pairs_(CameraPair::GenerateArray(camera_count)) {
 }
 
 bool CameraCalibration::MeasureFrameset(const Frameset &frameset) {
   assert(frameset.Size() == camera_count_);
   bool result = true;
 
-  /* 
+  /*
    * First we search for pattern in each single camera,
    * when both camera from a pair are calibrated, we estimate pair parameters.
    */
-  for(CameraIndex cam = 0; cam < camera_count_; ++cam) {
+  for (CameraIndex cam = 0; cam < camera_count_; ++cam) {
     if (!frameset.IsValid(cam)) {
       result = result && (camera_states_[cam] == kReady);
       continue;
     }
-    
+
     Point2Vector image_points;
 
     switch (camera_states_[cam]) {
       case kUnitialized:
       case kCollecting:
-        if (pattern_.Match(frameset[cam].data, image_points)) {
+        if (pattern_.Match(frameset[cam].data, &image_points)) {
           image_points_[cam].push_back(image_points);
           camera_states_[cam] = kCollecting;
         }
@@ -93,8 +92,8 @@ bool CameraCalibration::MeasureFrameset(const Frameset &frameset) {
     switch (pair_states_[pair.index]) {
       case kUnitialized:
       case kCollecting:
-        if (pattern_.Match(frameset[cam1].data, image_points1) &&
-            pattern_.Match(frameset[cam2].data, image_points2)) {
+        if (pattern_.Match(frameset[cam1].data, &image_points1) &&
+            pattern_.Match(frameset[cam2].data, &image_points2)) {
           image_points_[cam1].push_back(image_points1);
           image_points_[cam2].push_back(image_points2);
 
@@ -125,7 +124,7 @@ bool CameraCalibration::MeasureFrameset(const Frameset &frameset) {
                 error);
 
           pair_states_[pair.index] = kReady;
-          image_points_[cam1].clear(); 
+          image_points_[cam1].clear();
           image_points_[cam2].clear();
         }
 
@@ -142,4 +141,4 @@ bool CameraCalibration::MeasureFrameset(const Frameset &frameset) {
   return result;
 }
 
-}
+} // namespace dove_eye
