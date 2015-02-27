@@ -20,6 +20,9 @@ namespace dove_eye {
  */
 class Frameset {
  public:
+  typedef Frame *iterator;
+  typedef const Frame *const_iterator;
+
   static const CameraIndex kMaxSize = 4;
 
   Frameset() = delete;
@@ -78,6 +81,22 @@ class Frameset {
   inline const Frame &operator[](const CameraIndex cam) const {
     assert(cam < size_);
     return frames_[cam];
+  }
+
+  inline const_iterator begin() const {
+    return frames_;
+  }
+
+  inline const_iterator end() const {
+    return frames_ + size_;
+  }
+
+  inline iterator begin() {
+    return frames_;
+  }
+
+  inline iterator end() {
+    return frames_ + size_;
   }
 
   inline void SetValid(const CameraIndex cam, const bool value = true) {

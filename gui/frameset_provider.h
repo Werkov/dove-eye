@@ -20,7 +20,7 @@ class FramesetProvider : public QObject {
   typedef dove_eye::FramesetAggregator<dove_eye::BlockingPolicy>
       InnerFrameProvider;
 
-  FramesetProvider(QObject *parent = nullptr)
+  explicit FramesetProvider(QObject *parent = nullptr)
       : QObject(parent) {
   }
 
