@@ -21,6 +21,8 @@ add_library(gui ${SOURCES} ${UIC})
 
 include_directories(${CMAKE_SOURCE_DIR}/lib/include)
 
+add_definitions("-DHAVE_GUI")
+
 target_link_libraries(gui Qt5::Widgets ${OpenCV_LIBS})
 
 

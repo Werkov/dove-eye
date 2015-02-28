@@ -6,9 +6,9 @@ using dove_eye::Frameset;
 
 namespace gui {
 
-void FramesetProvider::Start(InnerFrameProvider &provider) {
-  frameset_iterator_ = provider.begin();
-  frameset_end_iterator_ = provider.end();
+void FramesetProvider::Start(InnerFrameProvider *provider) {
+  frameset_iterator_ = provider->begin();
+  frameset_end_iterator_ = provider->end();
 
   timer_.start(0, this);
 }

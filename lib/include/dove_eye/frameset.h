@@ -25,14 +25,12 @@ class Frameset {
 
   static const CameraIndex kMaxSize = 4;
 
-  Frameset() = delete;
-
   /*
    * Because of the const member size_ we have to provide the Big Five
    * methods for copying/moving.
    */
 
-  explicit Frameset(const CameraIndex size)
+  explicit Frameset(const CameraIndex size = 0)
       : size_(size),
         validity_() {
     assert(size_ <= kMaxSize);
@@ -120,6 +118,14 @@ class Frameset {
 };
 
 } // namespace dove_eye
+
+#ifdef HAVE_GUI
+/*
+ * Make Frameset available as argument for Qt's queued connections.
+ */
+#include <QMetaType>
+Q_DECLARE_METATYPE(dove_eye::Frameset)
+#endif
 
 #endif // DOVE_EYE_FRAMESET_H_
 

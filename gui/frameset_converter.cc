@@ -32,6 +32,9 @@ void FramesetConverter::ProcessFramesetInternal(dove_eye::Frameset frameset) {
   ImageList image_list(frameset.Size());
 
   for (CameraIndex cam = 0; cam < frameset.Size(); ++cam) {
+    if (!frameset.IsValid(cam)) {
+      continue;
+    }
     auto &mat = frameset[cam].data;
 
     /* Convert image for display. */
@@ -47,10 +50,8 @@ void FramesetConverter::ProcessFramesetInternal(dove_eye::Frameset frameset) {
                                delete static_cast<cv::Mat *>(mat);
                              }, new cv::Mat(mat));
     assert(image_list[cam].constBits() == mat.data);
-
-    emit ImagesetReady(image_list);
   }
-
+  emit ImagesetReady(image_list);
 }
 
 void FramesetConverter::Enqueue(const dove_eye::Frameset &frameset) {

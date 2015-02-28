@@ -6,6 +6,7 @@
 
 #include "dove_eye/frameset.h"
 #include "dove_eye/frameset_aggregator.h"
+#include "dove_eye/types.h"
 
 namespace gui {
 
@@ -20,15 +21,18 @@ class FramesetProvider : public QObject {
   typedef dove_eye::FramesetAggregator<dove_eye::BlockingPolicy>
       InnerFrameProvider;
 
-  explicit FramesetProvider(QObject *parent = nullptr)
-      : QObject(parent) {
+  explicit FramesetProvider(const dove_eye::CameraIndex width,
+                            QObject *parent = nullptr)
+      : QObject(parent),
+        frameset_iterator_(width),
+        frameset_end_iterator_(width) {
   }
 
  signals:
   void FramesetReady(const dove_eye::Frameset &);
 
  public slots:
-  void Start(InnerFrameProvider &provider);
+  void Start(InnerFrameProvider *provider);
 
   void Stop();
 

@@ -14,6 +14,9 @@ void FrameViewer::SetImage(const QImage &image) {
     DEBUG("Viewer dropped a frame!\n");
   }
   image_ = image;
+  if (image_.size() != size()) {
+    setFixedSize(image_.size());
+  }
   update();
 }
 

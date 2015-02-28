@@ -48,4 +48,6 @@ class FramesetConverter : public QObject {
 
 } // namespace gui
 
+Q_DECLARE_METATYPE(gui::FramesetConverter::ImageList)
+
 #endif // GUI_FRAMESET_CONVERTER_H_

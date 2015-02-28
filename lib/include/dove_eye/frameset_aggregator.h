@@ -27,6 +27,11 @@ class BlockingPolicy {
 
   bool GetFrame(Frame *frame, CameraIndex *cam) {
     if (!initialized_) {
+      if (providers_.size() == 0) {
+        /* Not set initalized_, next time make this check too. */
+        return false;
+      }
+
       for (int i = 0; i < providers_.size(); ++i) {
         iterators_[i] = providers_[i]->begin();
         ends_[i] = providers_[i]->end();
@@ -80,15 +85,20 @@ class FramesetAggregator {
     typedef FramesetAggregator<FramePolicy> Aggregator;
 
    public:
-    Iterator() : Iterator(nullptr, false) {
+    explicit Iterator(Aggregator *aggregator = nullptr, const bool valid = true)
+        : aggregator_(aggregator),
+          valid_(valid && aggregator && aggregator->width() > 0),
+          window_start_(0),
+          queues_(aggregator ? aggregator->width() : 0),
+          frameset_(aggregator ? aggregator->width() : 0) {
     }
 
-    explicit Iterator(Aggregator *aggregator, bool valid = true)
-        : aggregator_(aggregator),
-          valid_(valid),
+    explicit Iterator(const CameraIndex width)
+        : aggregator_(nullptr),
+          valid_(false),
           window_start_(0),
-          queues_(aggregator->width()),
-          frameset_(aggregator->width()) {
+          queues_(0),
+          frameset_(width) {
     }
 
     Frameset operator*() const {
