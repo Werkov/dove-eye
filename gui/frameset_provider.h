@@ -25,12 +25,12 @@ class FramesetProvider : public QObject {
   }
 
  signals:
-  void frameset_ready(const dove_eye::Frameset &);
+  void FramesetReady(const dove_eye::Frameset &);
 
  public slots:
-  void start(InnerFrameProvider &provider);
+  void Start(InnerFrameProvider &provider);
 
-  void stop();
+  void Stop();
 
 
  protected:

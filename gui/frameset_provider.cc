@@ -6,14 +6,14 @@ using dove_eye::Frameset;
 
 namespace gui {
 
-void FramesetProvider::start(InnerFrameProvider &provider) {
+void FramesetProvider::Start(InnerFrameProvider &provider) {
   frameset_iterator_ = provider.begin();
   frameset_end_iterator_ = provider.end();
 
   timer_.start(0, this);
 }
 
-void FramesetProvider::stop() {
+void FramesetProvider::Stop() {
   timer_.stop();
 }
 
@@ -27,7 +27,7 @@ void FramesetProvider::timerEvent(QTimerEvent *event) {
     return;
   }
 
-  emit frameset_ready(*frameset_iterator_);
+  emit FramesetReady(*frameset_iterator_);
   ++frameset_iterator_;
 }
 

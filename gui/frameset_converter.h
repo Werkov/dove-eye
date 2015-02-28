@@ -28,10 +28,10 @@ class FramesetConverter : public QObject {
   }
 
  signals:
-  void imageset_ready(const ImageList &);
+  void ImagesetReady(const ImageList &);
 
  public slots:
-  void process_frameset(const dove_eye::Frameset &frameset);
+  void ProcessFrameset(const dove_eye::Frameset &frameset);
 
  protected:
   void timerEvent(QTimerEvent *event) override;
@@ -41,9 +41,9 @@ class FramesetConverter : public QObject {
   dove_eye::Frameset frameset_;
   bool allow_drop_ = true;
 
-  void process_internal(dove_eye::Frameset frameset);
+  void ProcessFramesetInternal(dove_eye::Frameset frameset);
 
-  void enqueue(const dove_eye::Frameset &frameset);
+  void Enqueue(const dove_eye::Frameset &frameset);
 };
 
 } // namespace gui

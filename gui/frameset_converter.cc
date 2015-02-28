@@ -8,11 +8,11 @@ using dove_eye::CameraIndex;
 
 namespace gui {
 
-void FramesetConverter::process_frameset(const dove_eye::Frameset &frameset) {
+void FramesetConverter::ProcessFrameset(const dove_eye::Frameset &frameset) {
   if (allow_drop_) {
-    enqueue(frameset);
+    Enqueue(frameset);
   } else {
-    process_internal(frameset);
+    ProcessFramesetInternal(frameset);
   }
 }
 
@@ -21,14 +21,14 @@ void FramesetConverter::timerEvent(QTimerEvent *event) {
     return;
   }
 
-  process_internal(frameset_);
+  ProcessFramesetInternal(frameset_);
   for (auto &frame : frameset_) {
     frame.data.release();
   }
   timer_.stop();
 }
 
-void FramesetConverter::process_internal(dove_eye::Frameset frameset) {
+void FramesetConverter::ProcessFramesetInternal(dove_eye::Frameset frameset) {
   ImageList image_list(frameset.Size());
 
   for (CameraIndex cam = 0; cam < frameset.Size(); ++cam) {
@@ -48,12 +48,12 @@ void FramesetConverter::process_internal(dove_eye::Frameset frameset) {
                              }, new cv::Mat(mat));
     assert(image_list[cam].constBits() == mat.data);
 
-    emit imageset_ready(image_list);
+    emit ImagesetReady(image_list);
   }
 
 }
 
-void FramesetConverter::enqueue(const dove_eye::Frameset &frameset) {
+void FramesetConverter::Enqueue(const dove_eye::Frameset &frameset) {
   if (!frameset_[0].data.empty()) {
     DEBUG("Converter dropped a frame\n");
   }
