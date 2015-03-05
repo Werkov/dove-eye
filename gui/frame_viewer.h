@@ -3,6 +3,7 @@
 
 #include <QImage>
 #include <QPaintEvent>
+#include <QResizeEvent>
 #include <QWidget>
 
 #include "dove_eye/types.h"
@@ -27,6 +28,8 @@ class FrameViewer : public QWidget {
 
  protected:
   void paintEvent(QPaintEvent *event) override;
+
+  void resizeEvent(QResizeEvent *event) override;
 
  private:
   QImage image_;

@@ -15,9 +15,6 @@ void FrameViewer::SetImage(const QImage &image) {
     DEBUG("Viewer dropped a frame!\n");
   }
   image_ = image;
-  if (image_.size() != size()) {
-    setFixedSize(image_.size());
-  }
   update();
 }
 
@@ -27,6 +24,9 @@ void FrameViewer::paintEvent(QPaintEvent *event) {
   image_ = QImage();
 }
 
+void FrameViewer::resizeEvent(QResizeEvent *event) {
+  DEBUG("frame resized to: %i, %i\n", event->size().width(), event->size().height());
+}
 
 
 } // namespace gui

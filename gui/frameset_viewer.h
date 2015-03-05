@@ -2,6 +2,7 @@
 #define GUI_FRAMESET_VIEWER_H_
 
 #include <QLayout>
+#include <QResizeEvent>
 #include <QVector>
 #include <QWidget>
 
@@ -31,6 +32,9 @@ class FramesetViewer : public QWidget {
 
  public slots:
   void SetImageset(const FramesetConverter::ImageList &image_list);
+
+ protected:
+  void resizeEvent(QResizeEvent *event) override;
 
  private:
   dove_eye::CameraIndex width_;
