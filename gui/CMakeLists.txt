@@ -19,6 +19,7 @@ qt5_wrap_ui(UIC ${UI})
 
 add_library(gui ${SOURCES} ${UIC})
 
+include_directories(${CMAKE_SOURCE_DIR}/gui)
 include_directories(${CMAKE_SOURCE_DIR}/lib/include)
 
 add_definitions("-DHAVE_GUI")

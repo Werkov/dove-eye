@@ -6,6 +6,7 @@
 
 using dove_eye::CameraIndex;
 
+
 namespace gui {
 
 void FramesetConverter::ProcessFrameset(const dove_eye::Frameset &frameset) {

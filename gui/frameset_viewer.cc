@@ -8,21 +8,18 @@ using dove_eye::CameraIndex;
 
 namespace gui {
 
-FramesetViewer *FramesetViewer::createWithLayout(
-    const dove_eye::CameraIndex width,
-    QLayout *layout,
-    QWidget *parent) {
-  auto result = new FramesetViewer(width, parent);
+void FramesetViewer::SetWidth(const dove_eye::CameraIndex width) {
+  width_ = width;
 
-  for (CameraIndex cam = 0; cam < width; ++cam) {
-    auto viewer = new FrameViewer();
-    result->viewers_[cam] = viewer;
-    layout->addWidget(viewer);
+  for (auto viewer : viewers_) {
+    delete viewer;
   }
+  viewers_.resize(width_);
 
-  result->setLayout(layout);
-
-  return result;
+  for (CameraIndex cam = 0; cam < width_; ++cam) {
+    auto viewer = new FrameViewer(this);
+    this->viewers_[cam] = viewer;
+  }
 }
 
 void FramesetViewer::SetImageset(

@@ -21,22 +21,19 @@ class FramesetViewer : public QWidget {
   Q_OBJECT
 
  public:
-  explicit FramesetViewer(const dove_eye::CameraIndex width,
-                          QWidget *parent = nullptr)
+  explicit FramesetViewer(QWidget *parent = nullptr)
       : QWidget(parent),
-        width_(width),
-        viewers_(width) {
+        width_(0),
+        viewers_(0) {
   }
 
-  static FramesetViewer *createWithLayout(const dove_eye::CameraIndex width,
-                                          QLayout *layout,
-                                          QWidget *parent);
+  void SetWidth(const dove_eye::CameraIndex width);
 
  public slots:
   void SetImageset(const FramesetConverter::ImageList &image_list);
 
  private:
-  const dove_eye::CameraIndex width_;
+  dove_eye::CameraIndex width_;
   QVector<FrameViewer *> viewers_;
 };
 
