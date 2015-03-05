@@ -8,6 +8,8 @@
 " Turn on syntax highlighting.
 syntax on
 
+nmap <F5> :!./cscope.sh<Return> :cs r<Return><Return>
+
 " Detect if the current file type is a C-like language.
 au BufNewFile,BufRead *.h,*.cc,*.cpp call SetupForCLang()
 
