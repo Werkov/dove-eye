@@ -13,11 +13,12 @@ nmap <F5> :!./cscope.sh<Return> :cs r<Return><Return>
 " Detect if the current file type is a C-like language.
 au BufNewFile,BufRead *.h,*.cc,*.cpp call SetupForCLang()
 
+" Highlight lines longer than 80 characters.
+au BufWinEnter * let w:m2=matchadd('ErrorMsg', '\%>80v.\+', -1)
+
 " Configuration for C-like languages.
 function! SetupForCLang()
-    " Highlight lines longer than 80 characters.
-    au BufWinEnter * let w:m2=matchadd('ErrorMsg', '\%>80v.\+', -1)
-    " Alternately, uncomment these lines to wrap at 80 characters.
+   " Alternately, uncomment these lines to wrap at 80 characters.
     " setlocal textwidth=80
     " setlocal wrap
 
