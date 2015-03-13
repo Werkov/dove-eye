@@ -12,27 +12,44 @@ namespace gui {
 void FramesetViewer::SetWidth(const dove_eye::CameraIndex width) {
   width_ = width;
 
+  if (converter_ && converter_->width() != width_) {
+    converter_ = nullptr;
+  }
+
   for (auto viewer : viewers_) {
     delete viewer;
   }
   viewers_.resize(width_);
 
-  auto layout = new QVBoxLayout();
+  auto new_layout = new QVBoxLayout();
 
   for (CameraIndex cam = 0; cam < width_; ++cam) {
     auto viewer = new FrameViewer(this);
+
+    if (converter_) {
+      viewer->SetConverter(converter_, cam);
+    }
 
     QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     sizePolicy.setHorizontalStretch(0);
     sizePolicy.setVerticalStretch(0);
     viewer->setSizePolicy(sizePolicy);
 
-    layout->addWidget(viewer);
-    this->viewers_[cam] = viewer;
+    new_layout->addWidget(viewer);
+    viewers_[cam] = viewer;
   }
 
-  delete this->layout();
-  this->setLayout(layout);
+  delete layout();
+  setLayout(new_layout);
+}
+
+void FramesetViewer::SetConverter(FramesetConverter *converter) {
+  assert(width_ == converter->width());
+
+  converter_ = converter;
+  for (CameraIndex cam = 0; cam < width_; ++cam) {
+    viewers_[cam]->SetConverter(converter_, cam);
+  }
 }
 
 void FramesetViewer::SetImageset(
@@ -45,7 +62,7 @@ void FramesetViewer::SetImageset(
 }
 
 void FramesetViewer::resizeEvent(QResizeEvent *event) {
-  DEBUG("resized to: %i, %i\n", event->size().width(), event->size().height());
+  DEBUG("frameset resized to: %i, %i\n", event->size().width(), event->size().height());
 }
 
 } // namespace gui

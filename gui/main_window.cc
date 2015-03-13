@@ -26,6 +26,7 @@ MainWindow::MainWindow(FramesetProvider::InnerFrameProvider *aggregator,
       converter_(new FramesetConverter(aggregator->width())) {
   ui_->setupUi(this);
   ui_->viewer->SetWidth(aggregator->width());
+  ui_->viewer->SetConverter(converter_.get());
 
   qRegisterMetaType<InnerFrameProvider *>();
   qRegisterMetaType<FramesetConverter::ImageList>();

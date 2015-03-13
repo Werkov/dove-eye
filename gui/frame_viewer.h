@@ -20,8 +20,11 @@ class FrameViewer : public QWidget {
 
  public:
   explicit FrameViewer(QWidget *parent = nullptr)
-      : QWidget(parent) {
+      : QWidget(parent),
+        converter_(nullptr) {
   }
+
+  void SetConverter(FramesetConverter *converter, dove_eye::CameraIndex cam);
 
  public slots:
   void SetImage(const QImage &image);
@@ -33,6 +36,8 @@ class FrameViewer : public QWidget {
 
  private:
   QImage image_;
+  FramesetConverter *converter_;
+  dove_eye::CameraIndex cam_;
 };
 
 } // namespace gui

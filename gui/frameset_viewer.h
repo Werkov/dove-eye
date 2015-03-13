@@ -25,10 +25,13 @@ class FramesetViewer : public QWidget {
   explicit FramesetViewer(QWidget *parent = nullptr)
       : QWidget(parent),
         width_(0),
-        viewers_(0) {
+        viewers_(0),
+        converter_(nullptr) {
   }
 
   void SetWidth(const dove_eye::CameraIndex width);
+
+  void SetConverter(FramesetConverter *converter);
 
  public slots:
   void SetImageset(const FramesetConverter::ImageList &image_list);
@@ -39,6 +42,7 @@ class FramesetViewer : public QWidget {
  private:
   dove_eye::CameraIndex width_;
   QVector<FrameViewer *> viewers_;
+  FramesetConverter *converter_;
 };
 
 } // namespace gui

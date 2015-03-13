@@ -24,8 +24,15 @@ class FramesetConverter : public QObject {
   explicit FramesetConverter(const dove_eye::CameraIndex width,
                              QObject *parent = nullptr)
       : QObject(parent),
-        frameset_(width) {
+        frameset_(width),
+        frame_sizes_(width) {
   }
+
+  inline dove_eye::CameraIndex width() const {
+    return frameset_.Size();
+  }
+
+  void SetFrameSize(const dove_eye::CameraIndex cam, const QSize size);
 
  signals:
   void ImagesetReady(const ImageList &);
@@ -40,6 +47,7 @@ class FramesetConverter : public QObject {
   QBasicTimer timer_;
   dove_eye::Frameset frameset_;
   bool allow_drop_ = true;
+  QVector<QSize> frame_sizes_;
 
   void ProcessFramesetInternal(dove_eye::Frameset frameset);
 

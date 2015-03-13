@@ -9,6 +9,13 @@ using dove_eye::CameraIndex;
 
 namespace gui {
 
+void FramesetConverter::SetFrameSize(const dove_eye::CameraIndex cam,
+                                     const QSize size) {
+  assert(cam < frame_sizes_.size());
+
+  frame_sizes_[cam] = size;
+}
+
 void FramesetConverter::ProcessFrameset(const dove_eye::Frameset &frameset) {
   if (allow_drop_) {
     Enqueue(frameset);
@@ -36,9 +43,25 @@ void FramesetConverter::ProcessFramesetInternal(dove_eye::Frameset frameset) {
     if (!frameset.IsValid(cam)) {
       continue;
     }
+    // TODO shouldn't we work with deep copy (when applying modificatins)
     auto &mat = frameset[cam].data;
 
     /* Convert image for display. */
+    if (frame_sizes_[cam].width() > 0) {
+      auto &viewer_size = frame_sizes_[cam];
+      double frame_ratio = static_cast<double>(mat.rows) / mat.cols;
+      double viewer_ratio =
+          static_cast<double>(viewer_size.height()) / viewer_size.width();
+
+      cv::Size new_size(viewer_size.width(), viewer_size.height());
+
+      if (viewer_ratio < frame_ratio) {
+        new_size.width = new_size.height / frame_ratio;
+      } else {
+        new_size.height = new_size.width * frame_ratio;
+      }
+      cv::resize(mat, mat, new_size);
+    }
     cv::cvtColor(mat, mat, CV_BGR2RGB);
 
 
