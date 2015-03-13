@@ -4,6 +4,7 @@
 
 #include <opencv2/opencv.hpp>
 
+#include "dove_eye/blocking_policy.h"
 #include "dove_eye/camera_calibration.h"
 #include "dove_eye/chessboard_pattern.h"
 #include "dove_eye/file_video_provider.h"

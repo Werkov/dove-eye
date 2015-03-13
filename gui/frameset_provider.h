@@ -4,6 +4,7 @@
 #include <QBasicTimer>
 #include <QObject>
 
+#include "dove_eye/async_policy.h"
 #include "dove_eye/frameset.h"
 #include "dove_eye/frameset_aggregator.h"
 #include "dove_eye/types.h"
@@ -18,7 +19,7 @@ class FramesetProvider : public QObject {
   Q_OBJECT
 
  public:
-  typedef dove_eye::FramesetAggregator<dove_eye::BlockingPolicy>
+  typedef dove_eye::FramesetAggregator<dove_eye::AsyncPolicy>
       InnerFrameProvider;
 
   explicit FramesetProvider(const dove_eye::CameraIndex width,
