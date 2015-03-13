@@ -13,6 +13,11 @@ void FramesetConverter::SetFrameSize(const dove_eye::CameraIndex cam,
                                      const QSize size) {
   assert(cam < frame_sizes_.size());
 
+  /*
+   * Even though this method can be called from different thread,   *
+   * we are omitting any locking of frame_sizes_ as unsynchronized access may
+   * result in oddly resized frame only.
+   */
   frame_sizes_[cam] = size;
 }
 
@@ -43,8 +48,9 @@ void FramesetConverter::ProcessFramesetInternal(dove_eye::Frameset frameset) {
     if (!frameset.IsValid(cam)) {
       continue;
     }
-    // TODO shouldn't we work with deep copy (when applying modificatins)
-    auto &mat = frameset[cam].data;
+
+    /* Get own copy of frame, we'll modify it. */
+    auto mat = frameset[cam].data.clone();
 
     /* Convert image for display. */
     if (frame_sizes_[cam].width() > 0) {
@@ -75,12 +81,13 @@ void FramesetConverter::ProcessFramesetInternal(dove_eye::Frameset frameset) {
                              }, new cv::Mat(mat));
     assert(image_list[cam].constBits() == mat.data);
   }
+
   emit ImagesetReady(image_list);
 }
 
 void FramesetConverter::Enqueue(const dove_eye::Frameset &frameset) {
   if (!frameset_[0].data.empty()) {
-    DEBUG("Converter dropped a frame\n");
+    DEBUG("Converter dropped a frameset\n");
   }
 
   frameset_ = frameset;

@@ -57,12 +57,11 @@ void FramesetViewer::SetImageset(
   assert(width_ == image_list.size());
 
   for (CameraIndex cam = 0; cam < width_; ++cam) {
-    viewers_[cam]->SetImage(image_list[cam]);
+    /* Display only images from valid frames. */
+    if (image_list[cam].byteCount()) {
+      viewers_[cam]->SetImage(image_list[cam]);
+    }
   }
-}
-
-void FramesetViewer::resizeEvent(QResizeEvent *event) {
-  DEBUG("frameset resized to: %i, %i\n", event->size().width(), event->size().height());
 }
 
 } // namespace gui

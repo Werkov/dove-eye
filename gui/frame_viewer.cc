@@ -31,9 +31,7 @@ void FrameViewer::paintEvent(QPaintEvent *event) {
 }
 
 void FrameViewer::resizeEvent(QResizeEvent *event) {
-  DEBUG("frame resized to: %i, %i\n", event->size().width(), event->size().height());
   if (converter_) {
-    DEBUG("frame setting framesize to converter\n");
     converter_->SetFrameSize(cam_, event->size());
   }
 }

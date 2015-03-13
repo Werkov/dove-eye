@@ -148,25 +148,25 @@ class FramesetAggregator {
     Frameset frameset_;
 
     void PrepareFrameset() {
-      for (int i = 0; i < aggregator_->width(); ++i) {
+      for (CameraIndex cam = 0; cam < aggregator_->width(); ++cam) {
         Frame last_frame;
         bool has_frame = false;
-        while (!queues_[i].empty() &&
-               queues_[i].front().timestamp < window_start_) {
-          last_frame = queues_[i].front();
+        while (!queues_[cam].empty() &&
+               queues_[cam].front().timestamp < window_start_) {
+          last_frame = queues_[cam].front();
           has_frame = true;
-          queues_[i].pop();
+          queues_[cam].pop();
         }
 
         if (has_frame) {
-          frameset_.SetValid(i);
-          frameset_[i] = last_frame;
+          frameset_.SetValid(cam);
+          frameset_[cam] = last_frame;
         } else {
           /*
            * FIXME Think about this, set to invalid, however, last frame still
            * accessible.
            */
-          frameset_.SetValid(i, false);
+          frameset_.SetValid(cam, false);
         }
       }
     }

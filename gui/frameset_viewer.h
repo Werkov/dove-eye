@@ -36,9 +36,6 @@ class FramesetViewer : public QWidget {
  public slots:
   void SetImageset(const FramesetConverter::ImageList &image_list);
 
- protected:
-  void resizeEvent(QResizeEvent *event) override;
-
  private:
   dove_eye::CameraIndex width_;
   QVector<FrameViewer *> viewers_;

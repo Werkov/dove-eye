@@ -13,6 +13,9 @@ namespace gui {
 
 /*
  * \see http://stackoverflow.com/a/21253353/1351874
+ *
+ * Converts frameset to vector of QImage. If a frame is not valid,
+ * default empty QImage instance is returned.
  */
 
 class FramesetConverter : public QObject {
