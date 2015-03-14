@@ -1,6 +1,7 @@
 #ifndef DOVE_EYE_ASYNC_POLICY_H_
 #define DOVE_EYE_ASYNC_POLICY_H_
 
+#include <atomic>
 #include <condition_variable>
 #include <memory>
 #include <mutex>
@@ -29,6 +30,9 @@ class AsyncPolicy {
   }
 
   ~AsyncPolicy() {
+    stop_requested_ = true;
+    queue_cv_.notify_all();
+
     for (auto &thread : threads_) {
       if (thread.joinable()) {
         thread.join();
@@ -38,6 +42,7 @@ class AsyncPolicy {
 
   void Start() {
     running_producers_ = providers_.size();
+    stop_requested_ = false;
 
     for (CameraIndex cam = 0; cam < providers_.size(); ++cam) {
       threads_[cam] = std::thread(&AsyncPolicy::ReadProvider, this, cam);
@@ -78,36 +83,41 @@ class AsyncPolicy {
   /* It's synchronized by queue_mtx_ too. */
   size_t running_producers_;
 
+  std::atomic<bool> stop_requested_;
   std::queue<CamFrame> queue_;
   std::mutex queue_mtx_;
   std::condition_variable queue_cv_;
 
   void ReadProvider(const CameraIndex cam) {
-    Lock lock(queue_mtx_, std::defer_lock);
-
     for (auto frame : *providers_[cam]) {
-      lock.lock();
+      /* Note the lock is released on every iteration */
+      Lock lock(queue_mtx_);
+
       if (queue_.size() == max_queue_size_) {
         if (allow_drop) {
           DEBUG("%i: AsyncPolicy dropped a frame\n", cam);
-          lock.unlock();
           continue;
         } else {
           queue_cv_.wait(lock, [&] {
-                          return queue_.size() < max_queue_size_;
+                          return (queue_.size() < max_queue_size_) ||
+                              stop_requested_;
                         });
         }
       }
 
+      if (stop_requested_) {
+        break;
+      }
+
       queue_.push(CamFrame(frame, cam));
       queue_cv_.notify_all();
-      lock.unlock();
     }
 
-    lock.lock();
-    assert(running_producers_ > 0);
-    running_producers_ -= 1;
-    lock.unlock();
+    {
+      Lock lock(queue_mtx_);
+      assert(running_producers_ > 0);
+      running_producers_ -= 1;
+    }
   }
 };
 
