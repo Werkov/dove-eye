@@ -13,9 +13,9 @@ namespace dove_eye {
 
 class FileVideoProvider : public VideoProvider {
  public:
-  explicit FileVideoProvider(const std::string &filename);
+  explicit FileVideoProvider(const std::string &filename,
+                             const bool blocking = true);
 
-  // Creates a new iterator, all copies share the state.
   FrameIterator begin() override;
 
   FrameIterator end() override;
@@ -39,7 +39,8 @@ class FileVideoProvider : public VideoProvider {
     };
     static CaptureDeleter capture_deleter_;
 
-    typedef std::unique_ptr<cv::VideoCapture, Iterator::CaptureDeleter> CvCapturePtr;
+    typedef std::unique_ptr<cv::VideoCapture, Iterator::CaptureDeleter>
+        CvCapturePtr;
     typedef std::lock_guard<std::mutex> CaptureLock;
 
     Iterator(const Iterator &);
@@ -48,6 +49,8 @@ class FileVideoProvider : public VideoProvider {
      */
     static std::mutex capture_lifecycle_mtx_;
 
+    const FileVideoProvider &provider_;
+
     /* Unique ownership, cannot copy the iterator anyway. */
     CvCapturePtr video_capture_;
 
@@ -55,11 +58,12 @@ class FileVideoProvider : public VideoProvider {
     Frame frame_;
     int frame_no_;
     double frame_period_;
-
-
   };
 
-  std::string filename_;
+  const std::string filename_;
+
+  /** Should retrieval of frames be blocking (for period derived from FPS). */
+  const bool blocking_;
 };
 
 } // namespace dove_eye

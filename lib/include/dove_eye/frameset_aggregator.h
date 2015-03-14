@@ -1,12 +1,14 @@
 #ifndef DOVE_EYE_FRAMESET_AGGREGATOR_H_
 #define DOVE_EYE_FRAMESET_AGGREGATOR_H_
 
+#include <deque>
 #include <queue>
 #include <vector>
 
 #include "dove_eye/frame.h"
 #include "dove_eye/frameset.h"
 #include "dove_eye/frame_iterator.h"
+#include "dove_eye/logging.h"
 #include "dove_eye/video_provider.h"
 
 
@@ -55,23 +57,27 @@ class FramesetAggregator {
     Iterator &operator++() {
       Frame frame;
       CameraIndex cam;
-      if (valid_ && !aggregator_->frame_reader_.GetFrame(&frame, &cam)) {
-        valid_ = false;
-        return *this;
-      }
+      bool frameset_created = false;
 
-      /*
-       * Apply offset,
-       * see http://www.ms.mff.cuni.cz/~koutnym/wiki/dove_eye/calibration/time
-       */
-      frame.timestamp -= aggregator_->offsets_[cam];
+      do {
+        if (valid_ && !aggregator_->frame_reader_.GetFrame(&frame, &cam)) {
+          valid_ = false;
+          return *this;
+        }
 
-      queues_[cam].push(frame);
+        /*
+         * Apply offset,
+         * see http://www.ms.mff.cuni.cz/~koutnym/wiki/dove_eye/calibration/time
+         */
+        frame.timestamp -= aggregator_->offsets_[cam];
 
-      if (frame.timestamp > window_start_ + aggregator_->window_size_) {
-        window_start_ = frame.timestamp - aggregator_->window_size_;
-        PrepareFrameset();
-      }
+        queues_[cam].push_back(frame);
+
+        if (frame.timestamp > window_start_ + aggregator_->window_size_) {
+          window_start_ = frame.timestamp - aggregator_->window_size_;
+          frameset_created = PrepareFrameset();
+        }
+      } while (!frameset_created);
 
       return *this;
     }
@@ -85,7 +91,7 @@ class FramesetAggregator {
     }
 
    private:
-    typedef std::queue<Frame> FrameQueue;
+    typedef std::deque<Frame> FrameQueue;
     typedef std::vector<FrameQueue> QueuesContainer;
 
     Aggregator *aggregator_;
@@ -94,7 +100,8 @@ class FramesetAggregator {
     QueuesContainer queues_;
     Frameset frameset_;
 
-    void PrepareFrameset() {
+    bool PrepareFrameset() {
+      bool frameset_created = false;
       for (CameraIndex cam = 0; cam < aggregator_->width(); ++cam) {
         Frame last_frame;
         bool has_frame = false;
@@ -102,21 +109,22 @@ class FramesetAggregator {
                queues_[cam].front().timestamp < window_start_) {
           last_frame = queues_[cam].front();
           has_frame = true;
-          queues_[cam].pop();
+          queues_[cam].pop_front();
         }
 
         if (has_frame) {
           frameset_.SetValid(cam);
           frameset_[cam] = last_frame;
+          frameset_created = true;
         } else {
-          /*
-           * FIXME Think about this, set to invalid, however, last frame still
-           * accessible.
-           */
           frameset_.SetValid(cam, false);
         }
+
       }
+
+      return frameset_created;
     }
+
   };
 
   FramesetAggregator(typename FramePolicy::ProvidersContainer &&providers,

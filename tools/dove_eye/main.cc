@@ -33,9 +33,9 @@ int main(int argc, char* argv[]) {
   }
 
 
-  // TODO window size should maximum offset
+  // TODO window size should be maximum offset
   Aggregator aggregator(
-      std::move(providers), offsets, 2.5);
+      std::move(providers), offsets, 2.0);
 
 
   MainWindow main_window(&aggregator);

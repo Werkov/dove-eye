@@ -13,6 +13,8 @@ struct Frame {
 
   Timestamp timestamp;
   cv::Mat data;
+
+  Frame Clone() const;
 };
 
 } // namespace dove_eye
