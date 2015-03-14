@@ -1,6 +1,7 @@
 #ifndef DOVE_EYE_BLOCKING_POLICY_H_
 #define DOVE_EYE_BLOCKING_POLICY_H_
 
+#include <cassert>
 #include <memory>
 #include <vector>
 
@@ -23,11 +24,11 @@ class BlockingPolicy {
         ends_(providers_.size()) {
   }
 
-  bool GetFrame(Frame *frame, CameraIndex *cam) {
+  void Start() {
     if (!initialized_) {
       if (providers_.size() == 0) {
         /* Not set initalized_, next time make this check too. */
-        return false;
+        return;
       }
 
       for (int i = 0; i < providers_.size(); ++i) {
@@ -36,6 +37,10 @@ class BlockingPolicy {
       }
       initialized_ = true;
     }
+  }
+
+  bool GetFrame(Frame *frame, CameraIndex *cam) {
+    assert(initialized_);
 
     int attempts = 0;
     while (iterators_[current_cam_] == ends_[current_cam_] &&

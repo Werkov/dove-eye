@@ -19,7 +19,7 @@ class FramesetProvider : public QObject {
   Q_OBJECT
 
  public:
-  typedef dove_eye::FramesetAggregator<dove_eye::AsyncPolicy>
+  typedef dove_eye::FramesetAggregator<dove_eye::AsyncPolicy<true>>
       InnerFrameProvider;
 
   explicit FramesetProvider(const dove_eye::CameraIndex width,

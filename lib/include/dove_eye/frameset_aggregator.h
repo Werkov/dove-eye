@@ -13,9 +13,10 @@
 namespace dove_eye {
 
 
-template<class FramePolicy>
+template<class FramePolicyT>
 class FramesetAggregator {
  public:
+  typedef FramePolicyT FramePolicy;
   typedef std::vector<Frame::TimestampDiff> OffsetsContainer;
 
   /*
@@ -33,7 +34,8 @@ class FramesetAggregator {
           window_start_(0),
           queues_(aggregator ? aggregator->width() : 0),
           frameset_(aggregator ? aggregator->width() : 0) {
-      if (aggregator_) {
+      /* If it's begin iterator, start the reader */
+      if (aggregator_ && valid) {
         aggregator_->frame_reader_.Start();
       }
     }

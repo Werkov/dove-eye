@@ -5,6 +5,7 @@
 
 #include "dove_eye/file_video_provider.h"
 #include "dove_eye/frameset_aggregator.h"
+#include "frameset_provider.h"
 #include "main_window.h"
 
 using dove_eye::FileVideoProvider;
@@ -18,15 +19,17 @@ int main(int argc, char* argv[]) {
 
   QApplication app(argc, argv);
 
-  typedef dove_eye::FramesetAggregator<dove_eye::BlockingPolicy> Aggregator;
+  typedef gui::FramesetProvider::InnerFrameProvider Aggregator;
 
-  dove_eye::BlockingPolicy::ProvidersContainer providers;
+  Aggregator::FramePolicy::ProvidersContainer providers;
   Aggregator::OffsetsContainer offsets;
 
+  double offs = 0;
   for (auto filename : args) {
     providers.push_back(std::unique_ptr<VideoProvider>(
             new FileVideoProvider(filename)));
-    offsets.push_back(0);
+    offsets.push_back(offs);
+    offs += 1.0;
   }
 
 
