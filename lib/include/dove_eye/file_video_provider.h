@@ -2,6 +2,7 @@
 #define DOVE_EYE_FILE_VIDEO_PROVIDER_H_
 
 #include <memory>
+#include <mutex>
 #include <string>
 
 #include <opencv2/opencv.hpp>
@@ -33,13 +34,29 @@ class FileVideoProvider : public VideoProvider {
     }
 
    private:
+    struct CaptureDeleter {
+      void operator()(cv::VideoCapture *to_delete) const;
+    };
+    static CaptureDeleter capture_deleter_;
+
+    typedef std::unique_ptr<cv::VideoCapture, Iterator::CaptureDeleter> CvCapturePtr;
+    typedef std::lock_guard<std::mutex> CaptureLock;
+
     Iterator(const Iterator &);
+    /**
+     * @see http://stackoverflow.com/a/12243521/1351874
+     */
+    static std::mutex capture_lifecycle_mtx_;
+
     /* Unique ownership, cannot copy the iterator anyway. */
-    std::unique_ptr<cv::VideoCapture> video_capture_;
+    CvCapturePtr video_capture_;
+
     bool valid_;
     Frame frame_;
     int frame_no_;
     double frame_period_;
+
+
   };
 
   std::string filename_;

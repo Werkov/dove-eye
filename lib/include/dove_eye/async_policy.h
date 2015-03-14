@@ -37,7 +37,7 @@ class AsyncPolicy {
   }
 
   void Start() {
-    producers_ = providers_.size();
+    running_producers_ = providers_.size();
 
     for (CameraIndex cam = 0; cam < providers_.size(); ++cam) {
       threads_[cam] = std::thread(&AsyncPolicy::ReadProvider, this, cam);
@@ -47,8 +47,7 @@ class AsyncPolicy {
   bool GetFrame(Frame *frame, CameraIndex *cam) {
     Lock lock(queue_mtx_);
 
-    if (producers_ == 0) {
-      DEBUG("Finished\n");
+    if (running_producers_ == 0) {
       return false;
     }
 
@@ -77,7 +76,7 @@ class AsyncPolicy {
 
   const size_t max_queue_size_;
   /* It's synchronized by queue_mtx_ too. */
-  size_t producers_;
+  size_t running_producers_;
 
   std::queue<CamFrame> queue_;
   std::mutex queue_mtx_;
@@ -90,7 +89,7 @@ class AsyncPolicy {
       lock.lock();
       if (queue_.size() == max_queue_size_) {
         if (allow_drop) {
-          DEBUG("AsyncPolicy dropped a frame\n");
+          DEBUG("%i: AsyncPolicy dropped a frame\n", cam);
           lock.unlock();
           continue;
         } else {
@@ -100,15 +99,14 @@ class AsyncPolicy {
         }
       }
 
-      DEBUG("Obtained frame from cam %i\n", cam);
       queue_.push(CamFrame(frame, cam));
       queue_cv_.notify_all();
       lock.unlock();
     }
 
     lock.lock();
-    assert(producers_ > 0);
-    producers_ -= 1;
+    assert(running_producers_ > 0);
+    running_producers_ -= 1;
     lock.unlock();
   }
 };

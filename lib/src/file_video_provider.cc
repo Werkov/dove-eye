@@ -15,10 +15,33 @@ FrameIterator FileVideoProvider::end() {
   return FrameIterator();
 }
 
-/* Iterator */
+/* Iterator -- static fields */
 
-FileVideoProvider::Iterator::Iterator(const FileVideoProvider &provider)
-    : video_capture_(new cv::VideoCapture(provider.filename_)) {
+std::mutex FileVideoProvider::Iterator::capture_lifecycle_mtx_;
+
+FileVideoProvider::Iterator::CaptureDeleter
+    FileVideoProvider::Iterator::capture_deleter_;
+
+/* Iterator -- methods */
+
+void FileVideoProvider::Iterator::CaptureDeleter::operator()(
+    cv::VideoCapture *to_delete) const {
+  CaptureLock lock(capture_lifecycle_mtx_);
+  delete to_delete;
+}
+
+FileVideoProvider::Iterator::Iterator(const FileVideoProvider &provider) {
+  /*
+   * Creation and disposal of cv::VideoCapture has to be synchronized,
+   * as it is not internally thread safe.
+   */
+  {
+    CaptureLock lock(capture_lifecycle_mtx_);
+    auto capture = new cv::VideoCapture(provider.filename_);
+
+    video_capture_ = CvCapturePtr(capture, Iterator::capture_deleter_);
+  }
+
   valid_ = video_capture_->isOpened();
   frame_no_ = 0;
   if (valid_) {
