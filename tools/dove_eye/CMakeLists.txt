@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.8.11)
 
 project(dove-eye)
 
+find_package(OpenCV REQUIRED)
 find_package(Qt5Widgets)
 
 add_executable(dove-eye_exec main.cc)
@@ -15,5 +16,5 @@ include_directories(${CMAKE_SOURCE_DIR}/gui)
 add_definitions("-DHAVE_GUI")
 
 if(WIN32)
-	#TODO include path to Qt libraries
+	include_directories(${OpenCV_INCLUDE_DIRS})
 endif()
