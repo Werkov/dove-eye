@@ -3,9 +3,11 @@
 
 #include <QApplication>
 
+#include "controller.h"
 #include "dove_eye/file_video_provider.h"
 #include "dove_eye/frameset_aggregator.h"
-#include "frameset_provider.h"
+#include "dove_eye/localization.h"
+#include "dove_eye/tracker.h"
 #include "main_window.h"
 
 using dove_eye::FileVideoProvider;
@@ -19,7 +21,7 @@ int main(int argc, char* argv[]) {
 
   QApplication app(argc, argv);
 
-  typedef gui::FramesetProvider::InnerFrameProvider Aggregator;
+  typedef gui::Controller::InnerFrameProvider Aggregator;
 
   Aggregator::FramePolicy::ProvidersContainer providers;
   Aggregator::OffsetsContainer offsets;
@@ -38,7 +40,11 @@ int main(int argc, char* argv[]) {
       std::move(providers), offsets, 2.0);
 
 
-  MainWindow main_window(&aggregator);
+  dove_eye::Tracker tracker;
+  dove_eye::Localization localization;
+  gui::Controller controller(aggregator, tracker, localization);
+
+  MainWindow main_window(&controller);
   main_window.show();
 
 

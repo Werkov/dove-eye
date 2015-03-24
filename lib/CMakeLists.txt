@@ -9,9 +9,13 @@ file(GLOB SOURCES src/*.cc)
 add_library(dove-eye ${SOURCES})
 target_link_libraries(dove-eye ${OpenCV_LIBS})
 
+# TODO why it's not automatic with C++
+target_link_libraries(dove-eye pthread)
+
 
 include_directories(./include)
 
 if(WIN32)
         include_directories(${OpenCV_INCLUDE_DIRS})
 endif()
+
