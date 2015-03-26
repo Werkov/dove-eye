@@ -3,13 +3,20 @@
 
 #include <stdio.h>
 
+//TODO Replace "\n" with platform independent constant
 #ifndef NDEBUG
-#define DEBUG(...) fprintf(stderr, __VA_ARGS__)
+#define DEBUG(...) do {              \
+  fprintf(stderr , __VA_ARGS__);     \
+  fprintf(stderr, "\n");             \
+} while(false)
 #else
 #define DEBUG(...) /* empty */
 #endif
 
-#define ERROR(...) fprintf(stderr, __VA_ARGS__)
+#define ERROR(...) do {              \
+  fprintf(stderr , __VA_ARGS__);     \
+  fprintf(stderr, "\n");             \
+} while(false)
 
 #endif // DOVE_EYE_LOGGING_H_
 

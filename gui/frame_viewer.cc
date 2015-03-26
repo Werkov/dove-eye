@@ -12,7 +12,7 @@ namespace gui {
 
 void FrameViewer::SetImage(const QImage &image) {
   if (!image_.isNull()) {
-    DEBUG("Viewer dropped a frame!\n");
+    DEBUG("Viewer dropped a frame!");
   }
   image_ = image;
   update();

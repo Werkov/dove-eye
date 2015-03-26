@@ -95,7 +95,7 @@ class AsyncPolicy {
 
       if (queue_.size() == max_queue_size_) {
         if (allow_drop) {
-          DEBUG("%i: AsyncPolicy dropped a frame\n", cam);
+          DEBUG("%i: AsyncPolicy dropped a frame", cam);
           continue;
         } else {
           queue_cv_.wait(lock, [&] {

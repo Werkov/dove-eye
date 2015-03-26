@@ -87,7 +87,7 @@ void FramesetConverter::ProcessFramesetInternal(dove_eye::Frameset frameset) {
 
 void FramesetConverter::Enqueue(const dove_eye::Frameset &frameset) {
   if (!frameset_[0].data.empty()) {
-    DEBUG("Converter dropped a frameset\n");
+    DEBUG("Converter dropped a frameset");
   }
 
   frameset_ = frameset;

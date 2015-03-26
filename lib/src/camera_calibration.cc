@@ -57,7 +57,7 @@ bool CameraCalibration::MeasureFrameset(const Frameset &frameset) {
               camera_parameters_[cam].camera_matrix,
               camera_parameters_[cam].distortion_coefficients,
               cv::noArray(), cv::noArray());
-          DEBUG("Camera %i calibrated, reprojection error %f\n", cam, error);
+          DEBUG("Camera %i calibrated, reprojection error %f", cam, error);
 
           camera_states_[cam] = kReady;
           image_points_[cam].clear(); /* Will use it for pair calibration */
@@ -99,11 +99,11 @@ bool CameraCalibration::MeasureFrameset(const Frameset &frameset) {
 
           pair_states_[pair.index] = kCollecting;
         }
-        DEBUG("Matching pair %i, %i\n", cam1, cam2);
+        DEBUG("Matching pair %i, %i", cam1, cam2);
 
         /* We add frames in lockstep, thus read size from cam1 only. */
         if (image_points_[cam1].size() >= frames_to_collect_) {
-          DEBUG("Calibrating pair %i, %i\n", cam1, cam2);
+          DEBUG("Calibrating pair %i, %i", cam1, cam2);
           vector<Point3Vector> object_points(image_points_[cam1].size(),
               pattern_.ObjectPoints());
 
@@ -120,7 +120,7 @@ bool CameraCalibration::MeasureFrameset(const Frameset &frameset) {
               pair_parameters_[pair.index].essential_matrix, /* E */
               cv::noArray()); /* F */
 
-          DEBUG("Pair %i, %i calibrated, reprojection error %f\n", cam1, cam2,
+          DEBUG("Pair %i, %i calibrated, reprojection error %f", cam1, cam2,
                 error);
 
           pair_states_[pair.index] = kReady;

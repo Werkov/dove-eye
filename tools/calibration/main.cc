@@ -89,7 +89,7 @@ int CalibrateCameras(const string &output, const vector<string> &filenames) {
 
   FileStorage file_storage(output, FileStorage::WRITE);
   if (!file_storage.isOpened()) {
-    ERROR("Cannot open file %s\n", output.c_str());
+    ERROR("Cannot open file %s", output.c_str());
     return 1;
   }
 
