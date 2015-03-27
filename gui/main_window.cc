@@ -26,8 +26,15 @@ MainWindow::MainWindow(Controller *controller,
 
   qRegisterMetaType<FramesetConverter::ImageList>();
   qRegisterMetaType<FramesetConverter::ImageList>("ImageList");
-  // TODO should be registered somewhere else?
+
+  // TODO Should be registered somewhere else?
+  //      (Must be before connections are established.)
+  qRegisterMetaType<dove_eye::CameraIndex>();
+  /* Metatypes probably don't work with typedefs so here's a workaround */
+  qRegisterMetaType<dove_eye::CameraIndex>("dove_eye::CameraIndex");
   qRegisterMetaType<dove_eye::Frameset>();
+  qRegisterMetaType<gui::GuiMark>();
+  qRegisterMetaType<gui::GuiMark>("GuiMark");
 
 
   controller_thread_.start();
@@ -40,6 +47,8 @@ MainWindow::MainWindow(Controller *controller,
                    converter_.get(), &FramesetConverter::ProcessFrameset);
   QObject::connect(converter_.get(), &FramesetConverter::ImagesetReady,
                    ui_->viewer, &FramesetViewer::SetImageset);
+  QObject::connect(converter_.get(), &FramesetConverter::MarkCreated,
+                   controller, &Controller::SetMark);
 
 
 

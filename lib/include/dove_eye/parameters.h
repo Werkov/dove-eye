@@ -7,13 +7,22 @@ class Parameters {
  public:
   enum Key {
     TEMPLATE_RADIUS,
-    TEMPLATE_SEARCH_FACTOR
+    TEMPLATE_SEARCH_FACTOR,
+    TEMPLATE_THRESHOLD
   };
 
   template<typename T = double>
   T Get(const Key key) const {
-    // TODO
-    return 0;
+    switch (key) {
+      case TEMPLATE_RADIUS:
+        return 30;
+      case TEMPLATE_SEARCH_FACTOR:
+        return 2;
+      case TEMPLATE_THRESHOLD:
+        return 0.5;
+      default:
+        assert(false);
+    }
   }
 
 };

@@ -2,6 +2,7 @@
 #define GUI_FRAME_VIEWER_H_
 
 #include <QImage>
+#include <QMouseEvent>
 #include <QPaintEvent>
 #include <QResizeEvent>
 #include <QWidget>
@@ -33,6 +34,8 @@ class FrameViewer : public QWidget {
   void paintEvent(QPaintEvent *event) override;
 
   void resizeEvent(QResizeEvent *event) override;
+
+  void mouseReleaseEvent(QMouseEvent *event) override;
 
  private:
   QImage image_;

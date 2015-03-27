@@ -8,6 +8,7 @@
 
 #include "dove_eye/frameset.h"
 #include "dove_eye/types.h"
+#include "gui_mark.h"
 
 namespace gui {
 
@@ -28,7 +29,8 @@ class FramesetConverter : public QObject {
                              QObject *parent = nullptr)
       : QObject(parent),
         frameset_(width),
-        frame_sizes_(width) {
+        frame_sizes_(width),
+        viewer_sizes_(width) {
   }
 
   inline dove_eye::CameraIndex width() const {
@@ -37,8 +39,16 @@ class FramesetConverter : public QObject {
 
   void SetFrameSize(const dove_eye::CameraIndex cam, const QSize size);
 
+  void PropagateMark(const dove_eye::CameraIndex cam,
+                     const GuiMark mark);
+
  signals:
   void ImagesetReady(const ImageList &);
+
+  void MarkCreated(const dove_eye::CameraIndex cam,
+                   const GuiMark mark);
+  //void MarkCreated(const int cam,
+  //                 const GuiMark mark);
 
  public slots:
   void ProcessFrameset(const dove_eye::Frameset &frameset);
@@ -51,6 +61,7 @@ class FramesetConverter : public QObject {
   dove_eye::Frameset frameset_;
   bool allow_drop_ = true;
   QVector<QSize> frame_sizes_;
+  QVector<QSize> viewer_sizes_;
 
   void ProcessFramesetInternal(dove_eye::Frameset frameset);
 

@@ -14,5 +14,14 @@ typedef int CameraIndex;
 
 };
 
+#ifdef HAVE_GUI
+/*
+ * Make CameraIndex available as argument for Qt's queued connections.
+ */
+#include <QMetaType>
+Q_DECLARE_METATYPE(dove_eye::CameraIndex)
+#endif
+
+
 #endif // DOVE_EYE_TYPES_H_
 

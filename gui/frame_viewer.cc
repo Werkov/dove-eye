@@ -3,6 +3,7 @@
 #include <QPainter>
 
 #include "dove_eye/logging.h"
+#include "gui_mark.h"
 
 using dove_eye::CameraIndex;
 
@@ -36,6 +37,12 @@ void FrameViewer::resizeEvent(QResizeEvent *event) {
   }
 }
 
+void FrameViewer::mouseReleaseEvent(QMouseEvent *event) {
+  if (converter_) {
+    GuiMark mark = { .pos = event->pos() };
+    converter_->PropagateMark(cam_, mark);
+  }
+}
 
 } // namespace gui
 

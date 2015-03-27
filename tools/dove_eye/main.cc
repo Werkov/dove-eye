@@ -51,7 +51,7 @@ int main(int argc, char* argv[]) {
   Parameters parameters;
   dove_eye::Tracker tracker(width, TemplateTracker(parameters));
   dove_eye::Localization localization;
-  gui::Controller controller(aggregator, tracker, localization);
+  gui::Controller controller(parameters, aggregator, tracker, localization);
 
   MainWindow main_window(&controller);
   main_window.show();

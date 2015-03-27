@@ -3,12 +3,15 @@
 
 #include <QBasicTimer>
 #include <QObject>
+#include <QPoint>
 
 #include "dove_eye/async_policy.h"
 #include "dove_eye/frameset_aggregator.h"
 #include "dove_eye/localization.h"
+#include "dove_eye/parameters.h"
 #include "dove_eye/tracker.h"
 #include "dove_eye/types.h"
+#include "gui_mark.h"
 
 namespace gui {
 
@@ -23,11 +26,13 @@ class Controller : public QObject {
   typedef dove_eye::FramesetAggregator<dove_eye::AsyncPolicy<true>>
       InnerFrameProvider;
 
-  explicit Controller(InnerFrameProvider &provider,
+  explicit Controller(dove_eye::Parameters &parameters,
+                      InnerFrameProvider &provider,
                       dove_eye::Tracker &tracker,
                       dove_eye::Localization &localization,
                       QObject *parent = nullptr)
       : QObject(parent),
+        parameters_(parameters),
         frameset_iterator_(provider.width()),
         frameset_end_iterator_(provider.width()),
         provider_(provider),
@@ -49,11 +54,14 @@ class Controller : public QObject {
 
   void Stop();
 
+  void SetMark(const dove_eye::CameraIndex cam, const GuiMark mark);
+
 
  protected:
   void timerEvent(QTimerEvent *event) override;
 
  private:
+  const dove_eye::Parameters parameters_;
   QBasicTimer timer_;
   InnerFrameProvider::Iterator frameset_iterator_;
   InnerFrameProvider::Iterator frameset_end_iterator_;
@@ -61,6 +69,9 @@ class Controller : public QObject {
   InnerFrameProvider &provider_;
   dove_eye::Tracker &tracker_;
   dove_eye::Localization &localization_;
+
+  void DecorateFrameset(dove_eye::Frameset &frameset,
+                        const dove_eye::Positset positset);
 };
 
 } // namespace gui

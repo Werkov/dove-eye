@@ -17,13 +17,14 @@ Tracker::Tracker(const CameraIndex width, const InnerTracker &inner_tracker)
 }
 
 
-void Tracker::SetMark(CameraIndex cam, cv::Point2f mark, bool project_other) {
+void Tracker::SetMark(const CameraIndex cam, const InnerTracker::Mark mark,
+                      bool project_other) {
   assert(cam < width_);
   // TODO implement projection
-  assert(project_other = false);
+  assert(project_other == false);
 
   trackpoints_[cam] = mark;
-  trackpoints_.SetValid(false);
+  trackpoints_.SetValid(cam, false);
 
   trackstates_[cam] = MARK_SET;
 }
@@ -47,20 +48,20 @@ void Tracker::TrackSingle(const CameraIndex cam, const Frame &frame) {
       if (trackers_[cam]->InitializeTracking(frame, trackpoints_[cam],
                                             &trackpoints_[cam])) {
         trackstates_[cam] = TRACKING;
-        trackpoints_.SetValid(true);
+        trackpoints_.SetValid(cam, true);
       } else {
         /*
          * If initialization failed, do not change state
          * and try it next time.
          */
-        trackpoints_.SetValid(false);
+        trackpoints_.SetValid(cam, false);
       }
       break;
 
     case TRACKING:
       if (!trackers_[cam]->Track(frame, &trackpoints_[cam])) {
         trackstates_[cam] = LOST;
-        trackpoints_.SetValid(false);
+        trackpoints_.SetValid(cam, false);
       }
       break;
     case LOST:
