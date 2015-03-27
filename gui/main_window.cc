@@ -19,10 +19,10 @@ MainWindow::MainWindow(Controller *controller,
                        QWidget *parent)
     : QMainWindow(parent),
       ui_(new Ui::MainWindow),
-      converter_(new FramesetConverter(controller->width())),
+      converter_(new FramesetConverter(controller->Arity())),
       parameters_dialog_(new ParametersDialog()) {
   ui_->setupUi(this);
-  ui_->viewer->SetWidth(controller->width());
+  ui_->viewer->SetArity(controller->Arity());
   ui_->viewer->SetConverter(converter_.get());
 
   qRegisterMetaType<FramesetConverter::ImageList>();

@@ -58,7 +58,7 @@ void Controller::timerEvent(QTimerEvent *event) {
 void Controller::DecorateFrameset(dove_eye::Frameset &frameset,
                                   const dove_eye::Positset positset) {
 
-  for (CameraIndex cam = 0; cam < frameset.Size(); ++cam) {
+  for (CameraIndex cam = 0; cam < frameset.Arity(); ++cam) {
     if (!frameset.IsValid(cam)) {
       continue;
     }

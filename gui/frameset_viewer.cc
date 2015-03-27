@@ -9,21 +9,21 @@ using dove_eye::CameraIndex;
 
 namespace gui {
 
-void FramesetViewer::SetWidth(const dove_eye::CameraIndex width) {
-  width_ = width;
+void FramesetViewer::SetArity(const dove_eye::CameraIndex arity) {
+  arity_ = arity;
 
-  if (converter_ && converter_->width() != width_) {
+  if (converter_ && converter_->Arity() != arity_) {
     converter_ = nullptr;
   }
 
   for (auto viewer : viewers_) {
     delete viewer;
   }
-  viewers_.resize(width_);
+  viewers_.resize(arity_);
 
   auto new_layout = new QVBoxLayout();
 
-  for (CameraIndex cam = 0; cam < width_; ++cam) {
+  for (CameraIndex cam = 0; cam < arity_; ++cam) {
     auto viewer = new FrameViewer(this);
 
     if (converter_) {
@@ -44,19 +44,19 @@ void FramesetViewer::SetWidth(const dove_eye::CameraIndex width) {
 }
 
 void FramesetViewer::SetConverter(FramesetConverter *converter) {
-  assert(width_ == converter->width());
+  assert(arity_ == converter->Arity());
 
   converter_ = converter;
-  for (CameraIndex cam = 0; cam < width_; ++cam) {
+  for (CameraIndex cam = 0; cam < arity_; ++cam) {
     viewers_[cam]->SetConverter(converter_, cam);
   }
 }
 
 void FramesetViewer::SetImageset(
     const FramesetConverter::ImageList &image_list) {
-  assert(width_ == image_list.size());
+  assert(arity_ == image_list.size());
 
-  for (CameraIndex cam = 0; cam < width_; ++cam) {
+  for (CameraIndex cam = 0; cam < arity_; ++cam) {
     /* Display only images from valid frames. */
     if (image_list[cam].byteCount()) {
       viewers_[cam]->SetImage(image_list[cam]);

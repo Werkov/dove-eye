@@ -33,15 +33,15 @@ class Controller : public QObject {
                       QObject *parent = nullptr)
       : QObject(parent),
         parameters_(parameters),
-        frameset_iterator_(provider.width()),
-        frameset_end_iterator_(provider.width()),
+        frameset_iterator_(provider.Arity()),
+        frameset_end_iterator_(provider.Arity()),
         provider_(provider),
         tracker_(tracker),
         localization_(localization) {
   }
 
-  inline dove_eye::CameraIndex width() const {
-    return provider_.width();
+  inline dove_eye::CameraIndex Arity() const {
+    return provider_.Arity();
   }
 
  signals:

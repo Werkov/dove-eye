@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
     offsets.push_back(offs);
     offs += 1.0;
   }
-  CameraIndex width = offsets.size();
+  CameraIndex arity = offsets.size();
 
 
   // TODO window size should be maximum offset
@@ -49,7 +49,7 @@ int main(int argc, char* argv[]) {
 
 
   Parameters parameters;
-  dove_eye::Tracker tracker(width, TemplateTracker(parameters));
+  dove_eye::Tracker tracker(arity, TemplateTracker(parameters));
   dove_eye::Localization localization;
   gui::Controller controller(parameters, aggregator, tracker, localization);
 

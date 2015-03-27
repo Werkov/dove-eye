@@ -32,22 +32,22 @@ class FramesetAggregator {
    public:
     explicit Iterator(Aggregator *aggregator = nullptr, const bool valid = true)
         : aggregator_(aggregator),
-          valid_(valid && aggregator && aggregator->width() > 0),
+          valid_(valid && aggregator && aggregator->Arity() > 0),
           window_start_(0),
-          queues_(aggregator ? aggregator->width() : 0),
-          frameset_(aggregator ? aggregator->width() : 0) {
+          queues_(aggregator ? aggregator->Arity() : 0),
+          frameset_(aggregator ? aggregator->Arity() : 0) {
       /* If it's begin iterator, start the reader */
       if (aggregator_ && valid) {
         aggregator_->frame_reader_.Start();
       }
     }
 
-    explicit Iterator(const CameraIndex width)
+    explicit Iterator(const CameraIndex arity)
         : aggregator_(nullptr),
           valid_(false),
           window_start_(0),
           queues_(0),
-          frameset_(width) {
+          frameset_(arity) {
     }
 
     Frameset operator*() const {
@@ -102,7 +102,7 @@ class FramesetAggregator {
 
     bool PrepareFrameset() {
       bool frameset_created = false;
-      for (CameraIndex cam = 0; cam < aggregator_->width(); ++cam) {
+      for (CameraIndex cam = 0; cam < aggregator_->Arity(); ++cam) {
         Frame last_frame;
         bool has_frame = false;
         while (!queues_[cam].empty() &&
@@ -143,7 +143,7 @@ class FramesetAggregator {
     return Iterator(this, false);
   }
 
-  CameraIndex width() const {
+  CameraIndex Arity() const {
     return offsets_.size();
   }
 

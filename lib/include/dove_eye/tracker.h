@@ -16,7 +16,7 @@ namespace dove_eye {
  */
 class Tracker {
  public:
-  explicit Tracker(const CameraIndex width, const InnerTracker &inner_tracker);
+  explicit Tracker(const CameraIndex arity, const InnerTracker &inner_tracker);
 
   void SetMark(const CameraIndex cam, const InnerTracker::Mark mark,
                bool project_other = false);
@@ -35,7 +35,7 @@ class Tracker {
   typedef std::unique_ptr<InnerTracker> InnerTrackerPtr;
   typedef std::vector<InnerTrackerPtr> TrackerVector;
 
-  const CameraIndex width_;
+  const CameraIndex arity;
   
   Positset trackpoints_;
 

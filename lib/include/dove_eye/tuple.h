@@ -14,7 +14,7 @@ namespace dove_eye {
  * Represents a tuple of objects for each camera.
  * Not all objects may be present.
  *
- * \note Limited to kMaxSize cameras.
+ * \note Limited to kMaxArity cameras.
  */
 template<typename T>
 class Tuple {
@@ -23,33 +23,33 @@ class Tuple {
   typedef T *iterator;
   typedef const T *const_iterator;
 
-  static const CameraIndex kMaxSize = 4;
+  static const CameraIndex kMaxArity = 4;
 
   /*
-   * Because of the const member size_ we have to provide the Big Five
+   * Because of the const member arity_ we have to provide the Big Five
    * methods for copying/moving.
    */
   explicit Tuple(const CameraIndex size = 0)
-      : size_(size),
+      : arity_(size),
         validity_() {
-    assert(size_ <= kMaxSize);
+    assert(arity_ <= kMaxArity);
   }
 
   Tuple(const Tuple &other)
-      : size_(other.size_) {
-    assert(size_ == other.size_);
+      : arity_(other.arity_) {
+    assert(arity_ == other.arity_);
 
-    for (CameraIndex cam = 0; cam < size_; ++cam) {
+    for (CameraIndex cam = 0; cam < arity_; ++cam) {
       items_[cam] = other.items_[cam];
       validity_[cam] = other.validity_[cam];
     }
   }
 
   Tuple(Tuple &&other)
-      : size_(other.size_) {
-    assert(size_ == other.size_);
+      : arity_(other.arity_) {
+    assert(arity_ == other.arity_);
 
-    for (CameraIndex cam = 0; cam < size_; ++cam) {
+    for (CameraIndex cam = 0; cam < arity_; ++cam) {
       items_[cam] = std::move(other.items_[cam]);
       validity_[cam] = other.validity_[cam];
     }
@@ -62,7 +62,7 @@ class Tuple {
   }
 
   inline Tuple &operator=(Tuple &&rhs) {
-    assert(size_ == rhs.size_);
+    assert(arity_ == rhs.arity_);
 
     std::swap(items_, rhs.items_);
     std::swap(validity_, rhs.validity_);
@@ -71,12 +71,12 @@ class Tuple {
   }
 
   inline T &operator[](const CameraIndex cam) {
-    assert(cam < size_);
+    assert(cam < arity_);
     return items_[cam];
   }
 
   inline const T &operator[](const CameraIndex cam) const {
-    assert(cam < size_);
+    assert(cam < arity_);
     return items_[cam];
   }
 
@@ -85,7 +85,7 @@ class Tuple {
   }
 
   inline const_iterator end() const {
-    return items_ + size_;
+    return items_ + arity_;
   }
 
   inline iterator begin() {
@@ -93,27 +93,27 @@ class Tuple {
   }
 
   inline iterator end() {
-    return items_ + size_;
+    return items_ + arity_;
   }
 
   inline void SetValid(const CameraIndex cam, const bool value = true) {
-    assert(cam < size_);
+    assert(cam < arity_);
     validity_[cam] = value;
   }
 
   inline bool IsValid(const CameraIndex cam) const {
-    assert(cam < size_);
+    assert(cam < arity_);
     return validity_[cam];
   }
 
-  inline CameraIndex Size() const {
-    return size_;
+  inline CameraIndex Arity() const {
+    return arity_;
   }
 
  private:
-  const CameraIndex size_;
-  T items_[kMaxSize];
-  bool validity_[kMaxSize];
+  const CameraIndex arity_;
+  T items_[kMaxArity];
+  bool validity_[kMaxArity];
 };
 
 } // namespace dove_eye

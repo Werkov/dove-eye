@@ -25,16 +25,16 @@ class FramesetConverter : public QObject {
  public:
   typedef QVector<QImage> ImageList;
 
-  explicit FramesetConverter(const dove_eye::CameraIndex width,
+  explicit FramesetConverter(const dove_eye::CameraIndex arity,
                              QObject *parent = nullptr)
       : QObject(parent),
-        frameset_(width),
-        frame_sizes_(width),
-        viewer_sizes_(width) {
+        frameset_(arity),
+        frame_sizes_(arity),
+        viewer_sizes_(arity) {
   }
 
-  inline dove_eye::CameraIndex width() const {
-    return frameset_.Size();
+  inline dove_eye::CameraIndex Arity() const {
+    return frameset_.Arity();
   }
 
   void SetFrameSize(const dove_eye::CameraIndex cam, const QSize size);

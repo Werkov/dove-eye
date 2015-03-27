@@ -6,12 +6,12 @@
 
 namespace dove_eye {
 
-Tracker::Tracker(const CameraIndex width, const InnerTracker &inner_tracker)
-    : width_(width),
-      trackpoints_(width),
-      trackstates_(width, UNINITIALIZED),
-      trackers_(width) {
-  for (CameraIndex cam = 0; cam < width; ++cam) {
+Tracker::Tracker(const CameraIndex arity, const InnerTracker &inner_tracker)
+    : arity(arity),
+      trackpoints_(arity),
+      trackstates_(arity, UNINITIALIZED),
+      trackers_(arity) {
+  for (CameraIndex cam = 0; cam < arity; ++cam) {
     trackers_[cam] = std::move(InnerTrackerPtr(inner_tracker.Clone()));
   }
 }
@@ -19,7 +19,7 @@ Tracker::Tracker(const CameraIndex width, const InnerTracker &inner_tracker)
 
 void Tracker::SetMark(const CameraIndex cam, const InnerTracker::Mark mark,
                       bool project_other) {
-  assert(cam < width_);
+  assert(cam < arity);
   // TODO implement projection
   assert(project_other == false);
 
@@ -30,9 +30,9 @@ void Tracker::SetMark(const CameraIndex cam, const InnerTracker::Mark mark,
 }
 
 Positset Tracker::Track(const Frameset &frameset) {
-  assert(frameset.Size() == width_);
+  assert(frameset.Arity() == arity);
 
-  for (CameraIndex cam = 0; cam < width_; ++cam) {
+  for (CameraIndex cam = 0; cam < arity; ++cam) {
     TrackSingle(cam, frameset[cam]);
   }
 

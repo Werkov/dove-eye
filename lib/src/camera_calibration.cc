@@ -25,7 +25,7 @@ CameraCalibration::CameraCalibration(const CameraIndex camera_count,
 }
 
 bool CameraCalibration::MeasureFrameset(const Frameset &frameset) {
-  assert(frameset.Size() == camera_count_);
+  assert(frameset.Arity() == camera_count_);
   bool result = true;
 
   /*

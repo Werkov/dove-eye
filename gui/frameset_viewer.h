@@ -24,12 +24,12 @@ class FramesetViewer : public QWidget {
  public:
   explicit FramesetViewer(QWidget *parent = nullptr)
       : QWidget(parent),
-        width_(0),
+        arity_(0),
         viewers_(0),
         converter_(nullptr) {
   }
 
-  void SetWidth(const dove_eye::CameraIndex width);
+  void SetArity(const dove_eye::CameraIndex arity);
 
   void SetConverter(FramesetConverter *converter);
 
@@ -37,7 +37,7 @@ class FramesetViewer : public QWidget {
   void SetImageset(const FramesetConverter::ImageList &image_list);
 
  private:
-  dove_eye::CameraIndex width_;
+  dove_eye::CameraIndex arity_;
   QVector<FrameViewer *> viewers_;
   FramesetConverter *converter_;
 };
