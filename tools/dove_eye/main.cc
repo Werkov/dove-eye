@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
   dove_eye::Localization localization;
   gui::Controller controller(parameters, aggregator, tracker, localization);
 
-  MainWindow main_window(&controller);
+  MainWindow main_window(parameters, &controller);
   main_window.show();
 
 

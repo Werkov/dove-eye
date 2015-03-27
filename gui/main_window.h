@@ -7,6 +7,7 @@
 #include <QThread>
 
 #include "controller.h"
+#include "dove_eye/parameters.h"
 #include "frameset_converter.h"
 #include "parameters_dialog.h"
 
@@ -17,7 +18,8 @@ class MainWindow;
 class MainWindow : public QMainWindow {
   Q_OBJECT
  public:
-  explicit MainWindow(gui::Controller *controller,
+  explicit MainWindow(dove_eye::Parameters &parameters,
+                      gui::Controller *controller,
                       QWidget *parent = nullptr);
 
   ~MainWindow() override;

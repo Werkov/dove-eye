@@ -10,12 +10,9 @@ const Parameters::Parameter Parameters::parameters[] = {
 };
 
 Parameters::Parameters() {
-  size_t i = 0;
-  while (Parameters::parameters[i].key != Parameters::_MAX_KEY) {
-    auto param = Parameters::parameters[i];
+  for (auto param : *this) {
     parameters_[param.key] = param;
     values_[param.key] = param.default_value;
-    ++i;
   }
 }
 

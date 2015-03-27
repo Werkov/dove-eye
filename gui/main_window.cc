@@ -9,18 +9,20 @@
 #include "ui_main_window.h"
 
 
+using dove_eye::Parameters;
 using gui::FramesetConverter;
 using gui::Controller;
 using gui::FramesetViewer;
 using std::cerr;
 using std::endl;
 
-MainWindow::MainWindow(Controller *controller,
+MainWindow::MainWindow(Parameters &parameters,
+                       Controller *controller,
                        QWidget *parent)
     : QMainWindow(parent),
       ui_(new Ui::MainWindow),
       converter_(new FramesetConverter(controller->Arity())),
-      parameters_dialog_(new ParametersDialog()) {
+      parameters_dialog_(new ParametersDialog(parameters)) {
   ui_->setupUi(this);
   ui_->viewer->SetArity(controller->Arity());
   ui_->viewer->SetConverter(converter_.get());
@@ -51,7 +53,8 @@ MainWindow::MainWindow(Controller *controller,
   QObject::connect(converter_.get(), &FramesetConverter::MarkCreated,
                    controller, &Controller::SetMark);
 
-  connect(ui_->action_modify_parameters, SIGNAL(triggered()), SLOT(ModifyParameters()));
+  connect(ui_->action_modify_parameters, &QAction::triggered,
+          this, &MainWindow::ModifyParameters);
   /*
    * Use invokeMethod because we are calling different thread (asynchronously)
    */
@@ -66,6 +69,7 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::ModifyParameters() {
+  parameters_dialog_->LoadValues();
   parameters_dialog_->show();
 }
 

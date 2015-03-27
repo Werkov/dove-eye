@@ -11,7 +11,7 @@ namespace dove_eye {
 class Parameters {
  public:
   enum Key {
-    TEMPLATE_RADIUS,
+    TEMPLATE_RADIUS = 0,
     TEMPLATE_SEARCH_FACTOR,
     TEMPLATE_THRESHOLD,
     _MAX_KEY
@@ -26,9 +26,40 @@ class Parameters {
     double max_value;
   };
 
+  class iterator {
+   public:
+    explicit iterator(const size_t key)
+        : key_(key) {
+    }
+
+    inline const Parameter &operator*() const {
+      return Parameters::parameters[key_];
+    }
+
+    inline iterator &operator++() {
+      ++key_;
+      return *this;
+    }
+
+    inline bool operator!=(const iterator &rhs) {
+      return key_ != rhs.key_;
+    }
+
+   private:
+    size_t key_;
+  };
+
   const static Parameter parameters[];
 
   Parameters();
+
+  inline iterator begin() const {
+    return iterator(0);
+  }
+
+  inline iterator end() const {
+    return iterator(static_cast<size_t>(_MAX_KEY));
+  }
 
   double Get(const Key key) const;
 
