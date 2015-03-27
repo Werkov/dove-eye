@@ -19,7 +19,8 @@ MainWindow::MainWindow(Controller *controller,
                        QWidget *parent)
     : QMainWindow(parent),
       ui_(new Ui::MainWindow),
-      converter_(new FramesetConverter(controller->width())) {
+      converter_(new FramesetConverter(controller->width())),
+      parameters_dialog_(new ParametersDialog()) {
   ui_->setupUi(this);
   ui_->viewer->SetWidth(controller->width());
   ui_->viewer->SetConverter(converter_.get());
@@ -50,8 +51,7 @@ MainWindow::MainWindow(Controller *controller,
   QObject::connect(converter_.get(), &FramesetConverter::MarkCreated,
                    controller, &Controller::SetMark);
 
-
-
+  connect(ui_->action_modify_parameters, SIGNAL(triggered()), SLOT(ModifyParameters()));
   /*
    * Use invokeMethod because we are calling different thread (asynchronously)
    */
@@ -65,4 +65,7 @@ MainWindow::~MainWindow() {
   converter_thread_.wait();
 }
 
+void MainWindow::ModifyParameters() {
+  parameters_dialog_->show();
+}
 

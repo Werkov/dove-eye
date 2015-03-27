@@ -50,8 +50,20 @@
      <height>25</height>
     </rect>
    </property>
+   <widget class="QMenu" name="mnuParameters">
+    <property name="title">
+     <string>Parameters</string>
+    </property>
+    <addaction name="action_modify_parameters"/>
+   </widget>
+   <addaction name="mnuParameters"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="action_modify_parameters">
+   <property name="text">
+    <string>Modify</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>

@@ -61,7 +61,7 @@ class Controller : public QObject {
   void timerEvent(QTimerEvent *event) override;
 
  private:
-  const dove_eye::Parameters parameters_;
+  const dove_eye::Parameters &parameters_;
   QBasicTimer timer_;
   InnerFrameProvider::Iterator frameset_iterator_;
   InnerFrameProvider::Iterator frameset_end_iterator_;

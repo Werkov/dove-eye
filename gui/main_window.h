@@ -8,6 +8,7 @@
 
 #include "controller.h"
 #include "frameset_converter.h"
+#include "parameters_dialog.h"
 
 namespace Ui {
 class MainWindow;
@@ -21,6 +22,9 @@ class MainWindow : public QMainWindow {
 
   ~MainWindow() override;
 
+ private slots:
+  void ModifyParameters();
+
  private:
   std::unique_ptr<Ui::MainWindow> ui_;
 
@@ -28,6 +32,8 @@ class MainWindow : public QMainWindow {
   QThread converter_thread_;
 
   std::unique_ptr<gui::FramesetConverter> converter_;
+
+  std::unique_ptr<ParametersDialog> parameters_dialog_;
 };
 
 #endif // GUI_MAIN_WINDOW_H_
