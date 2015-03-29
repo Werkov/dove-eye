@@ -11,15 +11,15 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(CMAKE_AUTOMOC ON)
 
-file(GLOB SOURCES *.cc)
-file(GLOB HEADERS *.h)
-file(GLOB UI *.ui)
+file(GLOB SOURCES *.cc gui/*.cc)
+file(GLOB HEADERS *.h gui/*.h)
+file(GLOB UI gui/*.ui)
 
 qt5_wrap_ui(UIC ${UI})
 
 add_library(gui ${SOURCES} ${UIC})
 
-include_directories(${CMAKE_SOURCE_DIR}/gui)
+include_directories(${CMAKE_SOURCE_DIR}/app)
 include_directories(${CMAKE_SOURCE_DIR}/lib/include)
 
 add_definitions("-DHAVE_GUI")

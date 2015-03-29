@@ -10,11 +10,11 @@
 
 
 using dove_eye::Parameters;
-using gui::FramesetConverter;
-using gui::Controller;
 using gui::FramesetViewer;
 using std::cerr;
 using std::endl;
+
+namespace gui {
 
 MainWindow::MainWindow(Parameters &parameters,
                        Controller *controller,
@@ -22,7 +22,8 @@ MainWindow::MainWindow(Parameters &parameters,
     : QMainWindow(parent),
       ui_(new Ui::MainWindow),
       converter_(new FramesetConverter(controller->Arity())),
-      parameters_dialog_(new ParametersDialog(parameters)) {
+      parameters_dialog_(new ParametersDialog(parameters)),
+      video_providers_dialog_(new VideoProvidersDialog()) {
   ui_->setupUi(this);
   ui_->viewer->SetArity(controller->Arity());
   ui_->viewer->SetConverter(converter_.get());
@@ -73,3 +74,4 @@ void MainWindow::ModifyParameters() {
   parameters_dialog_->show();
 }
 
+} // end namespace gui

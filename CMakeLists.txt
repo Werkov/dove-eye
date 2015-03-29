@@ -8,7 +8,7 @@ else()
 	add_definitions("-std=c++11 -Wall -Wno-sign-compare")
 endif()
 
-add_subdirectory(gui)
+add_subdirectory(app)
 add_subdirectory(lib)
 add_subdirectory(tools/calibration)
 add_subdirectory(tools/dove_eye)

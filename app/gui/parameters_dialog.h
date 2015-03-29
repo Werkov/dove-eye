@@ -13,6 +13,8 @@ namespace Ui {
 class ParametersDialog;
 }
 
+namespace gui {
+
 class ParametersDialog : public QDialog {
   Q_OBJECT
  public:
@@ -38,5 +40,7 @@ class ParametersDialog : public QDialog {
 
   void CreateControls();
 };
+
+} // end namespace gui
 
 #endif // GUI_PARAMETERS_DIALOG_H_

@@ -1,5 +1,5 @@
-#ifndef GUI_CONTROLLER_H_
-#define GUI_CONTROLLER_H_
+#ifndef CONTROLLER_H_
+#define CONTROLLER_H_
 
 #include <QBasicTimer>
 #include <QObject>
@@ -11,9 +11,8 @@
 #include "dove_eye/parameters.h"
 #include "dove_eye/tracker.h"
 #include "dove_eye/types.h"
-#include "gui_mark.h"
+#include "gui/gui_mark.h"
 
-namespace gui {
 
 /*
  * \see http://stackoverflow.com/a/21253353/1351874
@@ -54,7 +53,7 @@ class Controller : public QObject {
 
   void Stop();
 
-  void SetMark(const dove_eye::CameraIndex cam, const GuiMark mark);
+  void SetMark(const dove_eye::CameraIndex cam, const gui::GuiMark mark);
 
 
  protected:
@@ -74,6 +73,5 @@ class Controller : public QObject {
                         const dove_eye::Positset positset);
 };
 
-} // namespace gui
 
-#endif // GUI_CONTROLLER_H_
+#endif // CONTROLLER_H_

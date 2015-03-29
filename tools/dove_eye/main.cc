@@ -11,13 +11,14 @@
 #include "dove_eye/template_tracker.h"
 #include "dove_eye/tracker.h"
 #include "dove_eye/types.h"
-#include "main_window.h"
+#include "gui/main_window.h"
 
 using dove_eye::CameraIndex;
 using dove_eye::Parameters;
 using dove_eye::FileVideoProvider;
 using dove_eye::TemplateTracker;
 using dove_eye::VideoProvider;
+using gui::MainWindow;
 using std::string;
 using std::vector;
 
@@ -27,7 +28,7 @@ int main(int argc, char* argv[]) {
 
   QApplication app(argc, argv);
 
-  typedef gui::Controller::InnerFrameProvider Aggregator;
+  typedef Controller::InnerFrameProvider Aggregator;
 
   Aggregator::FramePolicy::ProvidersContainer providers;
   Aggregator::OffsetsContainer offsets;
@@ -51,7 +52,7 @@ int main(int argc, char* argv[]) {
   Parameters parameters;
   dove_eye::Tracker tracker(arity, TemplateTracker(parameters));
   dove_eye::Localization localization;
-  gui::Controller controller(parameters, aggregator, tracker, localization);
+  Controller controller(parameters, aggregator, tracker, localization);
 
   MainWindow main_window(parameters, &controller);
   main_window.show();

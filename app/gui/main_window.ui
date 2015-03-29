@@ -20,6 +20,9 @@
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
+      <property name="opaqueResize">
+       <bool>true</bool>
+      </property>
       <widget class="gui::FramesetViewer" name="viewer" native="true">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
@@ -32,7 +35,7 @@
        </property>
        <layout class="QVBoxLayout" name="verticalLayout"/>
       </widget>
-      <widget class="QWidget" name="wgtRight" native="true">
+      <widget class="QWidget" name="wgt_right" native="true">
        <property name="autoFillBackground">
         <bool>false</bool>
        </property>
@@ -50,13 +53,31 @@
      <height>25</height>
     </rect>
    </property>
-   <widget class="QMenu" name="mnuParameters">
+   <widget class="QMenu" name="menu_parameters">
     <property name="title">
      <string>Parameters</string>
     </property>
     <addaction name="action_modify_parameters"/>
    </widget>
-   <addaction name="mnuParameters"/>
+   <widget class="QMenu" name="menu_cameras">
+    <property name="title">
+     <string>Cameras</string>
+    </property>
+    <widget class="QMenu" name="menu_calibration">
+     <property name="title">
+      <string>Calibration</string>
+     </property>
+     <addaction name="action_load_intrinsic_parameters"/>
+     <addaction name="action_load_projection_parameters"/>
+     <addaction name="separator"/>
+     <addaction name="action_calibrate"/>
+     <addaction name="action_save_camera_parameters"/>
+    </widget>
+    <addaction name="action_video_providers"/>
+    <addaction name="menu_calibration"/>
+   </widget>
+   <addaction name="menu_cameras"/>
+   <addaction name="menu_parameters"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_modify_parameters">
@@ -64,12 +85,37 @@
     <string>Modify</string>
    </property>
   </action>
+  <action name="action_video_providers">
+   <property name="text">
+    <string>Video providers</string>
+   </property>
+  </action>
+  <action name="action_load_intrinsic_parameters">
+   <property name="text">
+    <string>Load intrinsic parameters</string>
+   </property>
+  </action>
+  <action name="action_load_projection_parameters">
+   <property name="text">
+    <string>Load projection parameters</string>
+   </property>
+  </action>
+  <action name="action_calibrate">
+   <property name="text">
+    <string>Calibrate</string>
+   </property>
+  </action>
+  <action name="action_save_camera_parameters">
+   <property name="text">
+    <string>Save camera parameters</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
    <class>gui::FramesetViewer</class>
    <extends>QWidget</extends>
-   <header>frameset_viewer.h</header>
+   <header>gui/frameset_viewer.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

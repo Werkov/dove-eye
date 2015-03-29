@@ -5,9 +5,8 @@
 #include "dove_eye/logging.h"
 
 using dove_eye::CameraIndex;
+using gui::GuiMark;
 
-
-namespace gui {
 
 void FramesetConverter::SetFrameSize(const dove_eye::CameraIndex cam,
                                      const QSize size) {
@@ -139,5 +138,4 @@ void FramesetConverter::Enqueue(const dove_eye::Frameset &frameset) {
 }
 
 
-} // namespace gui
 

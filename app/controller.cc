@@ -1,7 +1,7 @@
 #include "controller.h"
 
-#include <QTimerEvent>
 #include <opencv2/opencv.hpp>
+#include <QTimerEvent>
 
 #include "dove_eye/inner_tracker.h"
 
@@ -9,8 +9,8 @@ using dove_eye::CameraIndex;
 using dove_eye::Frameset;
 using dove_eye::InnerTracker;
 using dove_eye::Parameters;
+using gui::GuiMark;
 
-namespace gui {
 
 void Controller::Start() {
   frameset_iterator_ = provider_.begin();
@@ -71,4 +71,3 @@ void Controller::DecorateFrameset(dove_eye::Frameset &frameset,
   }
 }
 
-} // namespace gui

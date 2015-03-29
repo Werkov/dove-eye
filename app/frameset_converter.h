@@ -1,5 +1,5 @@
-#ifndef GUI_FRAMESET_CONVERTER_H_
-#define GUI_FRAMESET_CONVERTER_H_
+#ifndef FRAMESET_CONVERTER_H_
+#define FRAMESET_CONVERTER_H_
 
 #include <QBasicTimer>
 #include <QImage>
@@ -8,9 +8,8 @@
 
 #include "dove_eye/frameset.h"
 #include "dove_eye/types.h"
-#include "gui_mark.h"
+#include "gui/gui_mark.h"
 
-namespace gui {
 
 /*
  * \see http://stackoverflow.com/a/21253353/1351874
@@ -40,15 +39,13 @@ class FramesetConverter : public QObject {
   void SetFrameSize(const dove_eye::CameraIndex cam, const QSize size);
 
   void PropagateMark(const dove_eye::CameraIndex cam,
-                     const GuiMark mark);
+                     const gui::GuiMark mark);
 
  signals:
   void ImagesetReady(const ImageList &);
 
   void MarkCreated(const dove_eye::CameraIndex cam,
-                   const GuiMark mark);
-  //void MarkCreated(const int cam,
-  //                 const GuiMark mark);
+                   const gui::GuiMark mark);
 
  public slots:
   void ProcessFrameset(const dove_eye::Frameset &frameset);
@@ -68,8 +65,7 @@ class FramesetConverter : public QObject {
   void Enqueue(const dove_eye::Frameset &frameset);
 };
 
-} // namespace gui
 
-Q_DECLARE_METATYPE(gui::FramesetConverter::ImageList)
+Q_DECLARE_METATYPE(FramesetConverter::ImageList)
 
-#endif // GUI_FRAMESET_CONVERTER_H_
+#endif // FRAMESET_CONVERTER_H_

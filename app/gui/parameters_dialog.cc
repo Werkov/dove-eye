@@ -1,4 +1,4 @@
-#include "parameters_dialog.h"
+#include "gui/parameters_dialog.h"
 
 #include <QAbstractButton>
 #include <QDoubleSpinBox>
@@ -10,6 +10,8 @@
 #include "ui_parameters_dialog.h"
 
 using dove_eye::Parameters;
+
+namespace gui {
 
 ParametersDialog::ParametersDialog(Parameters &parameters, QWidget *parent)
     : QDialog(parent),
@@ -82,3 +84,5 @@ void ParametersDialog::CreateControls() {
 
   ui_->container->setLayout(layout);
 }
+
+} // end namespace gui
