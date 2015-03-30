@@ -70,8 +70,6 @@ class Application : public QObject {
   void MoveToNewThread(QObject* object);
   void MoveToThread(QObject* object, QThread* thread);
 
-  void SetArity(const dove_eye::CameraIndex arity);
-
   void SetupController(VideoProvidersContainer &&providers);
   void SetupConverter();
 

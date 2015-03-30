@@ -84,6 +84,10 @@ void FramesetConverter::ProcessFramesetInternal(dove_eye::Frameset frameset) {
 
     /* Get own copy of frame, we'll modify it. */
     auto mat = frameset[cam].data.clone();
+    if (!mat.data) {
+      DEBUG("Empty data from cam %i", cam);
+      continue;
+    }
 
     /*
      * Update frame size, we do it every frame, however, it's not actually
@@ -108,7 +112,15 @@ void FramesetConverter::ProcessFramesetInternal(dove_eye::Frameset frameset) {
       }
       cv::resize(mat, mat, new_size);
     }
-    cv::cvtColor(mat, mat, CV_BGR2RGB);
+
+    if (mat.channels() == 1) {
+      cv::cvtColor(mat, mat, CV_GRAY2BGR);
+    } else if (mat.channels() == 3) {
+      cv::cvtColor(mat, mat, CV_BGR2RGB);
+    } else {
+      ERROR("Unexpected no. of channels (%i) in cam %i frame.",
+            mat.channels(), cam);
+    }
 
 
     /*

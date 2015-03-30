@@ -12,6 +12,8 @@ namespace dove_eye {
 
 class VideoProvider {
  public:
+  virtual ~VideoProvider() {}
+
   virtual std::string Id() const = 0;
 
   virtual FrameIterator begin() = 0;

@@ -1,6 +1,7 @@
 #include "gui/video_providers_dialog.h"
 
 #include <QLabel>
+#include <QPushButton>
 
 #include "ui_video_providers_dialog.h"
 #include "widgets/video_provider.h"
@@ -22,8 +23,13 @@ void VideoProvidersDialog::SetProviders(
     const Application::VideoProvidersVector &providers) {
   auto layout = new QVBoxLayout();
 
+  QWidget *first_widget = nullptr;
   for (auto provider : providers) {
-    layout->addWidget(new widgets::VideoProvider(provider));
+    auto widget = new widgets::VideoProvider(provider);
+    if (!first_widget) {
+      first_widget = widget;
+    }
+    layout->addWidget(widget);
   }
 
   if (providers.size() == 0) {
@@ -33,6 +39,9 @@ void VideoProvidersDialog::SetProviders(
 
   delete ui_->frame->layout();
   ui_->frame->setLayout(layout);
+  if (first_widget) {
+    first_widget->setFocus();
+  }
 }
 
 void VideoProvidersDialog::OnAccepted() const {

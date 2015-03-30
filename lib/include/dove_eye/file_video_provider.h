@@ -3,8 +3,6 @@
 
 #include <string>
 
-#include <opencv2/opencv.hpp>
-
 #include "dove_eye/video_provider.h"
 
 namespace dove_eye {

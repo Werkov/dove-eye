@@ -10,6 +10,7 @@ VideoProvider::VideoProvider(dove_eye::VideoProvider *provider, QWidget *parent)
       provider_(provider) {
   ui_->setupUi(this);
   ui_->chk_enabled->setText(provider->Id().c_str());
+  setFocusProxy(ui_->chk_enabled);
 }
 
 VideoProvider::~VideoProvider() {

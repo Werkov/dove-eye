@@ -55,13 +55,13 @@
    </property>
    <widget class="QMenu" name="menu_parameters">
     <property name="title">
-     <string>Parameters</string>
+     <string>&amp;Parameters</string>
     </property>
     <addaction name="action_modify_parameters"/>
    </widget>
    <widget class="QMenu" name="menu_cameras">
     <property name="title">
-     <string>Cameras</string>
+     <string>&amp;Cameras</string>
     </property>
     <widget class="QMenu" name="menu_calibration">
      <property name="title">
@@ -87,7 +87,7 @@
   </action>
   <action name="action_video_providers">
    <property name="text">
-    <string>Video providers</string>
+    <string>Video &amp;providers</string>
    </property>
   </action>
   <action name="action_load_intrinsic_parameters">

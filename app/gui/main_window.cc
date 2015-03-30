@@ -18,6 +18,9 @@ MainWindow::MainWindow(Application *application, QWidget *parent)
       video_providers_dialog_(new VideoProvidersDialog()) {
   ui_->setupUi(this);
 
+  connect(application_, &Application::ChangedArity,
+          this, &MainWindow::ChangeArity);
+
   /* Dialog connections */
   connect(video_providers_dialog_.get(), &VideoProvidersDialog::SelectedProviders,
           application_, &Application::UseVideoProviders);
