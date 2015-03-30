@@ -84,15 +84,14 @@ void Application::SetupController() {
   auto new_controller = new Controller(parameters_, aggregator_, tracker,
                                        localization);
 
-  // TODO why static_cast doesn't work?
-  SwapAndDestroy(reinterpret_cast<QObject **>(&controller_), new_controller);
+  SwapAndDestroy(&controller_, new_controller);
 }
 
 void Application::SetupConverter() {
   assert(controller_);
 
   auto new_converter = new FramesetConverter(arity_);
-  SwapAndDestroy(reinterpret_cast<QObject **>(&converter_), new_converter);
+  SwapAndDestroy(&converter_, new_converter);
 
   QObject::connect(controller_, &Controller::FramesetReady,
                    converter_, &FramesetConverter::ProcessFrameset);
@@ -101,22 +100,3 @@ void Application::SetupConverter() {
 
 }
 
-void Application::SwapAndDestroy(QObject **object_ptr, QObject *new_object) {
-  assert(object_ptr);
-  /*
-   * Queue old object for destruction (it's safe to call it again in
-   * application's dtor), then we replace it with the new converter and reuse
-   * original's thread.
-   */
-  QObject *old_object = *object_ptr;
-
-  if (old_object != nullptr) {
-    auto thread = old_object->thread();
-    old_object->deleteLater();
-    MoveToThread(new_object, thread);
-  } else {
-    MoveToNewThread(new_object);
-  }
-
-  *object_ptr = new_object;
-}

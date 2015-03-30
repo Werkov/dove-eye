@@ -61,7 +61,26 @@ class Application : public QObject {
   void SetupController();
   void SetupConverter();
 
-  void SwapAndDestroy(QObject **object_ptr, QObject *new_object);
+  template<typename T>
+  void SwapAndDestroy(T **object_ptr, T *new_object) {
+    assert(object_ptr);
+    /*
+     * Queue old object for destruction (it's safe to call it again in
+     * application's dtor), then we replace it with the new converter and reuse
+     * original's thread.
+     */
+    T *old_object = *object_ptr;
+
+    if (old_object != nullptr) {
+      auto thread = old_object->thread();
+      old_object->deleteLater();
+      MoveToThread(new_object, thread);
+    } else {
+      MoveToNewThread(new_object);
+    }
+
+    *object_ptr = new_object;
+  }
 };
 
 
