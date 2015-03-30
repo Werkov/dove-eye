@@ -5,6 +5,8 @@
 
 #include <QDialog>
 
+#include "application.h"
+
 namespace Ui {
 class VideoProvidersDialog;
 }
@@ -14,10 +16,18 @@ namespace gui {
 class VideoProvidersDialog : public QDialog {
   Q_OBJECT
  public:
-  // TODO accept Application object (that would allow setting providers)
   explicit VideoProvidersDialog(QWidget *parent = nullptr);
 
   ~VideoProvidersDialog() override;
+
+ signals:
+  void SelectedProviders(const Application::VideoProvidersVector &providers) const;
+
+ public slots:
+  void SetProviders(const Application::VideoProvidersVector &providers);
+
+ private slots:
+  void OnAccepted() const;
 
  private:
   std::unique_ptr<Ui::VideoProvidersDialog> ui_;

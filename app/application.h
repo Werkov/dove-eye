@@ -2,6 +2,7 @@
 #define APPLICATION_H_
 
 #include <memory>
+#include <vector>
 
 #include <QList>
 #include <QObject>
@@ -13,6 +14,7 @@
 #include "dove_eye/template_tracker.h"
 #include "dove_eye/tracker.h"
 #include "dove_eye/types.h"
+#include "dove_eye/video_provider.h"
 #include "frameset_converter.h"
 
 /** Holds and manages all necessary object of application
@@ -22,6 +24,11 @@
 class Application : public QObject {
   Q_OBJECT
  public:
+  typedef std::vector<dove_eye::VideoProvider *> VideoProvidersVector;
+  typedef std::vector<std::unique_ptr<dove_eye::VideoProvider>>
+      VideoProvidersVectorOwning;
+  typedef Controller::Aggregator::ProvidersContainer VideoProvidersContainer;
+
   Application();
 
   ~Application() override;
@@ -37,12 +44,19 @@ class Application : public QObject {
  signals:
   void ChangedArity(const dove_eye::CameraIndex arity);
 
+ public slots:
+  VideoProvidersVector AvailableVideoProviders();
+  void UseVideoProviders(const VideoProvidersVector &providers);
+// TODO think about this
+// - rather rename (func pointer resolution)
+  //void UseVideoProviders(const std::string &filename);
+
  private:
   dove_eye::CameraIndex arity_;
   dove_eye::Parameters parameters_;
+  VideoProvidersVectorOwning available_providers_;
 
   Controller *controller_;
-  Controller::Aggregator *aggregator_;
   FramesetConverter* converter_;
 
   std::unique_ptr<dove_eye::Tracker> tracker_;
@@ -58,7 +72,7 @@ class Application : public QObject {
 
   void SetArity(const dove_eye::CameraIndex arity);
 
-  void SetupController();
+  void SetupController(VideoProvidersContainer &&providers);
   void SetupConverter();
 
   template<typename T>

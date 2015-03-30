@@ -18,9 +18,9 @@ MainWindow::MainWindow(Application *application, QWidget *parent)
       video_providers_dialog_(new VideoProvidersDialog()) {
   ui_->setupUi(this);
 
-
-  QObject::connect(application->converter(), &FramesetConverter::ImagesetReady,
-                   ui_->viewer, &FramesetViewer::SetImageset);
+  /* Dialog connections */
+  connect(video_providers_dialog_.get(), &VideoProvidersDialog::SelectedProviders,
+          application_, &Application::UseVideoProviders);
 
   /* Menu actions */
   connect(ui_->action_modify_parameters, &QAction::triggered,
@@ -35,6 +35,9 @@ MainWindow::~MainWindow() {
 void MainWindow::ChangeArity(const CameraIndex arity) {
   ui_->viewer->SetArity(arity);
   ui_->viewer->SetConverter(application_->converter());
+
+  QObject::connect(application_->converter(), &FramesetConverter::ImagesetReady,
+                   ui_->viewer, &FramesetViewer::SetImageset);
 }
 
 void MainWindow::ModifyParameters() {
@@ -43,6 +46,7 @@ void MainWindow::ModifyParameters() {
 }
 
 void MainWindow::VideoProviders() {
+  video_providers_dialog_->SetProviders(application_->AvailableVideoProviders());
   video_providers_dialog_->show();
 }
 

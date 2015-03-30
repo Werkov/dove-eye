@@ -11,9 +11,9 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(CMAKE_AUTOMOC ON)
 
-file(GLOB SOURCES *.cc gui/*.cc)
-file(GLOB HEADERS *.h gui/*.h)
-file(GLOB UI gui/*.ui)
+file(GLOB SOURCES *.cc gui/*.cc widgets/*.cc)
+file(GLOB HEADERS *.h gui/*.h widgets/*.h)
+file(GLOB UI gui/*.ui widgets/*.ui)
 
 qt5_wrap_ui(UIC ${UI})
 

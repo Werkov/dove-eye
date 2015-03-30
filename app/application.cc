@@ -8,7 +8,10 @@ using dove_eye::TemplateTracker;
 using dove_eye::Tracker;
 
 Application::Application()
-    : QObject() {
+    : QObject(),
+      arity_(0),
+      controller_(nullptr),
+      converter_(nullptr) {
   RegisterMetaTypes();
 
   //TODO call SetArity (together with providers API)
@@ -29,6 +32,43 @@ Application::~Application() {
   }
 }
 
+Application::VideoProvidersVector Application::AvailableVideoProviders() {
+  if (available_providers_.size() == 0) {
+    // TODO discover available video providers
+  }
+
+  VideoProvidersVector result;
+  for (auto &provider : available_providers_) {
+    result.push_back(provider.get());
+  }
+  return result;
+}
+
+void Application::UseVideoProviders(const VideoProvidersVector &providers) {
+  VideoProvidersContainer used_providers;
+
+  for (auto provider : providers) {
+    for (auto &provider_owner : available_providers_) {
+      bool released = false;
+      if (provider_owner.get() == provider) {
+        provider_owner.release();
+        released = true;
+        break;
+      }
+      assert(released);
+    }
+    used_providers.push_back(
+        std::move(VideoProvidersContainer::value_type(provider)));
+  }
+
+  arity_ = used_providers.size();
+
+  SetupController(std::move(used_providers));
+  SetupConverter();
+
+  emit ChangedArity(arity_);
+}
+
 void Application::MoveToNewThread(QObject* object) {
   QThread* thread = new QThread(this);
 
@@ -45,43 +85,16 @@ void Application::MoveToThread(QObject* object, QThread* thread) {
 }
 
 
-void Application::SetArity(const CameraIndex arity) {
-  arity_ = arity;
-
-  SetupController();
-  SetupConverter();
-
-  emit ChangedArity(arity);
-}
-
-void Application::SetupController() {
-  // TODO do not store aggregator (it's not QObject)
-//  typedef Controller::InnerFrameProvider Aggregator;
-//
-//  Aggregator::FramePolicy::ProvidersContainer providers;
-//  Aggregator::OffsetsContainer offsets;
-//
-//  double offs = 0;
-//  for (auto filename : args) {
-//    providers.push_back(std::unique_ptr<VideoProvider>(
-//            new FileVideoProvider(filename)));
-//    offsets.push_back(offs);
-//    offs += 1.0;
-//  }
-//  CameraIndex arity = offsets.size();
-//
-//
-//  // TODO window size should be maximum offset
-//  Aggregator aggregator(
-//      std::move(providers), offsets, 2.0);
-
-  assert(aggregator_);
+void Application::SetupController(VideoProvidersContainer &&providers) {
+  //TODO replace deprecated offsets API
+  Controller::Aggregator::OffsetsContainer offsets(providers.size(), 0);
+  auto aggregator = new Controller::Aggregator(std::move(providers), offsets, 0.1);
 
   TemplateTracker inner_tracker(parameters_);
   auto tracker = new Tracker(arity_, inner_tracker);
   auto localization = new Localization;
 
-  auto new_controller = new Controller(parameters_, aggregator_, tracker,
+  auto new_controller = new Controller(parameters_, aggregator, tracker,
                                        localization);
 
   SwapAndDestroy(&controller_, new_controller);

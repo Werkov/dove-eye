@@ -2,6 +2,7 @@
 #define DOVE_EYE_VIDEO_PROVIDER_H_
 
 #include <memory>
+#include <string>
 
 #include <opencv2/opencv.hpp>
 
@@ -11,6 +12,8 @@ namespace dove_eye {
 
 class VideoProvider {
  public:
+  virtual std::string Id() const = 0;
+
   virtual FrameIterator begin() = 0;
   virtual FrameIterator end() = 0;
 };

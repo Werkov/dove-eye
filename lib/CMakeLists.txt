@@ -4,7 +4,7 @@ project(dove-eye)
 
 find_package(OpenCV REQUIRED)
 
-file(GLOB SOURCES src/*.cc)
+file(GLOB SOURCES src/*.cc src/frame_iterator/*.cc)
 
 add_library(dove-eye ${SOURCES})
 target_link_libraries(dove-eye ${OpenCV_LIBS})

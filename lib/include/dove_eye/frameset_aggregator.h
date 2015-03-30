@@ -15,11 +15,11 @@
 namespace dove_eye {
 
 
-template<class FramePolicyT>
+template<class FramePolicy>
 class FramesetAggregator {
  public:
-  typedef FramePolicyT FramePolicy;
   typedef std::vector<Frame::TimestampDiff> OffsetsContainer;
+  typedef typename FramePolicy::ProvidersContainer ProvidersContainer;
 
   /*
    * Iteration state is kept in iterator, however
