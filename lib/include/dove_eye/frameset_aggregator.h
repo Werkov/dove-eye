@@ -127,6 +127,9 @@ class FramesetAggregator {
 
   };
 
+  /**
+   * @note FramesetAggregator takes ownership of contained video providers
+   */
   FramesetAggregator(typename FramePolicy::ProvidersContainer &&providers,
                      const OffsetsContainer &offsets,
                      Frame::TimestampDiff window_size)

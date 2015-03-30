@@ -1,6 +1,8 @@
 #ifndef CONTROLLER_H_
 #define CONTROLLER_H_
 
+#include <memory>
+
 #include <QBasicTimer>
 #include <QObject>
 #include <QPoint>
@@ -23,24 +25,26 @@ class Controller : public QObject {
 
  public:
   typedef dove_eye::FramesetAggregator<dove_eye::AsyncPolicy<true>>
-      InnerFrameProvider;
+      Aggregator;
 
+  /**
+   * @note Controller takes ownership of all ctor arguments given by pointer
+   */
   explicit Controller(dove_eye::Parameters &parameters,
-                      InnerFrameProvider &provider,
-                      dove_eye::Tracker &tracker,
-                      dove_eye::Localization &localization,
-                      QObject *parent = nullptr)
-      : QObject(parent),
+                      Aggregator *aggregator,
+                      dove_eye::Tracker *tracker,
+                      dove_eye::Localization *localization)
+      : QObject(),
         parameters_(parameters),
-        frameset_iterator_(provider.Arity()),
-        frameset_end_iterator_(provider.Arity()),
-        provider_(provider),
+        frameset_iterator_(aggregator->Arity()),
+        frameset_end_iterator_(aggregator->Arity()),
+        aggregator_(aggregator),
         tracker_(tracker),
         localization_(localization) {
   }
 
   inline dove_eye::CameraIndex Arity() const {
-    return provider_.Arity();
+    return aggregator_->Arity();
   }
 
  signals:
@@ -49,6 +53,7 @@ class Controller : public QObject {
   void LocationReady(const dove_eye::Location &);
 
  public slots:
+  // TODO remove start/stop?
   void Start();
 
   void Stop();
@@ -62,12 +67,12 @@ class Controller : public QObject {
  private:
   const dove_eye::Parameters &parameters_;
   QBasicTimer timer_;
-  InnerFrameProvider::Iterator frameset_iterator_;
-  InnerFrameProvider::Iterator frameset_end_iterator_;
+  Aggregator::Iterator frameset_iterator_;
+  Aggregator::Iterator frameset_end_iterator_;
 
-  InnerFrameProvider &provider_;
-  dove_eye::Tracker &tracker_;
-  dove_eye::Localization &localization_;
+  std::unique_ptr<Aggregator> aggregator_;
+  std::unique_ptr<dove_eye::Tracker> tracker_;
+  std::unique_ptr<dove_eye::Localization> localization_;
 
   void DecorateFrameset(dove_eye::Frameset &frameset,
                         const dove_eye::Positset positset);

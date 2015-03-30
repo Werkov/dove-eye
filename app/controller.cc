@@ -13,8 +13,8 @@ using gui::GuiMark;
 
 
 void Controller::Start() {
-  frameset_iterator_ = provider_.begin();
-  frameset_end_iterator_ = provider_.end();
+  frameset_iterator_ = aggregator_->begin();
+  frameset_end_iterator_ = aggregator_->end();
 
   timer_.start(0, this);
 }
@@ -28,7 +28,7 @@ void Controller::SetMark(const dove_eye::CameraIndex cam,
   InnerTracker::Mark mark(gui_mark.pos.x(), gui_mark.pos.y());
   // TODO encapsulate project_other into GuiMark
   bool project_other = false;
-  tracker_.SetMark(cam, mark, project_other);
+  tracker_->SetMark(cam, mark, project_other);
 }
 
 void Controller::timerEvent(QTimerEvent *event) {
@@ -43,13 +43,13 @@ void Controller::timerEvent(QTimerEvent *event) {
 
   auto frameset = *frameset_iterator_;
 
-  auto positset = tracker_.Track(frameset);
+  auto positset = tracker_->Track(frameset);
   emit PositsetReady(positset);
 
   DecorateFrameset(frameset, positset);
   emit FramesetReady(*frameset_iterator_);
 
-  auto location = localization_.Locate(positset);
+  auto location = localization_->Locate(positset);
   emit LocationReady(location);
 
   ++frameset_iterator_;

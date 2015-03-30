@@ -24,9 +24,8 @@ class FramesetConverter : public QObject {
  public:
   typedef QVector<QImage> ImageList;
 
-  explicit FramesetConverter(const dove_eye::CameraIndex arity,
-                             QObject *parent = nullptr)
-      : QObject(parent),
+  explicit FramesetConverter(const dove_eye::CameraIndex arity)
+      : QObject(),
         frameset_(arity),
         frame_sizes_(arity),
         viewer_sizes_(arity) {
