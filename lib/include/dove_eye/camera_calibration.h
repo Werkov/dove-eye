@@ -10,6 +10,7 @@
 #include "dove_eye/calibration_pattern.h"
 #include "dove_eye/camera_pair.h"
 #include "dove_eye/frameset.h"
+#include "dove_eye/parameters.h"
 #include "dove_eye/types.h"
 
 namespace dove_eye {
@@ -25,7 +26,8 @@ class CameraCalibration {
     cv::Mat essential_matrix;
   };
 
-  CameraCalibration(const CameraIndex arity,
+  CameraCalibration(const Parameters &parameters,
+                    const CameraIndex arity,
                     CalibrationPattern const *pattern);
 
   /** Search for pattern in frameset and use it for calibration.
@@ -70,9 +72,13 @@ class CameraCalibration {
     kReady
   };
 
+  const Parameters &parameters_;
+
   const CameraIndex arity_;
 
-  const int frames_to_collect_ = 10;
+  int frames_to_collect_;
+  int frames_skip_;
+  int frame_no_;
 
   std::unique_ptr<const CalibrationPattern> pattern_;
 

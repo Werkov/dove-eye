@@ -121,7 +121,7 @@ void Application::SetupController(VideoProvidersContainer &&providers) {
       parameters_.Get(Parameters::CALIBRATION_ROWS),
       parameters_.Get(Parameters::CALIBRATION_COLS),
       parameters_.Get(Parameters::CALIBRATION_SIZE));
-  auto calibration = new CameraCalibration(arity_, pattern);
+  auto calibration = new CameraCalibration(parameters_, arity_, pattern);
 
   TemplateTracker inner_tracker(parameters_);
   auto tracker = new Tracker(arity_, inner_tracker);

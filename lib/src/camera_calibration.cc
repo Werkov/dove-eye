@@ -12,22 +12,26 @@ using std::vector;
 
 namespace dove_eye {
 
-CameraCalibration::CameraCalibration(const CameraIndex arity,
+CameraCalibration::CameraCalibration(const Parameters &parameters,
+                                     const CameraIndex arity,
                                      CalibrationPattern const *pattern)
-    : arity_(arity),
+    : parameters_(parameters),
+      arity_(arity),
       pattern_(pattern),
-      image_points_(arity),
-      camera_states_(arity, kUnitialized),
       camera_parameters_(arity),
-      pair_states_(arity, kUnitialized),
       pair_parameters_(arity),
       pairs_(CameraPair::GenerateArray(arity)) {
+  Reset();
 }
 
 bool CameraCalibration::MeasureFrameset(const Frameset &frameset) {
   assert(frameset.Arity() == arity_);
-  bool result = true;
 
+  if (frame_no_++ % (frames_skip_ + 1) != 0) {
+    return false;
+  }
+
+  bool result = true;
   /*
    * First we search for pattern in each single camera,
    * when both camera from a pair are calibrated, we estimate pair parameters.
@@ -141,9 +145,11 @@ bool CameraCalibration::MeasureFrameset(const Frameset &frameset) {
 }
 
 void CameraCalibration::Reset() {
-  for (auto &image_points : image_points_) {
-    image_points.clear();
-  }
+  frames_to_collect_ = parameters_.Get(Parameters::CALIBRATION_FRAMES);
+  frames_skip_ = parameters_.Get(Parameters::CALIBRATION_SKIP);
+  frame_no_ = 0;
+  
+  image_points_ = decltype(image_points_)(arity_);
   camera_states_ = decltype(camera_states_)(arity_, kUnitialized);
   pair_states_ = decltype(pair_states_)(arity_, kUnitialized);
 }
