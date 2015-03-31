@@ -1,5 +1,5 @@
-#ifndef GUI_VIDEO_PROVIDERS_DIALOG_H_
-#define GUI_VIDEO_PROVIDERS_DIALOG_H_
+#ifndef GUI_CAMERAS_SETUP_DIALOG_H_
+#define GUI_CAMERAS_SETUP_DIALOG_H_
 
 #include <memory>
 
@@ -8,17 +8,17 @@
 #include "application.h"
 
 namespace Ui {
-class VideoProvidersDialog;
+class CamerasSetupDialog;
 }
 
 namespace gui {
 
-class VideoProvidersDialog : public QDialog {
+class CamerasSetupDialog : public QDialog {
   Q_OBJECT
  public:
-  explicit VideoProvidersDialog(QWidget *parent = nullptr);
+  explicit CamerasSetupDialog(QWidget *parent = nullptr);
 
-  ~VideoProvidersDialog() override;
+  ~CamerasSetupDialog() override;
 
  signals:
   void SelectedProviders(const Application::VideoProvidersVector &providers) const;
@@ -30,10 +30,10 @@ class VideoProvidersDialog : public QDialog {
   void OnAccepted() const;
 
  private:
-  std::unique_ptr<Ui::VideoProvidersDialog> ui_;
+  std::unique_ptr<Ui::CamerasSetupDialog> ui_;
 
 };
 
 } // end namespace gui
 
-#endif // GUI_VIDEO_PROVIDERS_DIALOG_H_
+#endif // GUI_CAMERAS_SETUP_DIALOG_H_

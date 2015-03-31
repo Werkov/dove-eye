@@ -59,25 +59,35 @@
     </property>
     <addaction name="action_modify_parameters"/>
    </widget>
-   <widget class="QMenu" name="menu_cameras">
+   <widget class="QMenu" name="menu_providers">
     <property name="title">
-     <string>&amp;Cameras</string>
+     <string>P&amp;roviders</string>
     </property>
-    <widget class="QMenu" name="menu_calibration">
-     <property name="title">
-      <string>Calibration</string>
-     </property>
-     <addaction name="action_load_intrinsic_parameters"/>
-     <addaction name="action_load_projection_parameters"/>
-     <addaction name="separator"/>
-     <addaction name="action_calibrate"/>
-     <addaction name="action_abort_calibration"/>
-     <addaction name="action_save_camera_parameters"/>
-    </widget>
-    <addaction name="action_video_providers"/>
-    <addaction name="menu_calibration"/>
+    <addaction name="action_setup_cameras"/>
+    <addaction name="action_open_video_file"/>
    </widget>
-   <addaction name="menu_cameras"/>
+   <widget class="QMenu" name="menu_localization">
+    <property name="title">
+     <string>&amp;Localization</string>
+    </property>
+    <addaction name="action_localization_start"/>
+    <addaction name="action_localization_stop"/>
+   </widget>
+   <widget class="QMenu" name="menu_calibration">
+    <property name="title">
+     <string>&amp;Calibration</string>
+    </property>
+    <addaction name="action_load_intrinsic_parameters"/>
+    <addaction name="action_load_projection_parameters"/>
+    <addaction name="separator"/>
+    <addaction name="action_calibrate"/>
+    <addaction name="action_abort_calibration"/>
+    <addaction name="separator"/>
+    <addaction name="action_save_camera_parameters"/>
+   </widget>
+   <addaction name="menu_providers"/>
+   <addaction name="menu_calibration"/>
+   <addaction name="menu_localization"/>
    <addaction name="menu_parameters"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -86,9 +96,9 @@
     <string>Modify</string>
    </property>
   </action>
-  <action name="action_video_providers">
+  <action name="action_setup_cameras">
    <property name="text">
-    <string>Video &amp;providers</string>
+    <string>&amp;Cameras</string>
    </property>
   </action>
   <action name="action_load_intrinsic_parameters">
@@ -117,6 +127,21 @@
   <action name="action_abort_calibration">
    <property name="text">
     <string>Abort calibration</string>
+   </property>
+  </action>
+  <action name="action_localization_start">
+   <property name="text">
+    <string>Start</string>
+   </property>
+  </action>
+  <action name="action_localization_stop">
+   <property name="text">
+    <string>Stop</string>
+   </property>
+  </action>
+  <action name="action_open_video_file">
+   <property name="text">
+    <string>Video &amp;file</string>
    </property>
   </action>
  </widget>

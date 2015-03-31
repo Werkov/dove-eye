@@ -22,7 +22,7 @@ MainWindow::MainWindow(Application *application, QWidget *parent)
       application_(application),
       ui_(new Ui::MainWindow),
       parameters_dialog_(new ParametersDialog(application->parameters())),
-      video_providers_dialog_(new VideoProvidersDialog()) {
+      cameras_setup_dialog_(new CamerasSetupDialog()) {
   ui_->setupUi(this);
   CreateStatusBar();
 
@@ -30,7 +30,7 @@ MainWindow::MainWindow(Application *application, QWidget *parent)
           this, &MainWindow::ChangeArity);
 
   /* Dialog connections */
-  connect(video_providers_dialog_.get(), &VideoProvidersDialog::SelectedProviders,
+  connect(cameras_setup_dialog_.get(), &CamerasSetupDialog::SelectedProviders,
           application_, &Application::UseVideoProviders);
 
   /* Menu actions */
@@ -40,8 +40,8 @@ MainWindow::MainWindow(Application *application, QWidget *parent)
           this, &MainWindow::Calibrate);
   connect(ui_->action_modify_parameters, &QAction::triggered,
           this, &MainWindow::ModifyParameters);
-  connect(ui_->action_video_providers, &QAction::triggered,
-          this, &MainWindow::VideoProviders);
+  connect(ui_->action_setup_cameras, &QAction::triggered,
+          this, &MainWindow::SetupCameras);
 
   /* Initialization */
   ChangeArity(application_->Arity());
@@ -101,9 +101,9 @@ void MainWindow::ModifyParameters() {
   parameters_dialog_->show();
 }
 
-void MainWindow::VideoProviders() {
-  video_providers_dialog_->SetProviders(application_->AvailableVideoProviders());
-  video_providers_dialog_->show();
+void MainWindow::SetupCameras() {
+  cameras_setup_dialog_->SetProviders(application_->AvailableVideoProviders());
+  cameras_setup_dialog_->show();
 }
 
 void MainWindow::ControllerModeChanged(const Controller::Mode mode) {

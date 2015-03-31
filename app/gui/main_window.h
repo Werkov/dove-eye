@@ -9,7 +9,7 @@
 #include "application.h"
 #include "dove_eye/types.h"
 #include "parameters_dialog.h"
-#include "video_providers_dialog.h"
+#include "cameras_setup_dialog.h"
 #include "widgets/calibration_status.h"
 #include "widgets/controller_status.h"
 
@@ -33,7 +33,7 @@ class MainWindow : public QMainWindow {
   void AbortCalibration();
   void Calibrate();
   void ModifyParameters();
-  void VideoProviders();
+  void SetupCameras();
   void ControllerModeChanged(const Controller::Mode mode);
 
  private:
@@ -42,7 +42,7 @@ class MainWindow : public QMainWindow {
   std::unique_ptr<Ui::MainWindow> ui_;
 
   std::unique_ptr<ParametersDialog> parameters_dialog_;
-  std::unique_ptr<VideoProvidersDialog> video_providers_dialog_;
+  std::unique_ptr<CamerasSetupDialog> cameras_setup_dialog_;
 
   widgets::ControllerStatus *controller_status_;
   widgets::CalibrationStatus *calibration_status_;

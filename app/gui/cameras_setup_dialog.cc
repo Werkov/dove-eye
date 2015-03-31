@@ -1,25 +1,25 @@
-#include "gui/video_providers_dialog.h"
+#include "gui/cameras_setup_dialog.h"
 
 #include <QLabel>
 #include <QPushButton>
 
-#include "ui_video_providers_dialog.h"
+#include "ui_cameras_setup_dialog.h"
 #include "widgets/video_provider.h"
 
 namespace gui {
 
-VideoProvidersDialog::VideoProvidersDialog(QWidget *parent)
+CamerasSetupDialog::CamerasSetupDialog(QWidget *parent)
     : QDialog(parent),
-      ui_(new Ui::VideoProvidersDialog) {
+      ui_(new Ui::CamerasSetupDialog) {
   connect(this, &QDialog::accepted,
-          this, &VideoProvidersDialog::OnAccepted);
+          this, &CamerasSetupDialog::OnAccepted);
   ui_->setupUi(this);
 }
 
-VideoProvidersDialog::~VideoProvidersDialog() {
+CamerasSetupDialog::~CamerasSetupDialog() {
 }
 
-void VideoProvidersDialog::SetProviders(
+void CamerasSetupDialog::SetProviders(
     const Application::VideoProvidersVector &providers) {
   auto layout = new QVBoxLayout();
 
@@ -44,7 +44,7 @@ void VideoProvidersDialog::SetProviders(
   }
 }
 
-void VideoProvidersDialog::OnAccepted() const {
+void CamerasSetupDialog::OnAccepted() const {
   Application::VideoProvidersVector result;
 
   for (auto video_provider : this->findChildren<widgets::VideoProvider *>()) {
