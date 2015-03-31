@@ -1,5 +1,7 @@
 #include "controller.h"
 
+#include <cassert>
+
 #include <opencv2/opencv.hpp>
 #include <QTimerEvent>
 
@@ -79,12 +81,16 @@ void Controller::timerEvent(QTimerEvent *event) {
       }
 
       break;
-    case kTracking:
+    case kTracking: {
       positset = tracker_->Track(frameset);
       emit PositsetReady(positset);
 
       auto location = localization_->Locate(positset);
       emit LocationReady(location);
+      break;
+    }
+    case kNonexistent:
+      assert(false);
       break;
   }
 

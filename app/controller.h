@@ -29,6 +29,7 @@ class Controller : public QObject {
       Aggregator;
 
   enum Mode {
+    kNonexistent,
     kIdle,
     kCalibration,
     kTracking

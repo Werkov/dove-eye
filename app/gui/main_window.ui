@@ -71,6 +71,7 @@
      <addaction name="action_load_projection_parameters"/>
      <addaction name="separator"/>
      <addaction name="action_calibrate"/>
+     <addaction name="action_abort_calibration"/>
      <addaction name="action_save_camera_parameters"/>
     </widget>
     <addaction name="action_video_providers"/>
@@ -104,10 +105,18 @@
    <property name="text">
     <string>Calibrate</string>
    </property>
+   <property name="visible">
+    <bool>true</bool>
+   </property>
   </action>
   <action name="action_save_camera_parameters">
    <property name="text">
     <string>Save camera parameters</string>
+   </property>
+  </action>
+  <action name="action_abort_calibration">
+   <property name="text">
+    <string>Abort calibration</string>
    </property>
   </action>
  </widget>

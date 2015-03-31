@@ -34,6 +34,8 @@ MainWindow::MainWindow(Application *application, QWidget *parent)
           application_, &Application::UseVideoProviders);
 
   /* Menu actions */
+  connect(ui_->action_abort_calibration, &QAction::triggered,
+          this, &MainWindow::AbortCalibration);
   connect(ui_->action_calibrate, &QAction::triggered,
           this, &MainWindow::Calibrate);
   connect(ui_->action_modify_parameters, &QAction::triggered,
@@ -51,7 +53,6 @@ MainWindow::~MainWindow() {
 void MainWindow::ChangeArity(const CameraIndex arity) {
   ui_->viewer->SetArity(arity);
   calibration_status_->SetArity(arity);
-  controller_status_->Reset(application_->controller());
 
   if (arity == 0) {
     ControllerModeChanged(Controller::kNonexistent);
@@ -83,6 +84,12 @@ void MainWindow::ChangeArity(const CameraIndex arity) {
 
 }
 
+void MainWindow::AbortCalibration() {
+  assert(application_->controller());
+
+  application_->controller()->SetMode(Controller::kIdle);
+}
+
 void MainWindow::Calibrate() {
   assert(application_->controller());
 
@@ -100,17 +107,18 @@ void MainWindow::VideoProviders() {
 }
 
 void MainWindow::ControllerModeChanged(const Controller::Mode mode) {
-  switch (mode) {
-    case Controller::kIdle:
-      statusBar()->removeWidget(calibration_status_);
-      break;
-    case Controller::kCalibration:
-      statusBar()->addWidget(calibration_status_);
-      calibration_status_->show();
-      break;
-    case Controller::kTracking:
-      statusBar()->removeWidget(calibration_status_);
-      break;
+  /* Update menu */
+  ui_->action_abort_calibration->setVisible(mode == Controller::kCalibration);
+  ui_->action_calibrate->setVisible(mode != Controller::kCalibration);
+  ui_->action_calibrate->setEnabled(mode != Controller::kNonexistent);
+
+  /* Update status bar */
+  bool show_calibration = (mode == Controller::kCalibration);
+  if (show_calibration) {
+    statusBar()->addWidget(calibration_status_);
+    calibration_status_->show();
+  } else {
+    statusBar()->removeWidget(calibration_status_);
   }
 }
 

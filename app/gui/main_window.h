@@ -30,6 +30,7 @@ class MainWindow : public QMainWindow {
   void ChangeArity(const dove_eye::CameraIndex arity);
 
  private slots:
+  void AbortCalibration();
   void Calibrate();
   void ModifyParameters();
   void VideoProviders();
