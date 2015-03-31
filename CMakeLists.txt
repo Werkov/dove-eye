@@ -10,6 +10,6 @@ endif()
 
 add_subdirectory(app)
 add_subdirectory(lib)
-add_subdirectory(tools/calibration)
+#add_subdirectory(tools/calibration)
 add_subdirectory(tools/dove_eye)
 
