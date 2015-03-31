@@ -1,3 +1,8 @@
+/** Simple calibration utility
+ *
+ * Obsolete! Use built-in calibration in dove-eye.
+ */
+
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -10,6 +15,7 @@
 #include "dove_eye/file_video_provider.h"
 #include "dove_eye/frameset_aggregator.h"
 #include "dove_eye/logging.h"
+#include "dove_eye/parameters.h"
 #include "dove_eye/time_calibration.h"
 #include "dove_eye/types.h"
 #include "dove_eye/video_provider.h"
@@ -22,6 +28,7 @@ using dove_eye::CameraIndex;
 using dove_eye::ChessboardPattern;
 using dove_eye::FileVideoProvider;
 using dove_eye::FramesetAggregator;
+using dove_eye::Parameters;
 using dove_eye::TimeCalibration;
 using dove_eye::VideoProvider;
 
@@ -68,18 +75,16 @@ int CalibrateCameras(const string &output, const vector<string> &filenames) {
   CameraCalibration calibration(filenames.size(), pattern);
 
   BlockingPolicy::ProvidersContainer providers;
-  Aggregator::OffsetsContainer offsets;
+  Parameters parameters;
 
   for (auto filename : filenames) {
     providers.push_back(unique_ptr<VideoProvider>(
             new FileVideoProvider(filename)));
-    offsets.push_back(0);
   }
 
 
   // TODO window size should maximum offset
-  Aggregator aggregator(
-      std::move(providers), offsets, 2.5);
+  Aggregator aggregator(std::move(providers), parameters);
 
   for (auto frameset : aggregator) {
     if (calibration.MeasureFrameset(frameset)) {

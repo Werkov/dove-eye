@@ -9,6 +9,7 @@
 #include "dove_eye/frameset.h"
 #include "dove_eye/frame_iterator.h"
 #include "dove_eye/logging.h"
+#include "dove_eye/parameters.h"
 #include "dove_eye/video_provider.h"
 
 
@@ -18,7 +19,6 @@ namespace dove_eye {
 template<class FramePolicy>
 class FramesetAggregator {
  public:
-  typedef std::vector<Frame::TimestampDiff> OffsetsContainer;
   typedef typename FramePolicy::ProvidersContainer ProvidersContainer;
 
   /*
@@ -38,7 +38,7 @@ class FramesetAggregator {
           frameset_(aggregator ? aggregator->Arity() : 0) {
       /* If it's begin iterator, start the reader */
       if (aggregator_ && valid) {
-        aggregator_->frame_reader_.Start();
+        aggregator_->frame_policy_.Start();
       }
     }
 
@@ -60,7 +60,7 @@ class FramesetAggregator {
       bool frameset_created = false;
 
       do {
-        if (valid_ && !aggregator_->frame_reader_.GetFrame(&frame, &cam)) {
+        if (valid_ && !aggregator_->frame_policy_.GetFrame(&frame, &cam)) {
           valid_ = false;
           return *this;
         }
@@ -69,12 +69,16 @@ class FramesetAggregator {
          * Apply offset,
          * see http://www.ms.mff.cuni.cz/~koutnym/wiki/dove_eye/calibration/time
          */
-        frame.timestamp -= aggregator_->offsets_[cam];
+        frame.timestamp -=
+            aggregator_->parameters_.Get(Parameters::CAM_OFFSET, cam);
 
         queues_[cam].push_back(frame);
 
-        if (frame.timestamp > window_start_ + aggregator_->window_size_) {
-          window_start_ = frame.timestamp - aggregator_->window_size_;
+        auto window_size =
+            aggregator_->parameters_.Get(Parameters::AGGREGATOR_WINDOW);
+
+        if (frame.timestamp > window_start_ + window_size) {
+          window_start_ = frame.timestamp - window_size;
           frameset_created = PrepareFrameset();
         }
       } while (!frameset_created);
@@ -131,11 +135,10 @@ class FramesetAggregator {
    * @note FramesetAggregator takes ownership of contained video providers
    */
   FramesetAggregator(typename FramePolicy::ProvidersContainer &&providers,
-                     const OffsetsContainer &offsets,
-                     Frame::TimestampDiff window_size)
-      : frame_reader_(std::move(providers)),
-        offsets_(offsets),
-        window_size_(window_size) {
+                     const dove_eye::Parameters &parameters)
+      : arity_(providers.size()),
+        frame_policy_(std::move(providers)),
+        parameters_(parameters) {
   }
 
   Iterator begin() {
@@ -147,13 +150,13 @@ class FramesetAggregator {
   }
 
   CameraIndex Arity() const {
-    return offsets_.size();
+    return arity_;
   }
 
  private:
-  FramePolicy frame_reader_;
-  OffsetsContainer offsets_;
-  Frame::TimestampDiff window_size_;
+  CameraIndex arity_;
+  FramePolicy frame_policy_;
+  const Parameters &parameters_;
 };
 
 } // namespace dove_eye

@@ -110,9 +110,7 @@ void Application::MoveToThread(QObject* object, QThread* thread) {
 
 
 void Application::SetupController(VideoProvidersContainer &&providers) {
-  //TODO replace deprecated offsets API
-  Controller::Aggregator::OffsetsContainer offsets(providers.size(), 0);
-  auto aggregator = new Controller::Aggregator(std::move(providers), offsets, 0.1);
+  auto aggregator = new Controller::Aggregator(std::move(providers), parameters_);
 
   TemplateTracker inner_tracker(parameters_);
   auto tracker = new Tracker(arity_, inner_tracker);
