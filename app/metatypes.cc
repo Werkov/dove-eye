@@ -2,6 +2,7 @@
 
 #include <QMetaObject>
 
+#include "controller.h"
 #include "dove_eye/frameset.h"
 #include "dove_eye/types.h"
 #include "frameset_converter.h"
@@ -18,5 +19,7 @@ void RegisterMetaTypes() {
   qRegisterMetaType<dove_eye::Frameset>();
   qRegisterMetaType<gui::GuiMark>();
   qRegisterMetaType<gui::GuiMark>("GuiMark");
+
+  qRegisterMetaType<Controller::Mode>();
 }
 

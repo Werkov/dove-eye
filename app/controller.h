@@ -58,11 +58,15 @@ class Controller : public QObject {
     return aggregator_->Arity();
   }
 
+  inline Mode mode() const {
+    return mode_;
+  }
+
  signals:
   void FramesetReady(const dove_eye::Frameset &);
   void PositsetReady(const dove_eye::Positset &);
   void LocationReady(const dove_eye::Location &);
-  void ModeChanged(const Mode new_mode);
+  void ModeChanged(const Controller::Mode new_mode);
 
   void CameraCalibrationProgressed(const dove_eye::CameraIndex cam,
                                    const double progress);
@@ -101,5 +105,6 @@ class Controller : public QObject {
                         const dove_eye::Positset positset);
 };
 
+Q_DECLARE_METATYPE(Controller::Mode)
 
 #endif // CONTROLLER_H_

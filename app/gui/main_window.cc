@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include <QtDebug>
+
 #include "controller.h"
 #include "dove_eye/types.h"
 #include "frameset_viewer.h"
@@ -11,6 +13,7 @@ using dove_eye::CameraIndex;
 using dove_eye::Parameters;
 using gui::FramesetViewer;
 using widgets::CalibrationStatus;
+using widgets::ControllerStatus;
 
 namespace gui {
 
@@ -48,14 +51,16 @@ MainWindow::~MainWindow() {
 void MainWindow::ChangeArity(const CameraIndex arity) {
   ui_->viewer->SetArity(arity);
   calibration_status_->SetArity(arity);
+  controller_status_->Reset(application_->controller());
 
   if (arity == 0) {
-    // TODO calibration is disabled when runnig (or there should be a stop)
-    ui_->action_calibrate->setEnabled(false);
+    ControllerModeChanged(Controller::kNonexistent);
+    controller_status_->ModeChanged(Controller::kNonexistent);
     return;
   }
 
-  ui_->action_calibrate->setEnabled(true);
+  ControllerModeChanged(application_->controller()->mode());
+  controller_status_->ModeChanged(application_->controller()->mode());
 
   ui_->viewer->SetConverter(application_->converter());
 
@@ -66,6 +71,9 @@ void MainWindow::ChangeArity(const CameraIndex arity) {
   /* Connect new controller */
   connect(application_->controller(), &Controller::ModeChanged,
           this, &MainWindow::ControllerModeChanged);
+  connect(application_->controller(), &Controller::ModeChanged,
+          controller_status_, &ControllerStatus::ModeChanged);
+
 
   connect(application_->controller(), &Controller::CameraCalibrationProgressed,
           calibration_status_, &CalibrationStatus::CameraCalibrationProgressed);
@@ -107,6 +115,9 @@ void MainWindow::ControllerModeChanged(const Controller::Mode mode) {
 }
 
 void MainWindow::CreateStatusBar() {
+  controller_status_ = new ControllerStatus();
+  statusBar()->addPermanentWidget(controller_status_);
+
   calibration_status_ = new CalibrationStatus();
   statusBar()->addWidget(calibration_status_);
 }

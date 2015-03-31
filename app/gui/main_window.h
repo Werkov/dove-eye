@@ -11,6 +11,7 @@
 #include "parameters_dialog.h"
 #include "video_providers_dialog.h"
 #include "widgets/calibration_status.h"
+#include "widgets/controller_status.h"
 
 namespace Ui {
 class MainWindow;
@@ -42,6 +43,7 @@ class MainWindow : public QMainWindow {
   std::unique_ptr<ParametersDialog> parameters_dialog_;
   std::unique_ptr<VideoProvidersDialog> video_providers_dialog_;
 
+  widgets::ControllerStatus *controller_status_;
   widgets::CalibrationStatus *calibration_status_;
 
   void CreateStatusBar();
