@@ -25,10 +25,10 @@ class Tracker {
 
  private:
   enum TrackState {
-    UNINITIALIZED,
-    MARK_SET,
-    TRACKING,
-    LOST
+    kUninitialized,
+    kMarkSet,
+    kTracking,
+    kLost
   };
 
   typedef std::vector<TrackState> StateVector;
