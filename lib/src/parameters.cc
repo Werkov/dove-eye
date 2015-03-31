@@ -18,14 +18,20 @@ const Parameters::Parameter Parameters::parameters[] = {
   DEFINE_PARAM(
       TEMPLATE_RADIUS,        "template.radius",        30,   "px", 2, 100 ),
   DEFINE_PARAM(
-      TEMPLATE_SEARCH_FACTOR, "template.search_factor", 2,    "",   1, 3 ),
+      TEMPLATE_SEARCH_FACTOR, "template.search_factor", 2,    "",    1, 3 ),
   DEFINE_PARAM(
-      TEMPLATE_THRESHOLD,     "template.threshold",     0.5,  "",   0, 1 ),
+      TEMPLATE_THRESHOLD,     "template.threshold",     0.5,  "",    0, 1 ),
   DEFINE_PARAM(
-      AGGREGATOR_WINDOW,      "aggregator.window",      0.1,  "s",  0, 5 ),
+      AGGREGATOR_WINDOW,      "aggregator.window",      0.1,  "s",   0, 5 ),
   DEFINE_PARAM_ARRAY(
-      CAM_OFFSET,             "aggregator.offset",      0,    "s",  0, 5 ),
-
+      CAM_OFFSET,             "aggregator.offset",      0,    "s",   0, 5 ),
+  DEFINE_PARAM(
+      CALIBRATION_ROWS,       "calibration.rows",       6,    "",    1, 10 ),
+  DEFINE_PARAM(
+      CALIBRATION_COLS,       "calibration.cols",       9,    "",    1, 10 ),
+  DEFINE_PARAM(
+      CALIBRATION_SIZE,       "calibration.size",   0.026,   "m", 1e-2, 1e-1 ),
+  
   {Parameters::_MAX_KEY, Parameters::_MAX_KEY}
 };
 

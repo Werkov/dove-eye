@@ -16,6 +16,7 @@ void Controller::Start() {
   frameset_iterator_ = aggregator_->begin();
   frameset_end_iterator_ = aggregator_->end();
 
+  SetMode(kIdle);
   timer_.start(0, this);
 }
 
@@ -31,6 +32,21 @@ void Controller::SetMark(const dove_eye::CameraIndex cam,
   tracker_->SetMark(cam, mark, project_other);
 }
 
+void Controller::SetMode(const Mode mode) {
+  mode_ = mode;
+
+  switch (mode_) {
+    case kCalibration:
+      calibration_->Reset();
+      break;
+    default:
+      /* empty */
+      break;
+  }
+
+  emit ModeChanged(mode_);
+}
+
 void Controller::timerEvent(QTimerEvent *event) {
   if (event->timerId() != timer_.timerId()) {
     return;
@@ -42,22 +58,43 @@ void Controller::timerEvent(QTimerEvent *event) {
   }
 
   auto frameset = *frameset_iterator_;
+  dove_eye::Positset positset(Arity());
 
-  auto positset = tracker_->Track(frameset);
-  emit PositsetReady(positset);
+  switch (mode_) {
+    case kIdle:
+      break;
+    case kCalibration:
+      if (calibration_->MeasureFrameset(frameset)) {
+        SetMode(kIdle);
+        // TODO set result to application
+      }
+
+      for (CameraIndex cam = 0; cam < Arity(); ++cam) {
+        emit CameraCalibrationProgressed(cam,
+                                         calibration_->CameraProgress(cam));
+      }
+      for (auto pair : calibration_->pairs()) {
+        emit PairCalibrationProgressed(pair.index,
+                                       calibration_->PairProgress(pair.index));
+      }
+
+      break;
+    case kTracking:
+      positset = tracker_->Track(frameset);
+      emit PositsetReady(positset);
+
+      auto location = localization_->Locate(positset);
+      emit LocationReady(location);
+      break;
+  }
 
   DecorateFrameset(frameset, positset);
-  emit FramesetReady(*frameset_iterator_);
-
-  auto location = localization_->Locate(positset);
-  emit LocationReady(location);
 
   ++frameset_iterator_;
 }
 
 void Controller::DecorateFrameset(dove_eye::Frameset &frameset,
                                   const dove_eye::Positset positset) {
-
   for (CameraIndex cam = 0; cam < frameset.Arity(); ++cam) {
     if (!frameset.IsValid(cam)) {
       continue;
@@ -69,5 +106,7 @@ void Controller::DecorateFrameset(dove_eye::Frameset &frameset,
                  cv::Scalar(0, 255, 0));
     }
   }
+
+  emit FramesetReady(*frameset_iterator_);
 }
 

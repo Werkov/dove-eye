@@ -3,8 +3,7 @@
 
 #include <vector>
 
-#include "dove_eye/calibration_pattern.h"
-#include "dove_eye/frameset.h"
+#include "dove_eye/types.h"
 
 namespace dove_eye {
 
@@ -15,11 +14,13 @@ struct CameraPair {
   CameraIndex cam2;
   CameraIndex index;
 
-  static PairArray GenerateArray(const CameraIndex camera_count);
+  static PairArray GenerateArray(const CameraIndex arity);
 
-  static CameraIndex Index(const CameraIndex camera_count,
-                                   const CameraIndex cam1,
-                                   const CameraIndex cam2);
+  static CameraIndex Index(const CameraIndex arity,
+                           const CameraIndex cam1,
+                           const CameraIndex cam2);
+
+  static CameraIndex Pairity(const CameraIndex arity);
 };
 
 } // namespace dove_eye

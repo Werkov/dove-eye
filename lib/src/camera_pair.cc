@@ -7,13 +7,13 @@
 
 namespace dove_eye {
 
-CameraPair::PairArray CameraPair::GenerateArray(const CameraIndex camera_count) {
-  const CameraIndex pair_count = camera_count * (camera_count - 1) / 2;
+CameraPair::PairArray CameraPair::GenerateArray(const CameraIndex arity) {
+  const CameraIndex pair_count = CameraPair::Pairity(arity);
   PairArray result(pair_count);
 
   int index = 0;
-  for (int cam1 = 0; cam1 < camera_count; ++cam1) {
-    for (int cam2 = cam1 + 1; cam2 < camera_count; ++cam2) {
+  for (int cam1 = 0; cam1 < arity; ++cam1) {
+    for (int cam2 = cam1 + 1; cam2 < arity; ++cam2) {
       result[index].index = index;
       result[index].cam1 = cam1;
       result[index].cam2 = cam2;
@@ -23,9 +23,9 @@ CameraPair::PairArray CameraPair::GenerateArray(const CameraIndex camera_count) 
   return result;
 }
 
-CameraIndex CameraPair::Index(const CameraIndex camera_count,
-                                      const CameraIndex cam1,
-                                      const CameraIndex cam2) {
+CameraIndex CameraPair::Index(const CameraIndex arity,
+                              const CameraIndex cam1,
+                              const CameraIndex cam2) {
   /* <- cam1 ->
    * c  .xxxx
    * a  ..xxx
@@ -36,7 +36,11 @@ CameraIndex CameraPair::Index(const CameraIndex camera_count,
    * Area of trapezoid (arithmetic sequence) + row index shifted by cam2.
    * Beware of zero-based indexing.
    */
-  return (2 * camera_count - cam2 - 1) * (cam2 + 1) / 2 + (cam1 - cam2 - 1);
+  return (2 * arity - cam2 - 1) * (cam2 + 1) / 2 + (cam1 - cam2 - 1);
+}
+
+CameraIndex CameraPair::Pairity(const CameraIndex arity) {
+  return arity * (arity - 1) / 2;
 }
 
 } // namespace dove_eye

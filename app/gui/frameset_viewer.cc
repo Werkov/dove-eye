@@ -44,6 +44,7 @@ void FramesetViewer::SetArity(const dove_eye::CameraIndex arity) {
 }
 
 void FramesetViewer::SetConverter(FramesetConverter *converter) {
+  assert(converter);
   assert(arity_ == converter->Arity());
 
   converter_ = converter;

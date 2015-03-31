@@ -8,6 +8,7 @@
 #include <QPoint>
 
 #include "dove_eye/async_policy.h"
+#include "dove_eye/camera_calibration.h"
 #include "dove_eye/frameset_aggregator.h"
 #include "dove_eye/localization.h"
 #include "dove_eye/parameters.h"
@@ -27,18 +28,28 @@ class Controller : public QObject {
   typedef dove_eye::FramesetAggregator<dove_eye::AsyncPolicy<true>>
       Aggregator;
 
+  enum Mode {
+    kIdle,
+    kCalibration,
+    kTracking
+  };
+
   /**
    * @note Controller takes ownership of all ctor arguments given by pointer
    */
-  explicit Controller(dove_eye::Parameters &parameters,
+  Controller(dove_eye::Parameters &parameters,
                       Aggregator *aggregator,
+                      dove_eye::CameraCalibration *calibration,
                       dove_eye::Tracker *tracker,
                       dove_eye::Localization *localization)
       : QObject(),
         parameters_(parameters),
+        mode_(kIdle),
+        arity_(aggregator->Arity()),
         frameset_iterator_(aggregator->Arity()),
         frameset_end_iterator_(aggregator->Arity()),
         aggregator_(aggregator),
+        calibration_(calibration),
         tracker_(tracker),
         localization_(localization) {
   }
@@ -51,6 +62,12 @@ class Controller : public QObject {
   void FramesetReady(const dove_eye::Frameset &);
   void PositsetReady(const dove_eye::Positset &);
   void LocationReady(const dove_eye::Location &);
+  void ModeChanged(const Mode new_mode);
+
+  void CameraCalibrationProgressed(const dove_eye::CameraIndex cam,
+                                   const double progress);
+  void PairCalibrationProgressed(const dove_eye::CameraIndex index,
+                                 const double progress);
 
  public slots:
   // TODO remove start/stop?
@@ -60,17 +77,23 @@ class Controller : public QObject {
 
   void SetMark(const dove_eye::CameraIndex cam, const gui::GuiMark mark);
 
+  void SetMode(const Mode mode);
+
 
  protected:
   void timerEvent(QTimerEvent *event) override;
 
  private:
   const dove_eye::Parameters &parameters_;
+  Mode mode_;
+  const dove_eye::CameraIndex arity_;
+
   QBasicTimer timer_;
   Aggregator::Iterator frameset_iterator_;
   Aggregator::Iterator frameset_end_iterator_;
 
   std::unique_ptr<Aggregator> aggregator_;
+  std::unique_ptr<dove_eye::CameraCalibration> calibration_;
   std::unique_ptr<dove_eye::Tracker> tracker_;
   std::unique_ptr<dove_eye::Localization> localization_;
 

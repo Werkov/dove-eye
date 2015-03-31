@@ -3,12 +3,17 @@
 #include <QMetaObject>
 #include <QtDebug>
 
+#include "dove_eye/camera_calibration.h"
 #include "dove_eye/camera_video_provider.h"
+#include "dove_eye/chessboard_pattern.h"
 #include "metatypes.h"
 
+using dove_eye::CameraCalibration;
 using dove_eye::CameraIndex;
 using dove_eye::CameraVideoProvider;
+using dove_eye::ChessboardPattern;
 using dove_eye::Localization;
+using dove_eye::Parameters;
 using dove_eye::TemplateTracker;
 using dove_eye::Tracker;
 
@@ -112,12 +117,18 @@ void Application::MoveToThread(QObject* object, QThread* thread) {
 void Application::SetupController(VideoProvidersContainer &&providers) {
   auto aggregator = new Controller::Aggregator(std::move(providers), parameters_);
 
+  auto pattern = new ChessboardPattern(
+      parameters_.Get(Parameters::CALIBRATION_ROWS),
+      parameters_.Get(Parameters::CALIBRATION_COLS),
+      parameters_.Get(Parameters::CALIBRATION_SIZE));
+  auto calibration = new CameraCalibration(arity_, pattern);
+
   TemplateTracker inner_tracker(parameters_);
   auto tracker = new Tracker(arity_, inner_tracker);
   auto localization = new Localization;
 
-  auto new_controller = new Controller(parameters_, aggregator, tracker,
-                                       localization);
+  auto new_controller = new Controller(parameters_, aggregator, calibration,
+                                       tracker, localization);
 
   SwapAndDestroy(&controller_, new_controller);
 }

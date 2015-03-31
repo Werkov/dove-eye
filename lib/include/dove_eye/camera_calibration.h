@@ -2,6 +2,7 @@
 #define DOVE_EYE_CAMERA_CALIBRATION_H_
 
 #include <cassert>
+#include <memory>
 #include <vector>
 
 #include <opencv2/opencv.hpp>
@@ -15,12 +16,6 @@ namespace dove_eye {
 
 class CameraCalibration {
  public:
-  enum MeasurementState {
-    kUnitialized,
-    kCollecting,
-    kReady
-  };
-
   struct CameraParameters {
     cv::Mat camera_matrix;
     cv::Mat distortion_coefficients;
@@ -30,8 +25,8 @@ class CameraCalibration {
     cv::Mat essential_matrix;
   };
 
-  CameraCalibration(const CameraIndex camera_count,
-                    const CalibrationPattern &pattern);
+  CameraCalibration(const CameraIndex arity,
+                    CalibrationPattern const *pattern);
 
   /** Search for pattern in frameset and use it for calibration.
    *
@@ -42,50 +37,44 @@ class CameraCalibration {
   // FIXME better for indvidual cameras/pairs
   void Reset();
 
-  CameraIndex camera_count() const {
-    return camera_count_;
+  CameraIndex Arity() const {
+    return arity_;
   }
 
   const CameraParameters &camera_result(const CameraIndex cam) const {
-    assert(cam < camera_count());
-    assert(camera_state(cam) == kReady);
+    assert(cam < Arity());
+    assert(camera_states_[cam] == kReady);
 
     return camera_parameters_[cam];
   }
 
-  const PairParameters &pair_result(const CameraIndex cam1,
-                                    const CameraIndex cam2) const {
-    assert(cam1 < camera_count());
-    assert(cam2 < camera_count());
-    assert(pair_state(cam1, cam2) == kReady);
+  const PairParameters &pair_result(const CameraIndex index) const {
+    assert(index < CameraPair::Pairity(Arity()));
+    assert(pair_states_[index] == kReady);
 
-    return pair_parameters_[CameraPair::Index(camera_count(), cam1, cam2)];
+    return pair_parameters_[index];
   }
 
-  MeasurementState camera_state(const CameraIndex cam) const {
-    assert(cam < camera_count());
-
-    return camera_states_[cam];
-  }
-
-  MeasurementState pair_state(const CameraIndex cam1,
-                              const CameraIndex cam2) const {
-    assert(cam1 < camera_count());
-    assert(cam2 < camera_count());
-
-    return pair_states_[CameraPair::Index(camera_count(), cam1, cam2)];
-  }
-
+  double CameraProgress(const CameraIndex cam) const;
+ 
+  double PairProgress(const CameraIndex index) const;
+ 
   const CameraPair::PairArray &pairs() const {
     return pairs_;
   }
 
  private:
-  const CameraIndex camera_count_;
+  enum MeasurementState {
+    kUnitialized,
+    kCollecting,
+    kReady
+  };
+
+  const CameraIndex arity_;
 
   const int frames_to_collect_ = 10;
 
-  const CalibrationPattern &pattern_;
+  std::unique_ptr<const CalibrationPattern> pattern_;
 
   std::vector<std::vector<Point2Vector>> image_points_;
 

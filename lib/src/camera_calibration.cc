@@ -12,27 +12,27 @@ using std::vector;
 
 namespace dove_eye {
 
-CameraCalibration::CameraCalibration(const CameraIndex camera_count,
-                                     const CalibrationPattern &pattern)
-    : camera_count_(camera_count),
+CameraCalibration::CameraCalibration(const CameraIndex arity,
+                                     CalibrationPattern const *pattern)
+    : arity_(arity),
       pattern_(pattern),
-      image_points_(camera_count),
-      camera_states_(camera_count, kUnitialized),
-      camera_parameters_(camera_count),
-      pair_states_(camera_count, kUnitialized),
-      pair_parameters_(camera_count),
-      pairs_(CameraPair::GenerateArray(camera_count)) {
+      image_points_(arity),
+      camera_states_(arity, kUnitialized),
+      camera_parameters_(arity),
+      pair_states_(arity, kUnitialized),
+      pair_parameters_(arity),
+      pairs_(CameraPair::GenerateArray(arity)) {
 }
 
 bool CameraCalibration::MeasureFrameset(const Frameset &frameset) {
-  assert(frameset.Arity() == camera_count_);
+  assert(frameset.Arity() == arity_);
   bool result = true;
 
   /*
    * First we search for pattern in each single camera,
    * when both camera from a pair are calibrated, we estimate pair parameters.
    */
-  for (CameraIndex cam = 0; cam < camera_count_; ++cam) {
+  for (CameraIndex cam = 0; cam < arity_; ++cam) {
     if (!frameset.IsValid(cam)) {
       result = result && (camera_states_[cam] == kReady);
       continue;
@@ -43,14 +43,14 @@ bool CameraCalibration::MeasureFrameset(const Frameset &frameset) {
     switch (camera_states_[cam]) {
       case kUnitialized:
       case kCollecting:
-        if (pattern_.Match(frameset[cam].data, &image_points)) {
+        if (pattern_->Match(frameset[cam].data, &image_points)) {
           image_points_[cam].push_back(image_points);
           camera_states_[cam] = kCollecting;
         }
 
         if (image_points_[cam].size() >= frames_to_collect_) {
           vector<Point3Vector> object_points(image_points_[cam].size(),
-              pattern_.ObjectPoints());
+              pattern_->ObjectPoints());
 
           auto error = calibrateCamera(object_points, image_points_[cam],
               frameset[cam].data.size(),
@@ -92,20 +92,19 @@ bool CameraCalibration::MeasureFrameset(const Frameset &frameset) {
     switch (pair_states_[pair.index]) {
       case kUnitialized:
       case kCollecting:
-        if (pattern_.Match(frameset[cam1].data, &image_points1) &&
-            pattern_.Match(frameset[cam2].data, &image_points2)) {
+        if (pattern_->Match(frameset[cam1].data, &image_points1) &&
+            pattern_->Match(frameset[cam2].data, &image_points2)) {
           image_points_[cam1].push_back(image_points1);
           image_points_[cam2].push_back(image_points2);
 
           pair_states_[pair.index] = kCollecting;
         }
-        DEBUG("Matching pair %i, %i", cam1, cam2);
 
         /* We add frames in lockstep, thus read size from cam1 only. */
         if (image_points_[cam1].size() >= frames_to_collect_) {
           DEBUG("Calibrating pair %i, %i", cam1, cam2);
           vector<Point3Vector> object_points(image_points_[cam1].size(),
-              pattern_.ObjectPoints());
+              pattern_->ObjectPoints());
 
           // FIXME Getting size more centrally probably.
           auto error = stereoCalibrate(object_points, image_points_[cam1],
@@ -139,6 +138,49 @@ bool CameraCalibration::MeasureFrameset(const Frameset &frameset) {
   }
 
   return result;
+}
+
+void CameraCalibration::Reset() {
+  for (auto &image_points : image_points_) {
+    image_points.clear();
+  }
+  camera_states_ = decltype(camera_states_)(arity_, kUnitialized);
+  pair_states_ = decltype(pair_states_)(arity_, kUnitialized);
+}
+
+double CameraCalibration::CameraProgress(const CameraIndex cam) const {
+  assert(cam < Arity());
+
+  switch (camera_states_[cam]) {
+    case kUnitialized:
+      return 0;
+    case kCollecting:
+      return
+          image_points_[cam].size() / static_cast<double>(frames_to_collect_);
+    case kReady:
+      return 1;
+  }
+
+  assert(false); return 0;
+}
+
+double CameraCalibration::PairProgress(const CameraIndex index) const {
+  assert(index < CameraPair::Pairity(Arity()));
+
+  switch (pair_states_[index]) {
+    case kUnitialized:
+      return 0;
+    case kCollecting: {
+      auto &pair = pairs_[index];
+      auto cam1 = pair.cam1;
+      return
+          image_points_[cam1].size() / static_cast<double>(frames_to_collect_);
+    }
+    case kReady:
+      return 1;
+  }
+
+  assert(false); return 0;
 }
 
 } // namespace dove_eye

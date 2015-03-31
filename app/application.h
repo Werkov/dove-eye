@@ -33,12 +33,20 @@ class Application : public QObject {
 
   ~Application() override;
 
-  inline FramesetConverter *converter() {
-    return converter_;
+  inline dove_eye::CameraIndex Arity() const {
+    return arity_;
   }
 
   inline dove_eye::Parameters &parameters() {
     return parameters_;
+  }
+
+  inline Controller *controller() {
+    return controller_;
+  }
+
+  inline FramesetConverter *converter() {
+    return converter_;
   }
 
  signals:
