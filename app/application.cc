@@ -8,6 +8,7 @@
 #include "dove_eye/chessboard_pattern.h"
 #include "metatypes.h"
 
+using dove_eye::CalibrationData;
 using dove_eye::CameraCalibration;
 using dove_eye::CameraIndex;
 using dove_eye::CameraVideoProvider;
@@ -16,6 +17,7 @@ using dove_eye::Localization;
 using dove_eye::Parameters;
 using dove_eye::TemplateTracker;
 using dove_eye::Tracker;
+using std::unique_ptr;
 
 Application::Application()
     : QObject(),
@@ -65,7 +67,7 @@ Application::VideoProvidersVector Application::AvailableVideoProviders() {
   return result;
 }
 
-void Application::UseVideoProviders(const VideoProvidersVector &providers) {
+void Application::UseCameraProviders(const VideoProvidersVector &providers) {
   VideoProvidersContainer used_providers;
 
   for (auto provider : providers) {
@@ -92,10 +94,20 @@ void Application::UseVideoProviders(const VideoProvidersVector &providers) {
   SetupController(std::move(used_providers));
   SetupConverter();
 
-  emit ChangedArity(arity_);
+  emit SetupPipeline();
 
   /* Asynchronously start new controller. */
   QMetaObject::invokeMethod(controller_, "Start");
+}
+
+void Application::SetCalibrationData(const CalibrationData calibration_data) {
+  calibration_data_ = std::move(unique_ptr<CalibrationData>(
+          new CalibrationData(calibration_data)));
+  /*
+   * Application is primary holder of calibration data, thus we signal each
+   * change in it to all slots.
+   */
+  emit CalibrationDataReady(calibration_data);
 }
 
 void Application::MoveToNewThread(QObject* object) {
@@ -129,6 +141,11 @@ void Application::SetupController(VideoProvidersContainer &&providers) {
 
   auto new_controller = new Controller(parameters_, aggregator, calibration,
                                        tracker, localization);
+
+  connect(new_controller, &Controller::CalibrationDataReady,
+          this, &Application::SetCalibrationData);
+  connect(this, &Application::CalibrationDataReady,
+          new_controller, &Controller::SetCalibrationData);
 
   SwapAndDestroy(&controller_, new_controller);
 }

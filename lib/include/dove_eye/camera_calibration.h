@@ -7,6 +7,7 @@
 
 #include <opencv2/opencv.hpp>
 
+#include "dove_eye/calibration_data.h"
 #include "dove_eye/calibration_pattern.h"
 #include "dove_eye/camera_pair.h"
 #include "dove_eye/frameset.h"
@@ -17,15 +18,6 @@ namespace dove_eye {
 
 class CameraCalibration {
  public:
-  struct CameraParameters {
-    cv::Mat camera_matrix;
-    cv::Mat distortion_coefficients;
-  };
-
-  struct PairParameters {
-    cv::Mat essential_matrix;
-  };
-
   CameraCalibration(const Parameters &parameters,
                     const CameraIndex arity,
                     CalibrationPattern const *pattern);
@@ -39,28 +31,22 @@ class CameraCalibration {
   // FIXME better for indvidual cameras/pairs
   void Reset();
 
-  CameraIndex Arity() const {
+  inline CameraIndex Arity() const {
     return arity_;
-  }
-
-  const CameraParameters &camera_result(const CameraIndex cam) const {
-    assert(cam < Arity());
-    assert(camera_states_[cam] == kReady);
-
-    return camera_parameters_[cam];
-  }
-
-  const PairParameters &pair_result(const CameraIndex index) const {
-    assert(index < CameraPair::Pairity(Arity()));
-    assert(pair_states_[index] == kReady);
-
-    return pair_parameters_[index];
   }
 
   double CameraProgress(const CameraIndex cam) const;
  
   double PairProgress(const CameraIndex index) const;
+
+  inline const CalibrationData &Data() const {
+    for (auto state : camera_states_) assert(state == kReady);
+    for (auto state : pair_states_) assert(state == kReady);
+
+    return data_;
+  }
  
+  // TODO remove this cache...
   const CameraPair::PairArray &pairs() const {
     return pairs_;
   }
@@ -85,10 +71,9 @@ class CameraCalibration {
   std::vector<std::vector<Point2Vector>> image_points_;
 
   std::vector<MeasurementState> camera_states_;
-  std::vector<CameraParameters> camera_parameters_;
-
   std::vector<MeasurementState> pair_states_;
-  std::vector<PairParameters> pair_parameters_;
+
+  CalibrationData data_;
 
   CameraPair::PairArray pairs_;
 };

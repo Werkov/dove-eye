@@ -9,6 +9,7 @@
 #include "frameset_viewer.h"
 #include "ui_main_window.h"
 
+using dove_eye::CalibrationData;
 using dove_eye::CameraIndex;
 using dove_eye::Parameters;
 using gui::FramesetViewer;
@@ -26,12 +27,14 @@ MainWindow::MainWindow(Application *application, QWidget *parent)
   ui_->setupUi(this);
   CreateStatusBar();
 
-  connect(application_, &Application::ChangedArity,
-          this, &MainWindow::ChangeArity);
+  connect(application_, &Application::SetupPipeline,
+          this, &MainWindow::SetupPipeline);
+  connect(application_, &Application::CalibrationDataReady,
+          this, &MainWindow::CalibrationDataReady);
 
   /* Dialog connections */
   connect(cameras_setup_dialog_.get(), &CamerasSetupDialog::SelectedProviders,
-          application_, &Application::UseVideoProviders);
+          application_, &Application::UseCameraProviders);
 
   /* Menu actions */
   connect(ui_->action_abort_calibration, &QAction::triggered,
@@ -44,17 +47,18 @@ MainWindow::MainWindow(Application *application, QWidget *parent)
           this, &MainWindow::SetupCameras);
 
   /* Initialization */
-  ChangeArity(application_->Arity());
+  SetupPipeline();
 }
 
 MainWindow::~MainWindow() {
 }
 
-void MainWindow::ChangeArity(const CameraIndex arity) {
-  ui_->viewer->SetArity(arity);
-  calibration_status_->SetArity(arity);
+void MainWindow::SetupPipeline() {
+  ui_->viewer->SetArity(application_->Arity());
+  calibration_status_->SetArity(application_->Arity());
 
-  if (arity == 0) {
+  if (application_->Arity() == 0) {
+    SetCalibration(false);
     ControllerModeChanged(Controller::kNonexistent);
     controller_status_->ModeChanged(Controller::kNonexistent);
     return;
@@ -82,6 +86,10 @@ void MainWindow::ChangeArity(const CameraIndex arity) {
   connect(application_->controller(), &Controller::PairCalibrationProgressed,
           calibration_status_, &CalibrationStatus::PairCalibrationProgressed);
 
+}
+
+void MainWindow::CalibrationDataReady(const CalibrationData data) {
+  SetCalibration(true);
 }
 
 void MainWindow::AbortCalibration() {
@@ -120,6 +128,10 @@ void MainWindow::ControllerModeChanged(const Controller::Mode mode) {
   } else {
     statusBar()->removeWidget(calibration_status_);
   }
+}
+
+void MainWindow::SetCalibration(const bool value) {
+  ui_->action_localization_start->setEnabled(value);
 }
 
 void MainWindow::CreateStatusBar() {

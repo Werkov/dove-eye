@@ -9,6 +9,7 @@
 #include <QThread>
 
 #include "controller.h"
+#include "dove_eye/calibration_data.h"
 #include "dove_eye/parameters.h"
 #include "dove_eye/localization.h"
 #include "dove_eye/template_tracker.h"
@@ -50,26 +51,25 @@ class Application : public QObject {
   }
 
  signals:
-  void ChangedArity(const dove_eye::CameraIndex arity);
+  void SetupPipeline();
+  // TODO implement loading from file
+  void CalibrationDataReady(const dove_eye::CalibrationData);
 
  public slots:
   VideoProvidersVector AvailableVideoProviders();
-  void UseVideoProviders(const VideoProvidersVector &providers);
-// TODO think about this
-// - rather rename (func pointer resolution)
-  //void UseVideoProviders(const std::string &filename);
+
+  void UseCameraProviders(const VideoProvidersVector &providers);
+
+  void SetCalibrationData(const dove_eye::CalibrationData calibration_data);
 
  private:
   dove_eye::CameraIndex arity_;
   dove_eye::Parameters parameters_;
   VideoProvidersVectorOwning available_providers_;
+  std::unique_ptr<dove_eye::CalibrationData> calibration_data_;
 
   Controller *controller_;
   FramesetConverter* converter_;
-
-  std::unique_ptr<dove_eye::Tracker> tracker_;
-  std::unique_ptr<dove_eye::Localization> localization_;
-  std::unique_ptr<dove_eye::TemplateTracker> inner_tracker_;
 
   QList<QThread *> threads_;
   QList<QObject *> objects_in_threads_;

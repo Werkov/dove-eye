@@ -7,6 +7,7 @@
 #include <QThread>
 
 #include "application.h"
+#include "dove_eye/calibration_data.h"
 #include "dove_eye/types.h"
 #include "parameters_dialog.h"
 #include "cameras_setup_dialog.h"
@@ -27,7 +28,8 @@ class MainWindow : public QMainWindow {
   ~MainWindow() override;
 
  public slots:
-  void ChangeArity(const dove_eye::CameraIndex arity);
+  void SetupPipeline();
+  void CalibrationDataReady(const dove_eye::CalibrationData data);
 
  private slots:
   void AbortCalibration();
@@ -35,6 +37,7 @@ class MainWindow : public QMainWindow {
   void ModifyParameters();
   void SetupCameras();
   void ControllerModeChanged(const Controller::Mode mode);
+  void SetCalibration(const bool value);
 
  private:
   Application *application_;

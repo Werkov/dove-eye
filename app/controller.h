@@ -8,6 +8,7 @@
 #include <QPoint>
 
 #include "dove_eye/async_policy.h"
+#include "dove_eye/calibration_data.h"
 #include "dove_eye/camera_calibration.h"
 #include "dove_eye/frameset_aggregator.h"
 #include "dove_eye/localization.h"
@@ -64,15 +65,17 @@ class Controller : public QObject {
   }
 
  signals:
-  void FramesetReady(const dove_eye::Frameset &);
-  void PositsetReady(const dove_eye::Positset &);
-  void LocationReady(const dove_eye::Location &);
+  void FramesetReady(const dove_eye::Frameset);
+  void PositsetReady(const dove_eye::Positset);
+  void LocationReady(const dove_eye::Location);
   void ModeChanged(const Controller::Mode new_mode);
 
   void CameraCalibrationProgressed(const dove_eye::CameraIndex cam,
                                    const double progress);
   void PairCalibrationProgressed(const dove_eye::CameraIndex index,
                                  const double progress);
+
+  void CalibrationDataReady(const dove_eye::CalibrationData);
 
  public slots:
   // TODO remove start/stop?
@@ -84,6 +87,7 @@ class Controller : public QObject {
 
   void SetMode(const Mode mode);
 
+  void SetCalibrationData(const dove_eye::CalibrationData calibration_data);
 
  protected:
   void timerEvent(QTimerEvent *event) override;
@@ -99,6 +103,7 @@ class Controller : public QObject {
 
   std::unique_ptr<Aggregator> aggregator_;
   std::unique_ptr<dove_eye::CameraCalibration> calibration_;
+  std::unique_ptr<dove_eye::CalibrationData> calibration_data_;
   std::unique_ptr<dove_eye::Tracker> tracker_;
   std::unique_ptr<dove_eye::Localization> localization_;
 

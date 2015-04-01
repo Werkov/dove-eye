@@ -3,12 +3,15 @@
 #include <QMetaObject>
 
 #include "controller.h"
+#include "dove_eye/calibration_data.h"
 #include "dove_eye/frameset.h"
 #include "dove_eye/types.h"
 #include "frameset_converter.h"
 #include "gui/gui_mark.h"
 
 void RegisterMetaTypes() {
+  qRegisterMetaType<dove_eye::CalibrationData>();
+
   qRegisterMetaType<dove_eye::CameraIndex>();
   /* Metatypes probably don't work with typedefs so here's a workaround */
   qRegisterMetaType<dove_eye::CameraIndex>("dove_eye::CameraIndex");

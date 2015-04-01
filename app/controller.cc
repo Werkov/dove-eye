@@ -7,11 +7,13 @@
 
 #include "dove_eye/inner_tracker.h"
 
+using dove_eye::CalibrationData;
 using dove_eye::CameraIndex;
 using dove_eye::Frameset;
 using dove_eye::InnerTracker;
 using dove_eye::Parameters;
 using gui::GuiMark;
+using std::unique_ptr;
 
 
 void Controller::Start() {
@@ -49,6 +51,12 @@ void Controller::SetMode(const Mode mode) {
   emit ModeChanged(mode_);
 }
 
+void Controller::SetCalibrationData(const CalibrationData calibration_data) {
+  calibration_data_ = std::move(unique_ptr<CalibrationData>(
+          new CalibrationData(calibration_data)));
+  // TODO set reference to tracker, localization
+}
+
 void Controller::timerEvent(QTimerEvent *event) {
   if (event->timerId() != timer_.timerId()) {
     return;
@@ -68,7 +76,12 @@ void Controller::timerEvent(QTimerEvent *event) {
     case kCalibration:
       if (calibration_->MeasureFrameset(frameset)) {
         SetMode(kIdle);
-        // TODO set result to application
+        /*
+         * This will notify the application and it will signal back to us,
+         * to update tracker, etc.
+         */
+        emit CalibrationDataReady(calibration_->Data());
+        break;
       }
 
       for (CameraIndex cam = 0; cam < Arity(); ++cam) {

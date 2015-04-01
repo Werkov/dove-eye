@@ -12,6 +12,16 @@ typedef std::vector<cv::Point3f> Point3Vector;
 
 typedef int CameraIndex;
 
+struct CameraParameters {
+  cv::Mat camera_matrix;
+  cv::Mat distortion_coefficients;
+};
+
+struct PairParameters {
+  cv::Mat essential_matrix;
+};
+
+
 };
 
 #ifdef HAVE_GUI

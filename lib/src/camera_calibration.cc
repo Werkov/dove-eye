@@ -18,8 +18,7 @@ CameraCalibration::CameraCalibration(const Parameters &parameters,
     : parameters_(parameters),
       arity_(arity),
       pattern_(pattern),
-      camera_parameters_(arity),
-      pair_parameters_(arity),
+      data_(arity),
       pairs_(CameraPair::GenerateArray(arity)) {
   Reset();
 }
@@ -58,8 +57,8 @@ bool CameraCalibration::MeasureFrameset(const Frameset &frameset) {
 
           auto error = calibrateCamera(object_points, image_points_[cam],
               frameset[cam].data.size(),
-              camera_parameters_[cam].camera_matrix,
-              camera_parameters_[cam].distortion_coefficients,
+              data_.camera_parameters_[cam].camera_matrix,
+              data_.camera_parameters_[cam].distortion_coefficients,
               cv::noArray(), cv::noArray());
           DEBUG("Camera %i calibrated, reprojection error %f", cam, error);
 
@@ -113,14 +112,14 @@ bool CameraCalibration::MeasureFrameset(const Frameset &frameset) {
           // FIXME Getting size more centrally probably.
           auto error = stereoCalibrate(object_points, image_points_[cam1],
               image_points_[cam2],
-              camera_parameters_[cam1].camera_matrix,
-              camera_parameters_[cam1].distortion_coefficients,
-              camera_parameters_[cam2].camera_matrix,
-              camera_parameters_[cam2].distortion_coefficients,
+              data_.camera_parameters_[cam1].camera_matrix,
+              data_.camera_parameters_[cam1].distortion_coefficients,
+              data_.camera_parameters_[cam2].camera_matrix,
+              data_.camera_parameters_[cam2].distortion_coefficients,
               cv::Size(1, 1), /* not actually used as we already know camera matrix */
               dummy_R,
               dummy_T,
-              pair_parameters_[pair.index].essential_matrix, /* E */
+              data_.pair_parameters_[pair.index].essential_matrix, /* E */
               cv::noArray()); /* F */
 
           DEBUG("Pair %i, %i calibrated, reprojection error %f", cam1, cam2,
@@ -151,7 +150,7 @@ void CameraCalibration::Reset() {
   
   image_points_ = decltype(image_points_)(arity_);
   camera_states_ = decltype(camera_states_)(arity_, kUnitialized);
-  pair_states_ = decltype(pair_states_)(arity_, kUnitialized);
+  pair_states_ = decltype(pair_states_)(CameraPair::Pairity(arity_), kUnitialized);
 }
 
 double CameraCalibration::CameraProgress(const CameraIndex cam) const {

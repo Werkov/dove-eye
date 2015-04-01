@@ -67,6 +67,9 @@
     <addaction name="action_open_video_file"/>
    </widget>
    <widget class="QMenu" name="menu_localization">
+    <property name="tearOffEnabled">
+     <bool>false</bool>
+    </property>
     <property name="title">
      <string>&amp;Localization</string>
     </property>
@@ -77,13 +80,12 @@
     <property name="title">
      <string>&amp;Calibration</string>
     </property>
-    <addaction name="action_load_intrinsic_parameters"/>
-    <addaction name="action_load_projection_parameters"/>
+    <addaction name="action_calibration_load"/>
     <addaction name="separator"/>
     <addaction name="action_calibrate"/>
     <addaction name="action_abort_calibration"/>
     <addaction name="separator"/>
-    <addaction name="action_save_camera_parameters"/>
+    <addaction name="action_calibration_save"/>
    </widget>
    <addaction name="menu_providers"/>
    <addaction name="menu_calibration"/>
@@ -101,14 +103,9 @@
     <string>&amp;Cameras</string>
    </property>
   </action>
-  <action name="action_load_intrinsic_parameters">
+  <action name="action_calibration_load">
    <property name="text">
-    <string>Load intrinsic parameters</string>
-   </property>
-  </action>
-  <action name="action_load_projection_parameters">
-   <property name="text">
-    <string>Load projection parameters</string>
+    <string>Load calibration data</string>
    </property>
   </action>
   <action name="action_calibrate">
@@ -119,9 +116,9 @@
     <bool>true</bool>
    </property>
   </action>
-  <action name="action_save_camera_parameters">
+  <action name="action_calibration_save">
    <property name="text">
-    <string>Save camera parameters</string>
+    <string>Save calibration data</string>
    </property>
   </action>
   <action name="action_abort_calibration">
