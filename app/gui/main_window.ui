@@ -57,7 +57,10 @@
     <property name="title">
      <string>&amp;Parameters</string>
     </property>
-    <addaction name="action_modify_parameters"/>
+    <addaction name="action_parameters_modify"/>
+    <addaction name="separator"/>
+    <addaction name="action_parameters_load"/>
+    <addaction name="action_parameters_save"/>
    </widget>
    <widget class="QMenu" name="menu_providers">
     <property name="title">
@@ -93,7 +96,7 @@
    <addaction name="menu_parameters"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="action_modify_parameters">
+  <action name="action_parameters_modify">
    <property name="text">
     <string>Modify</string>
    </property>
@@ -139,6 +142,16 @@
   <action name="action_open_video_file">
    <property name="text">
     <string>Video &amp;file</string>
+   </property>
+  </action>
+  <action name="action_parameters_load">
+   <property name="text">
+    <string>Load parameters</string>
+   </property>
+  </action>
+  <action name="action_parameters_save">
+   <property name="text">
+    <string>Save parameters</string>
    </property>
   </action>
  </widget>

@@ -2,6 +2,7 @@
 
 #include <cassert>
 
+#include <QFileDialog>
 #include <QtDebug>
 
 #include "controller.h"
@@ -41,8 +42,12 @@ MainWindow::MainWindow(Application *application, QWidget *parent)
           this, &MainWindow::AbortCalibration);
   connect(ui_->action_calibrate, &QAction::triggered,
           this, &MainWindow::Calibrate);
-  connect(ui_->action_modify_parameters, &QAction::triggered,
+  connect(ui_->action_parameters_modify, &QAction::triggered,
           this, &MainWindow::ModifyParameters);
+  connect(ui_->action_parameters_load, &QAction::triggered,
+          this, &MainWindow::LoadParameters);
+  connect(ui_->action_parameters_save, &QAction::triggered,
+          this, &MainWindow::SaveParameters);
   connect(ui_->action_setup_cameras, &QAction::triggered,
           this, &MainWindow::SetupCameras);
 
@@ -107,6 +112,24 @@ void MainWindow::Calibrate() {
 void MainWindow::ModifyParameters() {
   parameters_dialog_->LoadValues();
   parameters_dialog_->show();
+}
+
+void MainWindow::LoadParameters() {
+  auto filename = QFileDialog::getOpenFileName(this, tr("Load parameters"), "",
+                                               tr("YAML files (*.yaml)"));
+  if (filename.isNull()) {
+    return;
+  }
+  application_->parameters_storage()->LoadFromFile(filename);
+}
+
+void MainWindow::SaveParameters() {
+  auto filename = QFileDialog::getSaveFileName(this, tr("Save parameters"), "",
+                                               tr("YAML files (*.yaml)"));
+  if (filename.isNull()) {
+    return;
+  }
+  application_->parameters_storage()->SaveToFile(filename);
 }
 
 void MainWindow::SetupCameras() {

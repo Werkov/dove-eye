@@ -22,6 +22,8 @@ using std::unique_ptr;
 Application::Application()
     : QObject(),
       arity_(0),
+      parameters_(),
+      parameters_storage_(parameters_),
       controller_(nullptr),
       converter_(nullptr) {
   RegisterMetaTypes();

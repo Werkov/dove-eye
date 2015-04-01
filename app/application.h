@@ -17,6 +17,7 @@
 #include "dove_eye/types.h"
 #include "dove_eye/video_provider.h"
 #include "frameset_converter.h"
+#include "io/parameters_storage.h"
 
 /** Holds and manages all necessary object of application
  *
@@ -40,6 +41,10 @@ class Application : public QObject {
 
   inline dove_eye::Parameters &parameters() {
     return parameters_;
+  }
+
+  inline io::ParametersStorage *parameters_storage() {
+    return &parameters_storage_;
   }
 
   inline Controller *controller() {
@@ -67,6 +72,8 @@ class Application : public QObject {
   dove_eye::Parameters parameters_;
   VideoProvidersVectorOwning available_providers_;
   std::unique_ptr<dove_eye::CalibrationData> calibration_data_;
+
+  io::ParametersStorage parameters_storage_;
 
   Controller *controller_;
   FramesetConverter* converter_;
