@@ -5,6 +5,7 @@
 #include "controller.h"
 #include "dove_eye/calibration_data.h"
 #include "dove_eye/frameset.h"
+#include "dove_eye/localization.h"
 #include "dove_eye/types.h"
 #include "frameset_converter.h"
 #include "gui/gui_mark.h"
@@ -23,6 +24,7 @@ void RegisterMetaTypes() {
   qRegisterMetaType<gui::GuiMark>();
   qRegisterMetaType<gui::GuiMark>("GuiMark");
 
+  qRegisterMetaType<dove_eye::Location>();
   qRegisterMetaType<Controller::Mode>();
 }
 

@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.8.11)
 project(dove-eye)
 
 find_package(OpenCV)
+find_package(QGLViewer)
 find_package(Qt5Widgets)
 
 
@@ -31,10 +32,15 @@ add_library(gui ${SOURCES} ${UIC})
 
 include_directories(${CMAKE_SOURCE_DIR}/app)
 include_directories(${CMAKE_SOURCE_DIR}/lib/include)
+include_directories(${QGLViewer_INCLUDE_DIRS})
 
 add_definitions("-DHAVE_GUI")
 
-target_link_libraries(gui Qt5::Widgets ${OpenCV_LIBS} dove-eye)
+target_link_libraries(gui
+	Qt5::Widgets
+	${OpenCV_LIBS}
+	${QGLViewer_LIBS}
+	dove-eye)
 
 
 

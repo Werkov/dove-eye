@@ -16,6 +16,7 @@ using dove_eye::Parameters;
 using gui::FramesetViewer;
 using widgets::CalibrationStatus;
 using widgets::ControllerStatus;
+using widgets::SceneViewer;
 
 namespace gui {
 
@@ -94,6 +95,9 @@ void MainWindow::SetupPipeline() {
 
   connect(application_->controller(), &Controller::PairCalibrationProgressed,
           calibration_status_, &CalibrationStatus::PairCalibrationProgressed);
+
+  connect(application_->controller(), &Controller::LocationReady,
+          ui_->scene_viewer, &SceneViewer::SetLocation);
 
 }
 
