@@ -34,9 +34,11 @@ class MainWindow : public QMainWindow {
  private slots:
   void AbortCalibration();
   void Calibrate();
-  void ModifyParameters();
-  void LoadParameters();
-  void SaveParameters();
+  void CalibrationLoad();
+  void CalibrationSave();
+  void ParametersModify();
+  void ParametersLoad();
+  void ParametersSave();
   void SetupCameras();
   void ControllerModeChanged(const Controller::Mode mode);
   void SetCalibration(const bool value);

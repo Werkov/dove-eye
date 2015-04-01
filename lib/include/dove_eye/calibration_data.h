@@ -7,10 +7,29 @@
 #include "dove_eye/camera_pair.h"
 #include "dove_eye/types.h"
 
+#ifdef HAVE_GUI
+/* Forwards */
+class QString;
+#include "io/calibration_data_storage.h"
+#endif
+
 namespace dove_eye {
+
+struct CameraParameters {
+  cv::Mat camera_matrix;
+  cv::Mat distortion_coefficients;
+};
+
+struct PairParameters {
+  cv::Mat essential_matrix;
+};
+
 
 class CalibrationData {
   friend class CameraCalibration;
+#ifdef HAVE_GUI
+  friend CalibrationData io::CalibrationDataStorage::LoadFromFile(const QString &);
+#endif
 
  public:
   explicit CalibrationData(const CameraIndex arity = 0)
@@ -36,7 +55,8 @@ class CalibrationData {
   }
 
  private:
-  const CameraIndex arity_;
+  // FIXME Should be const, was lazy to implement the-big-five (operator=, ...)
+  CameraIndex arity_;
 
   std::vector<CameraParameters> camera_parameters_;
   std::vector<PairParameters> pair_parameters_;

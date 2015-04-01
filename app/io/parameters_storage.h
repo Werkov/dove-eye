@@ -12,8 +12,9 @@ class ParametersStorage : public QObject {
   Q_OBJECT
  public:
   explicit ParametersStorage(dove_eye::Parameters & parameters,
-                             QWidget *parent = nullptr)
-      : parameters_(parameters) {
+                             QObject *parent = nullptr)
+      : QObject(parent),
+        parameters_(parameters) {
   }
 
 

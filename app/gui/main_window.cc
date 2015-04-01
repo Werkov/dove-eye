@@ -42,12 +42,16 @@ MainWindow::MainWindow(Application *application, QWidget *parent)
           this, &MainWindow::AbortCalibration);
   connect(ui_->action_calibrate, &QAction::triggered,
           this, &MainWindow::Calibrate);
+  connect(ui_->action_calibration_load, &QAction::triggered,
+          this, &MainWindow::CalibrationLoad);
+  connect(ui_->action_calibration_save, &QAction::triggered,
+          this, &MainWindow::CalibrationSave);
   connect(ui_->action_parameters_modify, &QAction::triggered,
-          this, &MainWindow::ModifyParameters);
+          this, &MainWindow::ParametersModify);
   connect(ui_->action_parameters_load, &QAction::triggered,
-          this, &MainWindow::LoadParameters);
+          this, &MainWindow::ParametersLoad);
   connect(ui_->action_parameters_save, &QAction::triggered,
-          this, &MainWindow::SaveParameters);
+          this, &MainWindow::ParametersSave);
   connect(ui_->action_setup_cameras, &QAction::triggered,
           this, &MainWindow::SetupCameras);
 
@@ -109,12 +113,35 @@ void MainWindow::Calibrate() {
   application_->controller()->SetMode(Controller::kCalibration);
 }
 
-void MainWindow::ModifyParameters() {
+void MainWindow::CalibrationLoad() {
+  auto filename = QFileDialog::getOpenFileName(this, tr("Load calibration"), "",
+                                               tr("YAML files (*.yaml)"));
+  if (filename.isNull()) {
+    return;
+  }
+  auto calibration_data = application_->calibration_data_storage()
+      ->LoadFromFile(filename);
+
+  application_->SetCalibrationData(calibration_data);
+}
+
+void MainWindow::CalibrationSave() {
+  auto filename = QFileDialog::getSaveFileName(this, tr("Save calibration"), "",
+                                               tr("YAML files (*.yaml)"));
+  if (filename.isNull()) {
+    return;
+  }
+
+  application_->calibration_data_storage()
+      ->SaveToFile(filename, application_->calibration_data());
+}
+
+void MainWindow::ParametersModify() {
   parameters_dialog_->LoadValues();
   parameters_dialog_->show();
 }
 
-void MainWindow::LoadParameters() {
+void MainWindow::ParametersLoad() {
   auto filename = QFileDialog::getOpenFileName(this, tr("Load parameters"), "",
                                                tr("YAML files (*.yaml)"));
   if (filename.isNull()) {
@@ -123,7 +150,7 @@ void MainWindow::LoadParameters() {
   application_->parameters_storage()->LoadFromFile(filename);
 }
 
-void MainWindow::SaveParameters() {
+void MainWindow::ParametersSave() {
   auto filename = QFileDialog::getSaveFileName(this, tr("Save parameters"), "",
                                                tr("YAML files (*.yaml)"));
   if (filename.isNull()) {
@@ -142,6 +169,7 @@ void MainWindow::ControllerModeChanged(const Controller::Mode mode) {
   ui_->action_abort_calibration->setVisible(mode == Controller::kCalibration);
   ui_->action_calibrate->setVisible(mode != Controller::kCalibration);
   ui_->action_calibrate->setEnabled(mode != Controller::kNonexistent);
+  ui_->action_calibration_load->setEnabled(mode != Controller::kNonexistent);
 
   /* Update status bar */
   bool show_calibration = (mode == Controller::kCalibration);
@@ -155,6 +183,7 @@ void MainWindow::ControllerModeChanged(const Controller::Mode mode) {
 
 void MainWindow::SetCalibration(const bool value) {
   ui_->action_localization_start->setEnabled(value);
+  ui_->action_calibration_save->setEnabled(value);
 }
 
 void MainWindow::CreateStatusBar() {

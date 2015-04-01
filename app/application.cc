@@ -103,6 +103,11 @@ void Application::UseCameraProviders(const VideoProvidersVector &providers) {
 }
 
 void Application::SetCalibrationData(const CalibrationData calibration_data) {
+  assert(controller_);
+
+  // TODO this should be displayed as a user error
+  assert(controller_->Arity() == calibration_data.Arity());
+
   calibration_data_ = std::move(unique_ptr<CalibrationData>(
           new CalibrationData(calibration_data)));
   /*

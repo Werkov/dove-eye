@@ -17,6 +17,7 @@
 #include "dove_eye/types.h"
 #include "dove_eye/video_provider.h"
 #include "frameset_converter.h"
+#include "io/calibration_data_storage.h"
 #include "io/parameters_storage.h"
 
 /** Holds and manages all necessary object of application
@@ -43,8 +44,16 @@ class Application : public QObject {
     return parameters_;
   }
 
+  inline dove_eye::CalibrationData &calibration_data() {
+    return *calibration_data_;
+  }
+
   inline io::ParametersStorage *parameters_storage() {
     return &parameters_storage_;
+  }
+
+  inline io::CalibrationDataStorage *calibration_data_storage() {
+    return &calibration_data_storage_;
   }
 
   inline Controller *controller() {
@@ -74,6 +83,7 @@ class Application : public QObject {
   std::unique_ptr<dove_eye::CalibrationData> calibration_data_;
 
   io::ParametersStorage parameters_storage_;
+  io::CalibrationDataStorage calibration_data_storage_;
 
   Controller *controller_;
   FramesetConverter* converter_;
