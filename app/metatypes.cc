@@ -11,10 +11,13 @@
 #include "gui/gui_mark.h"
 
 void RegisterMetaTypes() {
+  /*
+   * Metatypes probably don't work with typedefs, typedefs must have explicitly
+   * registered name.
+   */
   qRegisterMetaType<dove_eye::CalibrationData>();
 
   qRegisterMetaType<dove_eye::CameraIndex>();
-  /* Metatypes probably don't work with typedefs so here's a workaround */
   qRegisterMetaType<dove_eye::CameraIndex>("dove_eye::CameraIndex");
 
   qRegisterMetaType<FramesetConverter::ImageList>();
@@ -24,7 +27,8 @@ void RegisterMetaTypes() {
   qRegisterMetaType<gui::GuiMark>();
   qRegisterMetaType<gui::GuiMark>("GuiMark");
 
-  qRegisterMetaType<dove_eye::Location>();
+  qRegisterMetaType<dove_eye::Location>("dove_eye::Location");
   qRegisterMetaType<Controller::Mode>();
+  qRegisterMetaType<Controller::UndistortMode>();
 }
 

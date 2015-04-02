@@ -4,13 +4,14 @@
 #include <opencv2/opencv.hpp>
 
 #include "dove_eye/frame.h"
+#include "dove_eye/positset.h"
 
 namespace dove_eye {
 
 class InnerTracker {
  public:
-  typedef cv::Point2f Mark;
-  typedef cv::Point2f Posit;
+  /** Mark is an object in input frame that can initialize tracking */
+  typedef Point2 Mark;
 
   virtual bool InitializeTracking(const Frame &frame, const Mark mark,
                                   Posit *result) = 0;

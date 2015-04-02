@@ -3,6 +3,7 @@
 
 #include <memory>
 
+#include <QActionGroup>
 #include <QMainWindow>
 #include <QThread>
 
@@ -27,6 +28,10 @@ class MainWindow : public QMainWindow {
 
   ~MainWindow() override;
 
+ signals:
+  void SetControllerMode(const Controller::Mode mode);
+  void SetUndistortMode(const Controller::UndistortMode undistort_mode);
+
  public slots:
   void SetupPipeline();
   void CalibrationDataReady(const dove_eye::CalibrationData data);
@@ -36,6 +41,7 @@ class MainWindow : public QMainWindow {
   void Calibrate();
   void CalibrationLoad();
   void CalibrationSave();
+  void GroupDistortion(QAction *action);
   void ParametersModify();
   void ParametersLoad();
   void ParametersSave();
@@ -48,13 +54,17 @@ class MainWindow : public QMainWindow {
 
   std::unique_ptr<Ui::MainWindow> ui_;
 
+  // FIXME consider using parenting to window instead of unique_ptr (could the
+  //       inline dtor)
+  std::unique_ptr<QActionGroup> action_group_distortion_;
   std::unique_ptr<ParametersDialog> parameters_dialog_;
   std::unique_ptr<CamerasSetupDialog> cameras_setup_dialog_;
 
   widgets::ControllerStatus *controller_status_;
   widgets::CalibrationStatus *calibration_status_;
 
-  void CreateStatusBar();
+  void SetupStatusBar();
+  void SetupMenu();
 };
 
 } // end namespace gui

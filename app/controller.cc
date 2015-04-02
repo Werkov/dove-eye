@@ -51,10 +51,40 @@ void Controller::SetMode(const Mode mode) {
   emit ModeChanged(mode_);
 }
 
+void Controller::SetUndistortMode(const UndistortMode undistort_mode) {
+  undistort_mode_ = undistort_mode;
+
+  switch (undistort_mode_) {
+    case kIgnoreDistortion:
+      tracker_->distorted_input(false);
+      UndistortToProviders(false);
+      break;
+
+    case kUndistortVideo:
+      tracker_->distorted_input(false);
+      UndistortToProviders(true);
+
+      break;
+    case kUndistortData:
+      tracker_->distorted_input(true);
+      UndistortToProviders(false);
+      break;
+  }
+}
+
 void Controller::SetCalibrationData(const CalibrationData calibration_data) {
-  calibration_data_ = std::move(unique_ptr<CalibrationData>(
-          new CalibrationData(calibration_data)));
-  // TODO set reference to tracker, localization
+  /* Before we delete old calibration_data update references. */
+  auto new_calibration_data = new CalibrationData(calibration_data);
+
+  assert(tracker_);
+  tracker_->calibration_data(new_calibration_data);
+
+  CalibrationDataToProviders(new_calibration_data);
+
+  // TODO set reference to localization
+
+  calibration_data_ =
+      std::move(unique_ptr<CalibrationData>(new_calibration_data));
 }
 
 void Controller::timerEvent(QTimerEvent *event) {
@@ -133,5 +163,21 @@ void Controller::DecorateFrameset(dove_eye::Frameset &frameset,
   }
 
   emit FramesetReady(*frameset_iterator_);
+}
+
+void Controller::CalibrationDataToProviders(
+    const CalibrationData *calibration_data) {
+
+  CameraIndex cam = 0;
+  for (auto provider : aggregator_->providers()) {
+    provider->camera_parameters(&calibration_data->camera_result(cam));
+    ++cam;
+  }
+}
+
+void Controller::UndistortToProviders(const bool undistort) {
+  for (auto provider : aggregator_->providers()) {
+    provider->undistort(undistort);
+  }
 }
 

@@ -40,12 +40,14 @@ class CalibrationData {
         pair_parameters_(arity) {
   }
 
+  // TODO rename to camera_parameters
   inline const CameraParameters &camera_result(const CameraIndex cam) const {
     assert(cam < Arity());
 
     return camera_parameters_[cam];
   }
 
+  // TODO rename to pair_parameters
   inline const PairParameters &pair_result(const CameraIndex index) const {
     assert(index < CameraPair::Pairity(Arity()));
 

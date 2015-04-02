@@ -4,6 +4,9 @@
 #include <memory>
 #include <vector>
 
+#include <opencv2/opencv.hpp>
+
+#include "dove_eye/calibration_data.h"
 #include "dove_eye/frame.h"
 #include "dove_eye/frameset.h"
 #include "dove_eye/inner_tracker.h"
@@ -12,7 +15,8 @@
 namespace dove_eye {
 
 /**
- * @note This class is not (intentionaly) thread safe.
+ * @note This class is not (intentionaly) thread safe, i.e. can be used in
+ *       single thread only.
  */
 class Tracker {
  public:
@@ -22,6 +26,26 @@ class Tracker {
                bool project_other = false);
 
   Positset Track(const Frameset &frameset);
+
+  inline bool distorted_input() const {
+    return distorted_input_;
+  }
+
+  /**
+   * When set to true, calibration data must be set too, so that tracker can
+   * undistort points.
+   */
+  inline void distorted_input(bool value) {
+    distorted_input_ = value;
+  }
+
+  inline const CalibrationData *calibration_data() const {
+    return calibration_data_;
+  }
+
+  inline void calibration_data(const CalibrationData *value) {
+    calibration_data_ = value;
+  }
 
  private:
   enum TrackState {
@@ -37,13 +61,20 @@ class Tracker {
 
   const CameraIndex arity;
   
-  Positset trackpoints_;
+  /** Output */
+  Positset positset_;
 
   StateVector trackstates_;
 
   TrackerVector trackers_;
 
+  bool distorted_input_;
+
+  const CalibrationData *calibration_data_;
+
   void TrackSingle(const CameraIndex cam, const Frame &frame);
+
+  Point2 Undistort(const Point2 &point, const CameraIndex cam) const;
 };
 
 } // namespace dove_eye

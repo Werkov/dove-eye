@@ -20,11 +20,11 @@ FrameIterator CameraVideoProvider::begin() {
   typedef CvFrameIterator<frame_iterator::ClockPolicy,
                           frame_iterator::NonblockingPolicy> CvIterator;
 
-  return FrameIterator(new CvIterator(device_));
+  return FrameIterator(this, new CvIterator(device_));
 }
 
 FrameIterator CameraVideoProvider::end() {
-  return FrameIterator();
+  return FrameIterator(this);
 }
 
 } // namespace dove_eye

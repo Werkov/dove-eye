@@ -27,7 +27,7 @@ MainWindow::MainWindow(Application *application, QWidget *parent)
       parameters_dialog_(new ParametersDialog(application->parameters())),
       cameras_setup_dialog_(new CamerasSetupDialog()) {
   ui_->setupUi(this);
-  CreateStatusBar();
+  SetupStatusBar();
 
   connect(application_, &Application::SetupPipeline,
           this, &MainWindow::SetupPipeline);
@@ -40,23 +40,7 @@ MainWindow::MainWindow(Application *application, QWidget *parent)
   connect(cameras_setup_dialog_.get(), &CamerasSetupDialog::SelectedProviders,
           application_, &Application::UseCameraProviders);
 
-  /* Menu actions */
-  connect(ui_->action_abort_calibration, &QAction::triggered,
-          this, &MainWindow::AbortCalibration);
-  connect(ui_->action_calibrate, &QAction::triggered,
-          this, &MainWindow::Calibrate);
-  connect(ui_->action_calibration_load, &QAction::triggered,
-          this, &MainWindow::CalibrationLoad);
-  connect(ui_->action_calibration_save, &QAction::triggered,
-          this, &MainWindow::CalibrationSave);
-  connect(ui_->action_parameters_modify, &QAction::triggered,
-          this, &MainWindow::ParametersModify);
-  connect(ui_->action_parameters_load, &QAction::triggered,
-          this, &MainWindow::ParametersLoad);
-  connect(ui_->action_parameters_save, &QAction::triggered,
-          this, &MainWindow::ParametersSave);
-  connect(ui_->action_setup_cameras, &QAction::triggered,
-          this, &MainWindow::SetupCameras);
+  SetupMenu();
 
   /* Initialization */
   SetupPipeline();
@@ -75,6 +59,7 @@ void MainWindow::SetupPipeline() {
     controller_status_->ModeChanged(Controller::kNonexistent);
     return;
   }
+  assert(application_->controller());
 
   ControllerModeChanged(application_->controller()->mode());
   controller_status_->ModeChanged(application_->controller()->mode());
@@ -85,7 +70,10 @@ void MainWindow::SetupPipeline() {
   connect(application_->converter(), &FramesetConverter::ImagesetReady,
                    ui_->viewer, &FramesetViewer::SetImageset);
 
-  /* Connect new controller */
+  /* Connect new controller
+   * Note the controller is running its own thread, therefore any communication
+   * with it must be done via signals only.
+   */
   connect(application_->controller(), &Controller::ModeChanged,
           this, &MainWindow::ControllerModeChanged);
   connect(application_->controller(), &Controller::ModeChanged,
@@ -101,6 +89,11 @@ void MainWindow::SetupPipeline() {
   connect(application_->controller(), &Controller::LocationReady,
           ui_->scene_viewer, &SceneViewer::SetLocation);
 
+
+  connect(this, &MainWindow::SetControllerMode,
+          application_->controller(), &Controller::SetMode);
+  connect(this, &MainWindow::SetUndistortMode,
+          application_->controller(), &Controller::SetUndistortMode);
 }
 
 void MainWindow::CalibrationDataReady(const CalibrationData data) {
@@ -108,15 +101,11 @@ void MainWindow::CalibrationDataReady(const CalibrationData data) {
 }
 
 void MainWindow::AbortCalibration() {
-  assert(application_->controller());
-
-  application_->controller()->SetMode(Controller::kIdle);
+  emit SetControllerMode(Controller::kIdle);
 }
 
 void MainWindow::Calibrate() {
-  assert(application_->controller());
-
-  application_->controller()->SetMode(Controller::kCalibration);
+  emit SetControllerMode(Controller::kCalibration);
 }
 
 void MainWindow::CalibrationLoad() {
@@ -140,6 +129,16 @@ void MainWindow::CalibrationSave() {
 
   application_->calibration_data_storage()
       ->SaveToFile(filename, application_->calibration_data());
+}
+
+void MainWindow::GroupDistortion(QAction *action) {
+  if (action == ui_->action_distortion_ignore) {
+    emit SetUndistortMode(Controller::kIgnoreDistortion);
+  } else if (action == ui_->action_distortion_video) {
+    emit SetUndistortMode(Controller::kUndistortVideo);
+  } else if (action == ui_->action_distortion_data) {
+    emit SetUndistortMode(Controller::kUndistortData);
+  }
 }
 
 void MainWindow::ParametersModify() {
@@ -176,6 +175,7 @@ void MainWindow::ControllerModeChanged(const Controller::Mode mode) {
   ui_->action_calibrate->setVisible(mode != Controller::kCalibration);
   ui_->action_calibrate->setEnabled(mode != Controller::kNonexistent);
   ui_->action_calibration_load->setEnabled(mode != Controller::kNonexistent);
+  action_group_distortion_->setEnabled(mode != Controller::kNonexistent);
 
   /* Update status bar */
   bool show_calibration = (mode == Controller::kCalibration);
@@ -188,11 +188,15 @@ void MainWindow::ControllerModeChanged(const Controller::Mode mode) {
 }
 
 void MainWindow::SetCalibration(const bool value) {
-  ui_->action_localization_start->setEnabled(value);
   ui_->action_calibration_save->setEnabled(value);
+
+  ui_->action_distortion_data->setEnabled(value);
+  ui_->action_distortion_video->setEnabled(value);
+
+  ui_->action_localization_start->setEnabled(value);
 }
 
-void MainWindow::CreateStatusBar() {
+void MainWindow::SetupStatusBar() {
   controller_status_ = new ControllerStatus();
   statusBar()->addPermanentWidget(controller_status_);
 
@@ -200,4 +204,32 @@ void MainWindow::CreateStatusBar() {
   statusBar()->addWidget(calibration_status_);
 }
 
+void MainWindow::SetupMenu() {
+  action_group_distortion_.reset(new QActionGroup(this));
+  ui_->action_distortion_ignore->setActionGroup(action_group_distortion_.get());
+  ui_->action_distortion_video->setActionGroup(action_group_distortion_.get());
+  ui_->action_distortion_data->setActionGroup(action_group_distortion_.get());
+
+
+  /* Menu connections */
+  connect(ui_->action_abort_calibration, &QAction::triggered,
+          this, &MainWindow::AbortCalibration);
+  connect(ui_->action_calibrate, &QAction::triggered,
+          this, &MainWindow::Calibrate);
+  connect(ui_->action_calibration_load, &QAction::triggered,
+          this, &MainWindow::CalibrationLoad);
+  connect(ui_->action_calibration_save, &QAction::triggered,
+          this, &MainWindow::CalibrationSave);
+  connect(ui_->action_parameters_modify, &QAction::triggered,
+          this, &MainWindow::ParametersModify);
+  connect(ui_->action_parameters_load, &QAction::triggered,
+          this, &MainWindow::ParametersLoad);
+  connect(ui_->action_parameters_save, &QAction::triggered,
+          this, &MainWindow::ParametersSave);
+  connect(ui_->action_setup_cameras, &QAction::triggered,
+          this, &MainWindow::SetupCameras);
+  connect(action_group_distortion_.get(), &QActionGroup::triggered,
+          this, &MainWindow::GroupDistortion);
+
+}
 } // end namespace gui

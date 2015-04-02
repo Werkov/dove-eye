@@ -18,11 +18,11 @@ FrameIterator FileVideoProvider::begin() {
   typedef CvFrameIterator<frame_iterator::FpsPolicy,
                           frame_iterator::BlockingPolicy> CvIterator;
 
-  return FrameIterator(new CvIterator(filename_));
+  return FrameIterator(this, new CvIterator(filename_));
 }
 
 FrameIterator FileVideoProvider::end() {
-  return FrameIterator();
+  return FrameIterator(this);
 }
 
 } // namespace dove_eye

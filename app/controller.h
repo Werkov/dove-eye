@@ -36,6 +36,12 @@ class Controller : public QObject {
     kTracking
   };
 
+  enum UndistortMode {
+    kIgnoreDistortion,
+    kUndistortData,
+    kUndistortVideo
+  };
+
   /**
    * @note Controller takes ownership of all ctor arguments given by pointer
    */
@@ -47,6 +53,7 @@ class Controller : public QObject {
       : QObject(),
         parameters_(parameters),
         mode_(kIdle),
+        undistort_mode_(kIgnoreDistortion),
         arity_(aggregator->Arity()),
         frameset_iterator_(aggregator->Arity()),
         frameset_end_iterator_(aggregator->Arity()),
@@ -62,6 +69,10 @@ class Controller : public QObject {
 
   inline Mode mode() const {
     return mode_;
+  }
+
+  inline UndistortMode undistort_mode() const {
+    return undistort_mode_;
   }
 
  signals:
@@ -87,6 +98,8 @@ class Controller : public QObject {
 
   void SetMode(const Mode mode);
 
+  void SetUndistortMode(const UndistortMode undistort_mode);
+
   void SetCalibrationData(const dove_eye::CalibrationData calibration_data);
 
  protected:
@@ -95,7 +108,16 @@ class Controller : public QObject {
  private:
   const dove_eye::Parameters &parameters_;
   Mode mode_;
+  UndistortMode undistort_mode_;
   const dove_eye::CameraIndex arity_;
+  /** Pointer to calibration data
+   * Reasons for pointer over reference:
+   *   - it may not be initialized at the beginning
+   *   - properly implemented calibration data won't be assignable (arity)
+   * IMPORTANT it must be prior any dependants (Aggregator, Tracker, ...)
+   *           because of destruction order (mind other threads)
+   */
+  std::unique_ptr<dove_eye::CalibrationData> calibration_data_;
 
   QBasicTimer timer_;
   Aggregator::Iterator frameset_iterator_;
@@ -103,14 +125,20 @@ class Controller : public QObject {
 
   std::unique_ptr<Aggregator> aggregator_;
   std::unique_ptr<dove_eye::CameraCalibration> calibration_;
-  std::unique_ptr<dove_eye::CalibrationData> calibration_data_;
   std::unique_ptr<dove_eye::Tracker> tracker_;
   std::unique_ptr<dove_eye::Localization> localization_;
 
   void DecorateFrameset(dove_eye::Frameset &frameset,
                         const dove_eye::Positset positset);
+
+  void CalibrationDataToProviders(
+      const dove_eye::CalibrationData *calibration_data);
+
+  void UndistortToProviders(const bool undistort);
+
 };
 
 Q_DECLARE_METATYPE(Controller::Mode)
+Q_DECLARE_METATYPE(Controller::UndistortMode)
 
 #endif // CONTROLLER_H_

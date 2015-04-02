@@ -4,13 +4,17 @@
 
 #include <opencv2/opencv.hpp>
 
+using cv::undistortPoints;
+
 namespace dove_eye {
 
 Tracker::Tracker(const CameraIndex arity, const InnerTracker &inner_tracker)
     : arity(arity),
-      trackpoints_(arity),
+      positset_(arity),
       trackstates_(arity, kUninitialized),
-      trackers_(arity) {
+      trackers_(arity),
+      distorted_input_(false),
+      calibration_data_(nullptr) {
   for (CameraIndex cam = 0; cam < arity; ++cam) {
     trackers_[cam] = std::move(InnerTrackerPtr(inner_tracker.Clone()));
   }
@@ -23,8 +27,8 @@ void Tracker::SetMark(const CameraIndex cam, const InnerTracker::Mark mark,
   // TODO implement projection
   assert(project_other == false);
 
-  trackpoints_[cam] = mark;
-  trackpoints_.SetValid(cam, false);
+  positset_[cam] = mark;
+  positset_.SetValid(cam, false);
 
   trackstates_[cam] = kMarkSet;
 }
@@ -36,7 +40,7 @@ Positset Tracker::Track(const Frameset &frameset) {
     TrackSingle(cam, frameset[cam]);
   }
 
-  return trackpoints_;
+  return positset_;
 }
 
 void Tracker::TrackSingle(const CameraIndex cam, const Frame &frame) {
@@ -45,23 +49,23 @@ void Tracker::TrackSingle(const CameraIndex cam, const Frame &frame) {
       return;
 
     case kMarkSet:
-      if (trackers_[cam]->InitializeTracking(frame, trackpoints_[cam],
-                                            &trackpoints_[cam])) {
+      if (trackers_[cam]->InitializeTracking(frame, positset_[cam],
+                                            &positset_[cam])) {
         trackstates_[cam] = kTracking;
-        trackpoints_.SetValid(cam, true);
+        positset_.SetValid(cam, true);
       } else {
         /*
          * If initialization failed, do not change state
          * and try it next time.
          */
-        trackpoints_.SetValid(cam, false);
+        positset_.SetValid(cam, false);
       }
       break;
 
     case kTracking:
-      if (!trackers_[cam]->Track(frame, &trackpoints_[cam])) {
+      if (!trackers_[cam]->Track(frame, &positset_[cam])) {
         trackstates_[cam] = kLost;
-        trackpoints_.SetValid(cam, false);
+        positset_.SetValid(cam, false);
       }
       break;
     case kLost:
@@ -70,6 +74,23 @@ void Tracker::TrackSingle(const CameraIndex cam, const Frame &frame) {
       //         or projection...
       break;
   }
+
+  if (positset_.IsValid(cam) && distorted_input()) {
+    positset_[cam] = Undistort(positset_[cam], cam);
+  }
+
+}
+
+Point2 Tracker::Undistort(const Point2 &point, const CameraIndex cam) const {
+  assert(calibration_data_);
+  // TODO verify this routine
+
+  cv::Mat result;
+  undistortPoints(cv::Mat(point), result,
+                  calibration_data_->camera_result(cam).camera_matrix,
+                  calibration_data_->camera_result(cam).distortion_coefficients);
+
+  return Point2(result);
 }
 
 } // namespace dove_eye

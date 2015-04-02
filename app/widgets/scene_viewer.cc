@@ -43,6 +43,7 @@ void SceneViewer::init() {
 
 void SceneViewer::draw() {
   if (draw_trajectory_) {
+    glLineWidth(1.0);
     glBegin(GL_LINE_STRIP);
       glColor3f(0.5, 0.5, 0.5);
       for (auto location : trajectory_) {
@@ -52,13 +53,13 @@ void SceneViewer::draw() {
   }
 
   glPointSize(10.0f);
+  glDisable(GL_LIGHTING);
   glBegin(GL_POINTS);
     glColor3f(1.0, 0.2f, 0);
     glVertex3f(location_.x, location_.y, location_.z);
   glEnd();
 
   /* Draw cameras */
-  glDisable(GL_LIGHTING);
   glLineWidth(4.0);
   glColor4f(1.0, 1.0, 1.0, 0.5);
   for (auto &camera : cameras_) {
@@ -86,12 +87,8 @@ void SceneViewer::CreateCameras(const dove_eye::CalibrationData &data) {
     auto &pair = data.pair_result(cam - 1);
     auto &T = pair.translation;
     auto &R = pair.rotation;
-    assert(T.channels() == 1);
-    assert(T.depth() == CV_64F);
 
-    assert(R.channels() == 1);
-    assert(R.depth() == CV_64F);
-
+    // FIXME Not sure whether cv::Vec3d would work with float cv::Mat
     const cv::Vec3d t(T);
     cameras_[cam]->setPosition(Vec(t));
    

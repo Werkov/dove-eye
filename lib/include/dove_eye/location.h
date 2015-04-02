@@ -1,14 +1,11 @@
 #ifndef DOVE_EYE_LOCATION_H_
 #define DOVE_EYE_LOCATION_H_
 
+#include "dove_eye/types.h"
 
 namespace dove_eye {
 
-struct Location {
-  double x;
-  double y;
-  double z;
-};
+typedef Point3 Location;
 
 } // namespace dove_eye
 

@@ -1,8 +1,8 @@
 #ifndef DOVE_EYE_FRAMESET_AGGREGATOR_H_
 #define DOVE_EYE_FRAMESET_AGGREGATOR_H_
 
+#include <cassert>
 #include <deque>
-#include <queue>
 #include <vector>
 
 #include "dove_eye/frame.h"
@@ -19,12 +19,11 @@ namespace dove_eye {
 template<class FramePolicy>
 class FramesetAggregator {
  public:
-  typedef typename FramePolicy::ProvidersContainer ProvidersContainer;
-
   /*
    * Iteration state is kept in iterator, however
    * during its increment underlying video providers are modified thus
-   * invalidating any other iterators to the same FramesetAggregator.
+   * potentially invalidating any other iterators to the same
+   * FramesetAggregator.
    */
   class Iterator {
     typedef FramesetAggregator<FramePolicy> Aggregator;
@@ -129,16 +128,26 @@ class FramesetAggregator {
       return frameset_created;
     }
 
-  };
+  }; // end class Iterator
+
+  typedef std::vector<VideoProvider *> ProvidersContainer;
 
   /**
    * @note FramesetAggregator takes ownership of contained video providers
    */
-  FramesetAggregator(typename FramePolicy::ProvidersContainer &&providers,
+  FramesetAggregator(const ProvidersContainer &providers,
                      const dove_eye::Parameters &parameters)
       : arity_(providers.size()),
-        frame_policy_(std::move(providers)),
-        parameters_(parameters) {
+        parameters_(parameters),
+        providers_(providers),
+        frame_policy_(providers) {
+
+  }
+
+  ~FramesetAggregator() {
+    for (auto provider_ptr : providers_) {
+      delete provider_ptr;
+    }
   }
 
   Iterator begin() {
@@ -153,10 +162,19 @@ class FramesetAggregator {
     return arity_;
   }
 
+  const ProvidersContainer &providers() const {
+    return providers_;
+  }
+
+
+
  private:
   CameraIndex arity_;
-  FramePolicy frame_policy_;
   const Parameters &parameters_;
+  ProvidersContainer providers_;
+  /* Policy must follow parameters (because of destruction order) */
+  FramePolicy frame_policy_;
+
 };
 
 } // namespace dove_eye

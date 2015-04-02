@@ -101,12 +101,22 @@
     <property name="title">
      <string>&amp;Calibration</string>
     </property>
-    <addaction name="action_calibration_load"/>
+    <widget class="QMenu" name="menu_distortion">
+     <property name="title">
+      <string>Distortion</string>
+     </property>
+     <addaction name="action_distortion_ignore"/>
+     <addaction name="action_distortion_video"/>
+     <addaction name="action_distortion_data"/>
+    </widget>
     <addaction name="separator"/>
     <addaction name="action_calibrate"/>
     <addaction name="action_abort_calibration"/>
     <addaction name="separator"/>
+    <addaction name="action_calibration_load"/>
     <addaction name="action_calibration_save"/>
+    <addaction name="separator"/>
+    <addaction name="menu_distortion"/>
    </widget>
    <addaction name="menu_providers"/>
    <addaction name="menu_calibration"/>
@@ -170,6 +180,30 @@
   <action name="action_parameters_save">
    <property name="text">
     <string>Save parameters</string>
+   </property>
+  </action>
+  <action name="action_distortion_ignore">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Ignore</string>
+   </property>
+  </action>
+  <action name="action_distortion_video">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Undistort &amp;video</string>
+   </property>
+  </action>
+  <action name="action_distortion_data">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Undistort &amp;data only</string>
    </property>
   </action>
  </widget>

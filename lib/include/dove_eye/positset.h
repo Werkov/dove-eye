@@ -4,10 +4,18 @@
 #include <opencv2/opencv.hpp>
 
 #include "dove_eye/tuple.h"
+#include "dove_eye/types.h"
 
 namespace dove_eye {
 
-typedef Tuple<cv::Point2f> Positset;
+/** Posit is output of inner tracker (i.e. processing single camera only)
+ * @note 'posit' is a term on its own, consider it just a coincidence that
+ *       it resembles word position (in image).
+ */
+typedef Point2 Posit;
+
+/** Positset represents general aggregated output of tracker */
+typedef Tuple<Point2> Positset;
 ;
 
 } // namespace dove_eye

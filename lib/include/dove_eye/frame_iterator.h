@@ -9,6 +9,9 @@
 
 namespace dove_eye {
 
+/* Forward */
+class VideoProvider;
+
 class FrameIteratorImpl {
  public:
   virtual ~FrameIteratorImpl() {}
@@ -26,23 +29,21 @@ class FrameIterator {
    * Takes ownership of the iterator and it's shared among copies of the
    * iterator.
    */
-  explicit FrameIterator(FrameIteratorImpl *iterator = nullptr)
-      : iterator_(iterator) {
+  explicit FrameIterator(const VideoProvider *video_provider = nullptr,
+                FrameIteratorImpl *iterator = nullptr)
+      : video_provider_(video_provider),
+        iterator_(iterator),
+        is_frame_valid_(true) {
   }
 
-  Frame operator*() const {
-    return iterator_->GetFrame();
-  }
+  Frame operator*() const;
 
-  FrameIterator &operator++() {
-    iterator_->MoveNext();
-    return *this;
-  }
+  FrameIterator &operator++();
 
   /**
    * Iterators equal only when they're both invalid.
    */
-  bool operator==(const FrameIterator &rhs) {
+  inline bool operator==(const FrameIterator &rhs) {
     bool this_valid = iterator_ && iterator_->IsValid();
     bool rhs_valid = rhs.iterator_ && rhs.iterator_->IsValid();
     return !this_valid && !rhs_valid;
@@ -53,7 +54,11 @@ class FrameIterator {
   }
 
  private:
+  const VideoProvider *video_provider_;
   std::shared_ptr<FrameIteratorImpl> iterator_;
+
+  mutable bool is_frame_valid_;
+  mutable Frame frame_;
 };
 
 } // namespace dove_eye

@@ -14,10 +14,10 @@ namespace dove_eye {
 
 class BlockingPolicy {
  public:
-  typedef std::vector<std::unique_ptr<VideoProvider>> ProvidersContainer;
+  typedef std::vector<VideoProvider *> ProvidersContainer;
 
-  explicit BlockingPolicy(ProvidersContainer &&providers)
-      : providers_(std::move(providers)),
+  explicit BlockingPolicy(const ProvidersContainer &providers)
+      : providers_(providers),
         current_cam_(0),
         initialized_(false),
         iterators_(providers_.size()),

@@ -2,6 +2,7 @@
 #define DOVE_EYE_ASYNC_POLICY_H_
 
 #include <atomic>
+#include <cassert>
 #include <condition_variable>
 #include <memory>
 #include <mutex>
@@ -11,6 +12,7 @@
 #include <vector>
 
 #include "dove_eye/frame.h"
+#include "dove_eye/frameset_aggregator.h"
 #include "dove_eye/types.h"
 #include "dove_eye/logging.h"
 #include "dove_eye/video_provider.h"
@@ -21,10 +23,10 @@ namespace dove_eye {
 template<bool allow_drop>
 class AsyncPolicy {
  public:
-  typedef std::vector<std::unique_ptr<VideoProvider>> ProvidersContainer;
+  typedef std::vector<VideoProvider *> ProvidersContainer;
 
-  explicit AsyncPolicy(ProvidersContainer &&providers)
-      : providers_(std::move(providers)),
+  explicit AsyncPolicy(const ProvidersContainer &providers)
+      : providers_(providers),
         threads_(providers_.size()),
         max_queue_size_(providers_.size() * kQueueSizeFactor_) {
   }
@@ -84,12 +86,15 @@ class AsyncPolicy {
   size_t running_producers_;
 
   std::atomic<bool> stop_requested_;
+
   std::queue<CamFrame> queue_;
   std::mutex queue_mtx_;
   std::condition_variable queue_cv_;
 
+
   void ReadProvider(const CameraIndex cam) {
     for (auto frame : *providers_[cam]) {
+
       /* Note the lock is released on every iteration */
       Lock lock(queue_mtx_);
 
