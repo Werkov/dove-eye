@@ -1,8 +1,12 @@
 #ifndef WIDGETS_SCENE_VIEWER_H_
 #define WIDGETS_SCENE_VIEWER_H_
 
+#include <memory>
+#include <vector>
+
 #include <QGLViewer/qglviewer.h>
 
+#include "dove_eye/calibration_data.h"
 #include "dove_eye/location.h"
 
 namespace widgets {
@@ -19,17 +23,26 @@ class SceneViewer : public QGLViewer {
 
   void SetDrawTrajectory(const bool value = true);
 
+  void SetCalibrationData(const dove_eye::CalibrationData &data);
+
 
  protected:
   void init() override;
   void draw() override;
 
  private:
+  typedef std::unique_ptr<qglviewer::Camera> CameraPtr;
+  typedef std::vector<CameraPtr> CamerasVector;
+
   bool draw_trajectory_;
 
   QVector<dove_eye::Location> trajectory_;
 
   dove_eye::Location location_;
+
+  CamerasVector cameras_;
+
+  void CreateCameras(const dove_eye::CalibrationData &data);
 };
 
 } // end namespace widgets

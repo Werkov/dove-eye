@@ -33,6 +33,8 @@ MainWindow::MainWindow(Application *application, QWidget *parent)
           this, &MainWindow::SetupPipeline);
   connect(application_, &Application::CalibrationDataReady,
           this, &MainWindow::CalibrationDataReady);
+  connect(application_, &Application::CalibrationDataReady,
+          ui_->scene_viewer, &SceneViewer::SetCalibrationData);
 
   /* Dialog connections */
   connect(cameras_setup_dialog_.get(), &CamerasSetupDialog::SelectedProviders,
