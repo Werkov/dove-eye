@@ -27,10 +27,10 @@ CameraIndex CameraPair::Index(const CameraIndex arity,
                               const CameraIndex cam1,
                               const CameraIndex cam2) {
   /* <- cam1 ->
-   * c  .xxxx
-   * a  ..xxx
-   * m  ...xx
-   * 2  ....x
+   * c  .0123
+   * a  ..456
+   * m  ...78
+   * 2  ....9
    *    .....
    *
    * Area of trapezoid (arithmetic sequence) + row index shifted by cam2.
