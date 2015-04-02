@@ -54,11 +54,9 @@ class MainWindow : public QMainWindow {
 
   std::unique_ptr<Ui::MainWindow> ui_;
 
-  // FIXME consider using parenting to window instead of unique_ptr (could the
-  //       inline dtor)
-  std::unique_ptr<QActionGroup> action_group_distortion_;
-  std::unique_ptr<ParametersDialog> parameters_dialog_;
-  std::unique_ptr<CamerasSetupDialog> cameras_setup_dialog_;
+  QActionGroup *action_group_distortion_;
+  ParametersDialog *parameters_dialog_;
+  CamerasSetupDialog *cameras_setup_dialog_;
 
   widgets::ControllerStatus *controller_status_;
   widgets::CalibrationStatus *calibration_status_;

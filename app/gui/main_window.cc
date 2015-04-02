@@ -24,8 +24,8 @@ MainWindow::MainWindow(Application *application, QWidget *parent)
     : QMainWindow(parent),
       application_(application),
       ui_(new Ui::MainWindow),
-      parameters_dialog_(new ParametersDialog(application->parameters())),
-      cameras_setup_dialog_(new CamerasSetupDialog()) {
+      parameters_dialog_(new ParametersDialog(application->parameters(), this)),
+      cameras_setup_dialog_(new CamerasSetupDialog(this)) {
   ui_->setupUi(this);
   SetupStatusBar();
 
@@ -37,7 +37,7 @@ MainWindow::MainWindow(Application *application, QWidget *parent)
           ui_->scene_viewer, &SceneViewer::SetCalibrationData);
 
   /* Dialog connections */
-  connect(cameras_setup_dialog_.get(), &CamerasSetupDialog::SelectedProviders,
+  connect(cameras_setup_dialog_, &CamerasSetupDialog::SelectedProviders,
           application_, &Application::UseCameraProviders);
 
   SetupMenu();
@@ -205,10 +205,10 @@ void MainWindow::SetupStatusBar() {
 }
 
 void MainWindow::SetupMenu() {
-  action_group_distortion_.reset(new QActionGroup(this));
-  ui_->action_distortion_ignore->setActionGroup(action_group_distortion_.get());
-  ui_->action_distortion_video->setActionGroup(action_group_distortion_.get());
-  ui_->action_distortion_data->setActionGroup(action_group_distortion_.get());
+  action_group_distortion_ = new QActionGroup(this);
+  ui_->action_distortion_ignore->setActionGroup(action_group_distortion_);
+  ui_->action_distortion_video->setActionGroup(action_group_distortion_);
+  ui_->action_distortion_data->setActionGroup(action_group_distortion_);
 
 
   /* Menu connections */
@@ -228,7 +228,7 @@ void MainWindow::SetupMenu() {
           this, &MainWindow::ParametersSave);
   connect(ui_->action_setup_cameras, &QAction::triggered,
           this, &MainWindow::SetupCameras);
-  connect(action_group_distortion_.get(), &QActionGroup::triggered,
+  connect(action_group_distortion_, &QActionGroup::triggered,
           this, &MainWindow::GroupDistortion);
 
 }
