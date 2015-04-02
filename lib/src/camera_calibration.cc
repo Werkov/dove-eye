@@ -117,10 +117,10 @@ bool CameraCalibration::MeasureFrameset(const Frameset &frameset) {
               data_.camera_parameters_[cam2].camera_matrix,
               data_.camera_parameters_[cam2].distortion_coefficients,
               cv::Size(1, 1), /* not actually used as we already know camera matrix */
-              dummy_R,
-              dummy_T,
-              data_.pair_parameters_[pair.index].essential_matrix, /* E */
-              cv::noArray()); /* F */
+              data_.pair_parameters_[pair.index].rotation,
+              data_.pair_parameters_[pair.index].translation,
+              cv::noArray(), /* E */
+              data_.pair_parameters_[pair.index].fundamental_matrix); /* F */
 
           DEBUG("Pair %i, %i calibrated, reprojection error %f", cam1, cam2,
                 error);

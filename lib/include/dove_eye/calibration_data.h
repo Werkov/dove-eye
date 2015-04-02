@@ -21,7 +21,9 @@ struct CameraParameters {
 };
 
 struct PairParameters {
-  cv::Mat essential_matrix;
+  cv::Mat fundamental_matrix;
+  cv::Mat rotation;
+  cv::Mat translation;
 };
 
 

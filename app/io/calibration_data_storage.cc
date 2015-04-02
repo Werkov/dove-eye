@@ -40,11 +40,27 @@ CalibrationData CalibrationDataStorage::LoadFromFile(const QString &filename) {
     ++cam;
   }
 
-  node = fs[kNameEssentialMatrix];
+  node = fs[kNameFundamentalMatrix];
   CameraIndex index = 0;
   for (auto file_node : node) {
     assert(index < pairity);
-    file_node >> result.pair_parameters_[index].essential_matrix;
+    file_node >> result.pair_parameters_[index].fundamental_matrix;
+    ++index;
+  }
+  
+  node = fs[kNameRotation];
+  index = 0;
+  for (auto file_node : node) {
+    assert(index < pairity);
+    file_node >> result.pair_parameters_[index].rotation;
+    ++index;
+  }
+
+  node = fs[kNameTranslation];
+  index = 0;
+  for (auto file_node : node) {
+    assert(index < pairity);
+    file_node >> result.pair_parameters_[index].translation;
     ++index;
   }
 
@@ -69,9 +85,21 @@ void CalibrationDataStorage::SaveToFile(const QString &filename,
   }
   fs << "]";
 
-  fs << kNameEssentialMatrix << "[";
+  fs << kNameFundamentalMatrix << "[";
   for (CameraIndex index = 0; index < CameraPair::Pairity(data.Arity()); ++index) {
-    fs << data.pair_result(index).essential_matrix;
+    fs << data.pair_result(index).fundamental_matrix;
+  }
+  fs << "]";
+
+  fs << kNameRotation << "[";
+  for (CameraIndex index = 0; index < CameraPair::Pairity(data.Arity()); ++index) {
+    fs << data.pair_result(index).rotation;
+  }
+  fs << "]";
+
+  fs << kNameTranslation << "[";
+  for (CameraIndex index = 0; index < CameraPair::Pairity(data.Arity()); ++index) {
+    fs << data.pair_result(index).translation;
   }
   fs << "]";
 }

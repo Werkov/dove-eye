@@ -28,6 +28,9 @@ class CalibrationDataStorage : public QObject {
   const char *kNameCameraMatrix = "C";
   const char *kNameDistortionCoefficients = "D";
   const char *kNameEssentialMatrix = "E";
+  const char *kNameFundamentalMatrix = "F";
+  const char *kNameRotation = "R";
+  const char *kNameTranslation = "T";
 };
 
 } // end namespace io
