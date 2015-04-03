@@ -22,6 +22,9 @@ CalibrationData CalibrationDataStorage::LoadFromFile(const QString &filename) {
   CameraIndex pairity = CameraPair::Pairity(arity);
   CalibrationData result(arity);
 
+  fs[kNamePosition] >> result.position_;
+  fs[kNameRotation] >> result.rotation_;
+
   auto node = fs[kNameCameraMatrix];
   assert(node.type() == FileNode::SEQ);
 
@@ -48,7 +51,7 @@ CalibrationData CalibrationDataStorage::LoadFromFile(const QString &filename) {
     ++index;
   }
   
-  node = fs[kNameRotation];
+  node = fs[kNamePairRotation];
   index = 0;
   for (auto file_node : node) {
     assert(index < pairity);
@@ -72,6 +75,8 @@ void CalibrationDataStorage::SaveToFile(const QString &filename,
   FileStorage fs(filename.toStdString(), FileStorage::WRITE);
 
   fs << kNameArity << data.Arity();
+  fs << kNamePosition << data.position();
+  fs << kNameRotation << data.rotation();
 
   fs << kNameCameraMatrix << "[";
   for (CameraIndex cam = 0; cam < data.Arity(); ++cam) {
@@ -91,7 +96,7 @@ void CalibrationDataStorage::SaveToFile(const QString &filename,
   }
   fs << "]";
 
-  fs << kNameRotation << "[";
+  fs << kNamePairRotation << "[";
   for (CameraIndex index = 0; index < CameraPair::Pairity(data.Arity()); ++index) {
     fs << data.pair_result(index).rotation;
   }

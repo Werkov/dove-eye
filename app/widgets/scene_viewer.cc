@@ -1,6 +1,7 @@
 #include "widgets/scene_viewer.h"
 
 #include <cassert>
+#include <iostream>
 
 #include <opencv2/opencv.hpp>
 
@@ -77,30 +78,50 @@ void SceneViewer::CreateCameras(const dove_eye::CalibrationData &data) {
     cameras_[cam] = std::move(CameraPtr(camera));
   }
 
-  /*
-   * First camera is at the origin, orientation being identity matrix.
-   *
-   * Obtain other camera position relative to the first camera,
-   * utilizing camera pairs indexing.
-   */
+  /* First camera position is given directly */
+  cv::Mat r0 = data.rotation().inv();
+  cv::Mat t0 = -data.rotation() * data.position();
+
+  PositionCamera(r0, t0, cameras_[0].get());
+
+  /* Other cameras are taken relatively to the first (0-th) camera. */
   for (CameraIndex cam = 1; cam < data.Arity(); ++cam) {
     auto &pair = data.pair_result(cam - 1);
-    auto &T = pair.translation;
-    auto &R = pair.rotation;
 
-    // FIXME Not sure whether cv::Vec3d would work with float cv::Mat
-    const cv::Vec3d t(T);
-    cameras_[cam]->setPosition(Vec(t));
-   
-    const cv::Vec3d c0(R.col(0));
-    const cv::Vec3d c1(R.col(1));
-    const cv::Vec3d c2(R.col(2));
-    
-    Quaternion q;
-    q.setFromRotatedBasis(Vec(c0), Vec(c1), Vec(c2));
-    cameras_[cam]->setOrientation(q);
+    cv::Mat r = pair.rotation * r0;
+    cv::Mat t = pair.rotation * t0 + pair.translation;
+
+    PositionCamera(r, t, cameras_[cam].get());
   }
+}
 
+/** Put camera to position specified by r and t matrices
+ *
+ * x_camera = r * x_world + t
+ *
+ * @param[in]  r  world-to-camera rotation
+ * @param[in]  t  world-to-camera translation
+ */
+void SceneViewer::PositionCamera(const cv::Mat &r, const cv::Mat &t,
+                                 qglviewer::Camera *camera) {
+  /*
+   * Calculate camera-to-world inverse and project (0, 0, 0)_camera to be
+   * position_world of camera.  Similarly project (0, 0, 1)_camera to be view
+   * direction (world) and (0, -1, 0) to be up vector (world).
+   *
+   * There is -1 at y as QGLViewer obviously use opposite y direction.
+   */
+  const cv::Mat inv_r = r.inv();
+  const cv::Mat inv_t = -inv_r * t;
+
+  const cv::Vec3d position(inv_t);
+  camera->setPosition(Vec(position));
+
+  const cv::Vec3d z_image(inv_r.col(2));
+  camera->setViewDirection(Vec(z_image));
+
+  const cv::Vec3d y_image(inv_r.col(1));
+  camera->setUpVector(Vec(-y_image));
 }
 
 } // end namespace widgets

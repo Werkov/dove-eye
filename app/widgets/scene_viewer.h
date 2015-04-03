@@ -43,6 +43,10 @@ class SceneViewer : public QGLViewer {
   CamerasVector cameras_;
 
   void CreateCameras(const dove_eye::CalibrationData &data);
+
+  static void PositionCamera(const cv::Mat &r, const cv::Mat &t,
+                             qglviewer::Camera *camera);
+
 };
 
 } // end namespace widgets

@@ -38,6 +38,8 @@ class CalibrationData {
       : arity_(arity),
         camera_parameters_(arity),
         pair_parameters_(arity) {
+    position_ = cv::Mat::zeros(3, 1, CV_64F);
+    rotation_ = cv::Mat::eye(3, 3, CV_64F);
   }
 
   // TODO rename to camera_parameters
@@ -53,6 +55,14 @@ class CalibrationData {
 
     return pair_parameters_[index];
   }
+
+  inline const cv::Mat &position() const {
+    return position_;
+  }
+
+  inline const cv::Mat &rotation() const {
+    return rotation_;
+  }
   
   inline CameraIndex Arity() const {
     return arity_;
@@ -61,6 +71,12 @@ class CalibrationData {
  private:
   // FIXME Should be const, was lazy to implement the-big-five (operator=, ...)
   CameraIndex arity_;
+
+  /** Position (in the world) of camera system, relative to camera 0 */
+
+  cv::Mat position_;
+  /** Rotation (camera-to-world) of camera system, relative to camera 0 */
+  cv::Mat rotation_;
 
   std::vector<CameraParameters> camera_parameters_;
   std::vector<PairParameters> pair_parameters_;
