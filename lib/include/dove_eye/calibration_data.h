@@ -42,15 +42,13 @@ class CalibrationData {
     rotation_ = cv::Mat::eye(3, 3, CV_64F);
   }
 
-  // TODO rename to camera_parameters
-  inline const CameraParameters &camera_result(const CameraIndex cam) const {
+  inline const CameraParameters &camera_parameters(const CameraIndex cam) const {
     assert(cam < Arity());
 
     return camera_parameters_[cam];
   }
 
-  // TODO rename to pair_parameters
-  inline const PairParameters &pair_result(const CameraIndex index) const {
+  inline const PairParameters &pair_parameters(const CameraIndex index) const {
     assert(index < CameraPair::Pairity(Arity()));
 
     return pair_parameters_[index];

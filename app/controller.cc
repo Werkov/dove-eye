@@ -170,7 +170,7 @@ void Controller::CalibrationDataToProviders(
 
   CameraIndex cam = 0;
   for (auto provider : aggregator_->providers()) {
-    provider->camera_parameters(&calibration_data->camera_result(cam));
+    provider->camera_parameters(&calibration_data->camera_parameters(cam));
     ++cam;
   }
 }

@@ -87,8 +87,8 @@ Point2 Tracker::Undistort(const Point2 &point, const CameraIndex cam) const {
 
   cv::Mat result;
   undistortPoints(cv::Mat(point), result,
-                  calibration_data_->camera_result(cam).camera_matrix,
-                  calibration_data_->camera_result(cam).distortion_coefficients);
+                  calibration_data_->camera_parameters(cam).camera_matrix,
+                  calibration_data_->camera_parameters(cam).distortion_coefficients);
 
   return Point2(result);
 }

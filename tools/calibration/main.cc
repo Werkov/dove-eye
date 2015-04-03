@@ -103,14 +103,14 @@ int CalibrateCameras(const string &output, const vector<string> &filenames) {
 
   for (CameraIndex cam = 0; cam < calibration.camera_count(); ++cam) {
     file_storage << (string("cam") + to_string(cam)) << "{" <<
-        "C" << calibration.camera_result(cam).camera_matrix <<
-        "D" << calibration.camera_result(cam).distortion_coefficients <<
+        "C" << calibration.camera_parameters(cam).camera_matrix <<
+        "D" << calibration.camera_parameters(cam).distortion_coefficients <<
         "}";
   }
 
   for (auto pair : calibration.pairs()) {
     file_storage << (string("pair") + to_string(pair.index)) << "{" <<
-        "E" << calibration.pair_result(pair.cam1, pair.cam2).essential_matrix <<
+        "E" << calibration.pair_parameters(pair.cam1, pair.cam2).essential_matrix <<
         "}";
   }
 

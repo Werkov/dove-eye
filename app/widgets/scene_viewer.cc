@@ -86,7 +86,7 @@ void SceneViewer::CreateCameras(const dove_eye::CalibrationData &data) {
 
   /* Other cameras are taken relatively to the first (0-th) camera. */
   for (CameraIndex cam = 1; cam < data.Arity(); ++cam) {
-    auto &pair = data.pair_result(cam - 1);
+    auto &pair = data.pair_parameters(cam - 1);
 
     cv::Mat r = pair.rotation * r0;
     cv::Mat t = pair.rotation * t0 + pair.translation;

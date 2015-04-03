@@ -80,31 +80,31 @@ void CalibrationDataStorage::SaveToFile(const QString &filename,
 
   fs << kNameCameraMatrix << "[";
   for (CameraIndex cam = 0; cam < data.Arity(); ++cam) {
-    fs << data.camera_result(cam).camera_matrix;
+    fs << data.camera_parameters(cam).camera_matrix;
   }
   fs << "]";
 
   fs << kNameDistortionCoefficients << "[";
   for (CameraIndex cam = 0; cam < data.Arity(); ++cam) {
-    fs << data.camera_result(cam).distortion_coefficients;
+    fs << data.camera_parameters(cam).distortion_coefficients;
   }
   fs << "]";
 
   fs << kNameFundamentalMatrix << "[";
   for (CameraIndex index = 0; index < CameraPair::Pairity(data.Arity()); ++index) {
-    fs << data.pair_result(index).fundamental_matrix;
+    fs << data.pair_parameters(index).fundamental_matrix;
   }
   fs << "]";
 
   fs << kNamePairRotation << "[";
   for (CameraIndex index = 0; index < CameraPair::Pairity(data.Arity()); ++index) {
-    fs << data.pair_result(index).rotation;
+    fs << data.pair_parameters(index).rotation;
   }
   fs << "]";
 
   fs << kNameTranslation << "[";
   for (CameraIndex index = 0; index < CameraPair::Pairity(data.Arity()); ++index) {
-    fs << data.pair_result(index).translation;
+    fs << data.pair_parameters(index).translation;
   }
   fs << "]";
 }
