@@ -15,11 +15,15 @@ find_path(QGLViewer_INCLUDE_DIR
 
 
 find_package(Qt5OpenGL)
-get_target_property(Qt5OpenGL_INCLUDE_DIRS Qt5::OpenGL INTERFACE_INCLUDE_DIRECTORIES)
+if(NOT Qt5OpenGL_INCLUDE_DIRS)
+	get_target_property(Qt5OpenGL_INCLUDE_DIRS Qt5::OpenGL INTERFACE_INCLUDE_DIRECTORIES)
+endif()
 get_target_property(Qt5OpenGL_LIBS Qt5::OpenGL LOCATION)
 
 find_package(Qt5Xml)
-get_target_property(Qt5Xml_INCLUDE_DIRS Qt5::Xml INTERFACE_INCLUDE_DIRECTORIES)
+if(NOT Qt5Xml_INCLUDE_DIRS)
+	get_target_property(Qt5Xml_INCLUDE_DIRS Qt5::Xml INTERFACE_INCLUDE_DIRECTORIES)
+endif()
 get_target_property(Qt5Xml_LIBS Qt5::Xml LOCATION)
 
 set(QGLViewer_INCLUDE_DIRS ${QGLViewer_INCLUDE_DIR};${Qt5Xml_INCLUDE_DIRS};${Qt5OpenGL_INCLUDE_DIRS})

@@ -34,6 +34,8 @@ include_directories(${CMAKE_SOURCE_DIR}/app)
 include_directories(${CMAKE_SOURCE_DIR}/lib/include)
 include_directories(${QGLViewer_INCLUDE_DIRS})
 
+include(${CMAKE_SOURCE_DIR}/cmake/precise_hack.cmake)
+
 add_definitions("-DHAVE_GUI")
 
 target_link_libraries(gui

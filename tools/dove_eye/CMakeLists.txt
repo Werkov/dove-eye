@@ -13,6 +13,8 @@ target_link_libraries(dove-eye_exec dove-eye gui Qt5::Widgets)
 include_directories(${CMAKE_SOURCE_DIR}/app)
 include_directories(${CMAKE_SOURCE_DIR}/lib/include)
 
+include(${CMAKE_SOURCE_DIR}/cmake/precise_hack.cmake)
+
 add_definitions("-DHAVE_GUI")
 
 if(WIN32)
