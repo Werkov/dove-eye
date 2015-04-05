@@ -45,8 +45,10 @@ Application::~Application() {
 
 Application::VideoProvidersVector Application::AvailableVideoProviders() {
   if (available_providers_.size() == 0) {
-    /* Scan device IDs from 0 to first invalid */
+    /* Scan device IDs from 0 to first invalid (with at most skip errors) */
+    const int skip = 10;
     int device = 0;
+    int errors = 0;
     while (true) {
       auto provider = new CameraVideoProvider(device);
       if (provider->begin() != provider->end()) {
@@ -56,7 +58,9 @@ Application::VideoProvidersVector Application::AvailableVideoProviders() {
       } else {
         delete provider;
         qDebug() << "Camera device" << device << "not working";
-        break;
+        if (++errors >= skip) {
+          break;
+        }
       }
       ++device;
     }
