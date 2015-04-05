@@ -10,15 +10,37 @@ namespace dove_eye {
 
 class TemplateTracker : public InnerTracker {
  public:
+  struct TemplateData : public TrackerData {
+    cv::Mat search_template;
+    double radius;
+  };
+
   explicit TemplateTracker(const Parameters &parameters)
       : parameters_(parameters),
-        initialized_(false) {
+        initialized_(false),
+        mark_set_(false) {
   }
 
-  bool InitializeTracking(const Frame &frame, const Mark mark,
-                          Posit *result) override;
+  inline void SetMark(const Mark mark) override {
+    mark_set_ = true;
+    mark_ = mark;
+  }
   
+  inline const TrackerData *tracker_data() const override {
+    return &data_;
+  }
+  
+  bool InitializeTracking(const Frame &frame, Posit *result) override;
+
+  bool InitializeTracking(
+      const Frame &frame,
+      const Epiline epiline,
+      const TrackerData *tracker_data,
+      Posit *result) override;
+ 
   bool Track(const Frame &frame, Posit *result) override;
+
+  bool ReinitializeTracking(const Frame &frame, Posit *result) override;
 
   InnerTracker *Clone() const override;
 
@@ -26,9 +48,24 @@ class TemplateTracker : public InnerTracker {
   const Parameters &parameters_;
   bool initialized_;
 
-  cv::Mat template_;
-  double radius_;
+  bool mark_set_;
+  Mark mark_;
+
+  TemplateData data_;
   cv::Point2f previous_match_;
+
+  cv::Mat EpilineToMask(const cv::Mat &data, const Epiline epiline) const;
+
+  bool TakeTemplate(const cv::Mat &data, const Point2 point, const double radius);
+
+  bool Match(
+      const cv::Mat &data,
+      const TemplateData &tpl,
+      const cv::Rect *roi,
+      const cv::Mat *mask,
+      const double threshold,
+      Point2 *result,
+      double *quality = nullptr) const;
 
 };
 

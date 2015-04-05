@@ -30,10 +30,19 @@ void Controller::Stop() {
 
 void Controller::SetMark(const dove_eye::CameraIndex cam,
                          const GuiMark gui_mark) {
+  if (!calibration_data_) {
+    return;
+  }
+
   InnerTracker::Mark mark(gui_mark.pos.x(), gui_mark.pos.y());
-  // TODO encapsulate project_other into GuiMark
   bool project_other = false;
-  tracker_->SetMark(cam, mark, project_other);
+  if (gui_mark.flags & GuiMark::kCtrl) {
+    project_other = true;
+  }
+
+  if (tracker_->SetMark(cam, mark, project_other)) {
+    SetMode(kTracking);
+  }
 }
 
 void Controller::SetMode(const Mode mode) {
@@ -137,11 +146,6 @@ void Controller::timerEvent(QTimerEvent *event) {
       break;
   }
 
-  dove_eye::Location location;
-  location.x = 0.3 + 0.4*cos(frameset[0].timestamp * 0.3);
-  location.y = 0.3 + 0.7*sin(frameset[0].timestamp * 0.2);
-  location.z = 0.1 + 10*sin(frameset[0].timestamp * 0.001);
-  emit LocationReady(location);
 
   DecorateFrameset(frameset, positset);
 

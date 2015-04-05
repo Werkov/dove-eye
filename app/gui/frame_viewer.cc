@@ -39,7 +39,16 @@ void FrameViewer::resizeEvent(QResizeEvent *event) {
 
 void FrameViewer::mouseReleaseEvent(QMouseEvent *event) {
   if (converter_) {
-    GuiMark mark = { .pos = event->pos() };
+    GuiMark mark;
+    mark.pos = event->pos();
+
+    if (event->modifiers() & Qt::ControlModifier) {
+      mark.flags |= GuiMark::kCtrl;
+    }
+    if (event->modifiers() & Qt::ShiftModifier) {
+      mark.flags |= GuiMark::kShift;
+    }
+
     converter_->PropagateMark(cam_, mark);
   }
 }

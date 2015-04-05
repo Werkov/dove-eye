@@ -10,6 +10,9 @@ namespace dove_eye {
 typedef cv::Point2f Point2;
 typedef cv::Point3f Point3;
 
+typedef cv::Vec2f Vector2;
+typedef cv::Vec3f Vector3;
+
 typedef std::vector<Point2> Point2Vector;
 typedef std::vector<Point3> Point3Vector;
 

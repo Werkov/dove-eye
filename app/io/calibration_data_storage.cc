@@ -22,8 +22,12 @@ CalibrationData CalibrationDataStorage::LoadFromFile(const QString &filename) {
   CameraIndex pairity = CameraPair::Pairity(arity);
   CalibrationData result(arity);
 
-  fs[kNamePosition] >> result.position_;
-  fs[kNameRotation] >> result.rotation_;
+  cv::Mat tmp;
+  fs[kNamePosition] >> tmp;
+  result.position(tmp);
+
+  fs[kNameRotation] >> tmp;
+  result.rotation(tmp);
 
   auto node = fs[kNameCameraMatrix];
   assert(node.type() == FileNode::SEQ);

@@ -1,5 +1,6 @@
 #include "dove_eye/camera_pair.h"
 
+#include <cassert>
 #include <vector>
 
 #include "dove_eye/calibration_pattern.h"
@@ -17,6 +18,7 @@ CameraPair::PairArray CameraPair::GenerateArray(const CameraIndex arity) {
       result[index].index = index;
       result[index].cam1 = cam1;
       result[index].cam2 = cam2;
+      ++index;
     }
   }
 
@@ -26,17 +28,21 @@ CameraPair::PairArray CameraPair::GenerateArray(const CameraIndex arity) {
 CameraIndex CameraPair::Index(const CameraIndex arity,
                               const CameraIndex cam1,
                               const CameraIndex cam2) {
-  /* <- cam1 ->
+  if (cam1 > cam2) {
+    return Index(arity, cam2, cam1);
+  }
+  /* <- cam2 ->
    * c  .0123
    * a  ..456
    * m  ...78
-   * 2  ....9
+   * 1  ....9
    *    .....
    *
    * Area of trapezoid (arithmetic sequence) + row index shifted by cam2.
    * Beware of zero-based indexing.
    */
-  return (2 * arity - cam2 - 1) * (cam2 + 1) / 2 + (cam1 - cam2 - 1);
+  assert(cam2 > cam1);
+  return (2 * arity - cam1 - 1) * cam1 / 2 + (cam2 - cam1 - 1);
 }
 
 CameraIndex CameraPair::Pairity(const CameraIndex arity) {

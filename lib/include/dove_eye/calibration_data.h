@@ -4,6 +4,8 @@
 #include <cassert>
 #include <vector>
 
+#include <opencv2/opencv.hpp>
+
 #include "dove_eye/camera_pair.h"
 #include "dove_eye/types.h"
 
@@ -27,6 +29,9 @@ struct PairParameters {
 };
 
 
+/**
+ * CalibrationData object is immutable by design, only friends can update it
+ */
 class CalibrationData {
   friend class CameraCalibration;
 #ifdef HAVE_GUI
@@ -37,7 +42,10 @@ class CalibrationData {
   explicit CalibrationData(const CameraIndex arity = 0)
       : arity_(arity),
         camera_parameters_(arity),
-        pair_parameters_(arity) {
+        pair_parameters_(arity),
+        globals_initialized_(false),
+        rotations_(arity),
+        translations_(arity) {
     position_ = cv::Mat::zeros(3, 1, CV_64F);
     rotation_ = cv::Mat::eye(3, 3, CV_64F);
   }
@@ -66,18 +74,56 @@ class CalibrationData {
     return arity_;
   }
 
+  inline const cv::Mat &CameraRotation(const CameraIndex cam) const {
+    assert(cam < Arity());
+
+    if (!globals_initialized_) {
+      CalculateGlobals();
+    }
+
+    return rotations_[cam];
+  }
+
+  inline const cv::Mat &CameraTranslation(const CameraIndex cam) const {
+    assert(cam < Arity());
+
+    if (!globals_initialized_) {
+      CalculateGlobals();
+    }
+
+    return translations_[cam];
+  }
  private:
+  typedef std::vector<cv::Mat> CvMatVector;
+
   // FIXME Should be const, was lazy to implement the-big-five (operator=, ...)
   CameraIndex arity_;
 
   /** Position (in the world) of camera system, relative to camera 0 */
-
   cv::Mat position_;
+
   /** Rotation (camera-to-world) of camera system, relative to camera 0 */
   cv::Mat rotation_;
 
   std::vector<CameraParameters> camera_parameters_;
   std::vector<PairParameters> pair_parameters_;
+
+  mutable bool globals_initialized_;
+  mutable CvMatVector rotations_;
+  mutable CvMatVector translations_;
+
+
+  inline void position(const cv::Mat &value) {
+    position_ = value;
+    globals_initialized_ = false;
+  }
+
+  inline void rotation(const cv::Mat &value) {
+    rotation_ = value;
+    globals_initialized_ = false;
+  }
+
+  void CalculateGlobals() const;
 };
 
 } // namespace dove_eye

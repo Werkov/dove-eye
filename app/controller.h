@@ -46,10 +46,10 @@ class Controller : public QObject {
    * @note Controller takes ownership of all ctor arguments given by pointer
    */
   Controller(dove_eye::Parameters &parameters,
-                      Aggregator *aggregator,
-                      dove_eye::CameraCalibration *calibration,
-                      dove_eye::Tracker *tracker,
-                      dove_eye::Localization *localization)
+             Aggregator *aggregator,
+             dove_eye::CameraCalibration *calibration,
+             dove_eye::Tracker *tracker,
+             dove_eye::Localization *localization)
       : QObject(),
         parameters_(parameters),
         mode_(kIdle),

@@ -44,8 +44,8 @@ void FramesetConverter::PropagateMark(const dove_eye::CameraIndex cam,
   }
 
   
-  GuiMark new_mark;
-  new_mark.pos = mark.pos * scale;
+  GuiMark new_mark(mark);
+  new_mark.pos *= scale;
 
   /* Check boundaries, assume zero-based indexing */
   if (new_mark.pos.x() < frame_size.width() &&

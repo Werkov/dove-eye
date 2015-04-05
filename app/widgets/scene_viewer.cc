@@ -75,32 +75,23 @@ void SceneViewer::CreateCameras(const dove_eye::CalibrationData &data) {
 
   for (CameraIndex cam = 0; cam < data.Arity(); ++cam) {
     auto camera = new Camera();
+
+    auto rot = data.CameraRotation(cam);
+    auto trans = data.CameraTranslation(cam);
+    PositionCamera(rot, trans, camera);
+
     cameras_[cam] = std::move(CameraPtr(camera));
-  }
-
-  /* First camera position is given directly */
-  cv::Mat r0 = data.rotation().inv();
-  cv::Mat t0 = -data.rotation() * data.position();
-
-  PositionCamera(r0, t0, cameras_[0].get());
-
-  /* Other cameras are taken relatively to the first (0-th) camera. */
-  for (CameraIndex cam = 1; cam < data.Arity(); ++cam) {
-    auto &pair = data.pair_parameters(cam - 1);
-
-    cv::Mat r = pair.rotation * r0;
-    cv::Mat t = pair.rotation * t0 + pair.translation;
-
-    PositionCamera(r, t, cameras_[cam].get());
   }
 }
 
 /** Put camera to position specified by r and t matrices
  *
- * x_camera = r * x_world + t
  *
  * @param[in]  r  world-to-camera rotation
  * @param[in]  t  world-to-camera translation
+ *
+ * Meaning
+ *     x_camera = r * x_world + t
  */
 void SceneViewer::PositionCamera(const cv::Mat &r, const cv::Mat &t,
                                  qglviewer::Camera *camera) {
