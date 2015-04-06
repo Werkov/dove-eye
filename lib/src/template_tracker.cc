@@ -2,9 +2,14 @@
 
 #include <opencv2/opencv.hpp>
 
+#include "dove_eye/cv_logging.h"
+#include "dove_eye/logging.h"
+
 using cv::line;
 using cv::matchTemplate;
+using cv::meanStdDev;
 using cv::minMaxLoc;
+using cv::setIdentity;
 using dove_eye::Parameters;
 
 namespace dove_eye {
@@ -20,7 +25,7 @@ bool TemplateTracker::InitializeTracking(const Frame &frame, Posit *result) {
   initialized_ = true;
 
   *result = mark_;
-  previous_match_ = *result;
+  kalman_filter_.Reset(frame.timestamp, *result);
 
   return true;
 }
@@ -50,9 +55,8 @@ bool TemplateTracker::InitializeTracking(
   }
   initialized_ = true;
 
-  /* Actual position is in the middle of template */
   *result = match_point;
-  previous_match_ = *result;
+  kalman_filter_.Reset(frame.timestamp, *result);
 
   return true;
 }
@@ -63,17 +67,19 @@ bool TemplateTracker::Track(const Frame &frame, Posit *result) {
   const auto f = parameters_.Get(Parameters::TEMPLATE_SEARCH_FACTOR);
   const auto thr = parameters_.Get(Parameters::TEMPLATE_THRESHOLD);
 
-  cv::Rect roi(previous_match_.x - f * data_.radius,
-           previous_match_.y - f * data_.radius,
+  auto exp = kalman_filter_.Predict(frame.timestamp);
+  Point2 match_point;
+
+  cv::Rect roi(exp.x - f * data_.radius, exp.y - f * data_.radius,
            2 * f * data_.radius, 2 * f * data_.radius);
 
-  Point2 match_point;
-  if (!Match(frame.data, data_, &roi, nullptr, thr, &match_point)) {
+  double quality;
+  if (!Match(frame.data, data_, &roi, nullptr, thr, &match_point, &quality)) {
     return false;
   }
 
   *result = match_point;
-  previous_match_ = *result;
+  kalman_filter_.Update(frame.timestamp, *result);
   return true;
 }
 
@@ -88,7 +94,7 @@ bool TemplateTracker::ReinitializeTracking(const Frame &frame, Posit *result) {
   }
 
   *result = match_point;
-  previous_match_ = *result;
+  kalman_filter_.Update(frame.timestamp, *result);
   return true;
 }
 
@@ -182,6 +188,11 @@ bool TemplateTracker::Match(
     extended_roi &= cv::Rect(cv::Point(0, 0), data.size());
   }
 
+  if (extended_roi.width < tpl.search_template.cols ||
+      extended_roi.height < tpl.search_template.rows) {
+    return false;
+  }
+
   //const int method = CV_TM_SQDIFF_NORMED;
   //const int method = CV_TM_CCORR_NORMED
   const int method = CV_TM_CCOEFF_NORMED;
@@ -194,6 +205,7 @@ bool TemplateTracker::Match(
   cv::Point min_loc;
   double max_val;
   cv::Point max_loc;
+  cv::Scalar std_dev;
 
   if (mask) {
     /* Mask is first cropped with same ROI as image */
@@ -214,8 +226,10 @@ bool TemplateTracker::Match(
     assert(match_result.cols == shifted_mask.cols);
 
     minMaxLoc(match_result, &min_val, &max_val, &min_loc, &max_loc, shifted_mask);
+    meanStdDev(match_result, cv::noArray(), std_dev, shifted_mask);
   } else {
     minMaxLoc(match_result, &min_val, &max_val, &min_loc, &max_loc);
+    meanStdDev(match_result, cv::noArray(), std_dev);
   }
 
   const double value = (method == CV_TM_SQDIFF_NORMED) ? (1-min_val) :
@@ -236,8 +250,12 @@ bool TemplateTracker::Match(
   }
 #endif
 
+  DEBUG("quality: %f\t%f\t%f\t%f", value, min_val, max_val, std_dev[0]);
 
   if (value <= threshold) {
+    log_mat(reinterpret_cast<size_t>(this) * 100 + 1, data(extended_roi));
+    log_mat(reinterpret_cast<size_t>(this) * 100 + 2, tpl.search_template);
+
     return false;
   }
 
@@ -252,6 +270,7 @@ bool TemplateTracker::Match(
   *result = Point2(loc.x, loc.y) + Point2(tpl_offset.x, tpl_offset.y);
   /* ...and has offset of the ROI */
   *result = *result + Point2(extended_roi.x, extended_roi.y);
+
 
   if (quality) {
     // FIXME definition of quality

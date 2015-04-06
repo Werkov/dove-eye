@@ -4,6 +4,7 @@
 #include <opencv2/opencv.hpp>
 
 #include "dove_eye/inner_tracker.h"
+#include "dove_eye/kalman_filter.h"
 #include "dove_eye/parameters.h"
 
 namespace dove_eye {
@@ -68,7 +69,7 @@ class TemplateTracker : public InnerTracker {
   Mark mark_;
 
   TemplateData data_;
-  cv::Point2f previous_match_;
+  KalmanFilter<Point2> kalman_filter_;
   
   cv::Mat EpilineToMask(const cv::Mat &data, const Epiline epiline) const;
 
