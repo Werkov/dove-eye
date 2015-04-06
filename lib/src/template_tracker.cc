@@ -2,11 +2,9 @@
 
 #include <opencv2/opencv.hpp>
 
-using cv::Mat;
 using cv::line;
 using cv::matchTemplate;
 using cv::minMaxLoc;
-using cv::Rect;
 using dove_eye::Parameters;
 
 namespace dove_eye {
@@ -35,6 +33,7 @@ bool TemplateTracker::InitializeTracking(
 
   const auto template_data = static_cast<const TemplateData *>(tracker_data);
   const auto epiline_mask = EpilineToMask(frame.data, epiline);
+
   // FIXME Use different threshold for foreign match?
   const auto thr = parameters_.Get(Parameters::TEMPLATE_THRESHOLD);
 
@@ -64,7 +63,7 @@ bool TemplateTracker::Track(const Frame &frame, Posit *result) {
   const auto f = parameters_.Get(Parameters::TEMPLATE_SEARCH_FACTOR);
   const auto thr = parameters_.Get(Parameters::TEMPLATE_THRESHOLD);
 
-  Rect roi(previous_match_.x - f * data_.radius,
+  cv::Rect roi(previous_match_.x - f * data_.radius,
            previous_match_.y - f * data_.radius,
            2 * f * data_.radius, 2 * f * data_.radius);
 
@@ -113,16 +112,16 @@ cv::Mat TemplateTracker::EpilineToMask(const cv::Mat &data,
   Point2 p2;
   if (abs(epiline[1]) > 1e-1) {
     p1.x = 0;
-    p1.y = (epiline[0] * p1.x + epiline[3]) / -epiline[1];
+    p1.y = (epiline[0] * p1.x + epiline[2]) / -epiline[1];
 
     p2.x = data.cols;
-    p2.y = (epiline[0] * p2.x + epiline[3]) / -epiline[1];
+    p2.y = (epiline[0] * p2.x + epiline[2]) / -epiline[1];
   } else {
     p1.y = 0;
-    p1.x = (epiline[1] * p1.y + epiline[3]) / -epiline[0];
+    p1.x = (epiline[1] * p1.y + epiline[2]) / -epiline[0];
 
-    p2.y = 0;
-    p2.x = (epiline[1] * p2.y + epiline[3]) / -epiline[0];
+    p2.y = data.rows;
+    p2.x = (epiline[1] * p2.y + epiline[2]) / -epiline[0];
   }
   
   cv::Mat mask(data.size(), CV_8U);
@@ -130,7 +129,7 @@ cv::Mat TemplateTracker::EpilineToMask(const cv::Mat &data,
 
   // FIXME Possibly use diffent parameters to specify epiline mask
   auto thickness = parameters_.Get(Parameters::TEMPLATE_RADIUS) *
-      parameters_.Get(Parameters::TEMPLATE_SEARCH_FACTOR) / 2;
+      parameters_.Get(Parameters::TEMPLATE_SEARCH_FACTOR);
 
   line(mask, p1, p2, cv::Scalar(255, 255, 255), thickness);
 
@@ -144,7 +143,7 @@ bool TemplateTracker::TakeTemplate(const cv::Mat &data, const Point2 point,
     return false;
   }
 
-  Rect roi(point.x - radius, point.y - radius, 2 * radius, 2 * radius);
+  cv::Rect roi(point.x - radius, point.y - radius, 2 * radius, 2 * radius);
 
   /* We don't want to have the template overwritten */
   data_.search_template = data(roi).clone();
@@ -153,6 +152,21 @@ bool TemplateTracker::TakeTemplate(const cv::Mat &data, const Point2 point,
   return true;
 }
 
+/** Wrapper for OpenCV function matchTemplate
+ *
+ * @param[in]   data      image to search for template
+ * @param[in]   tpl       template data (data and parameters)
+ * @param[in]   roi       (optional) region of interest that should be searched
+ *                            (in the image)
+ * @param[in]   mask      (optional) boolean mask restricting search (in the
+ *                            image too)
+ * @param[in]   threshold value [0,1] to accept the match (the higher, the
+ *                            better)
+ * @param[out]  result    image point of the best match
+ * @param[out]  quality   (optional) value in [0,1], the higher the better
+ *
+ * @return      true if sufficient match was found, false otherwise
+ */
 bool TemplateTracker::Match(
       const cv::Mat &data,
       const TemplateData &tpl,
@@ -161,44 +175,87 @@ bool TemplateTracker::Match(
       const double threshold,
       Point2 *result,
       double *quality) const {
-  Rect cropped_roi = Rect(cv::Point(0, 0), data.size());
+
+  auto extended_roi = cv::Rect(cv::Point(0, 0), data.size());
   if (roi) {
-    cropped_roi &= *roi;
+    extended_roi = cv::Rect(tpl.TopLeft(roi->tl()), tpl.BottomRight(roi->br()));
+    extended_roi &= cv::Rect(cv::Point(0, 0), data.size());
   }
 
-  // TODO is this preallocatin necessary?
-  Mat match_result(cropped_roi.height - tpl.search_template.rows + 1,
-                  cropped_roi.width - tpl.search_template.cols + 1, CV_32FC1);
-  matchTemplate(data(cropped_roi), tpl.search_template, match_result,
-                    CV_TM_SQDIFF_NORMED);
+  //const int method = CV_TM_SQDIFF_NORMED;
+  //const int method = CV_TM_CCORR_NORMED
+  const int method = CV_TM_CCOEFF_NORMED;
 
-  double min_diff;
+  cv::Mat match_result;
+  matchTemplate(data(extended_roi), tpl.search_template, match_result, method);
+
+
+  double min_val;
   cv::Point min_loc;
+  double max_val;
+  cv::Point max_loc;
 
   if (mask) {
-    Rect mask_roi(cv::Point(0, 0), match_result.size());
-    cv::Mat cropped_mask((*mask)(mask_roi));
+    /* Mask is first cropped with same ROI as image */
+    auto cropped_mask = (*mask)(extended_roi);
 
-    assert(match_result.rows = cropped_mask.rows);
-    assert(match_result.cols = cropped_mask.cols);
+    /* Consequently mask is shifted, which is effectively cropping top-left
+     * corner */
+    cv::Point mask_br(cropped_mask.cols, cropped_mask.rows);
+    cv::Rect shift_rect(-tpl.TopLeft(), mask_br - tpl.BottomRight());
 
-    minMaxLoc(match_result, &min_diff, nullptr, &min_loc, nullptr, cropped_mask);
+    /* We've worked with (zero-based) coordinates, add one to size */
+    shift_rect.width += 1;
+    shift_rect.height += 1;
+
+    auto shifted_mask = cropped_mask(shift_rect);
+
+    assert(match_result.rows == shifted_mask.rows);
+    assert(match_result.cols == shifted_mask.cols);
+
+    minMaxLoc(match_result, &min_val, &max_val, &min_loc, &max_loc, shifted_mask);
   } else {
-    minMaxLoc(match_result, &min_diff, nullptr, &min_loc, nullptr);
+    minMaxLoc(match_result, &min_val, &max_val, &min_loc, &max_loc);
   }
 
-  if (min_diff >= threshold) {
+  const double value = (method == CV_TM_SQDIFF_NORMED) ? (1-min_val) :
+      (method == CV_TM_CCORR_NORMED) ? max_val :
+      (method == CV_TM_CCOEFF_NORMED) ? (max_val - min_val) : 0;
+
+#if 0
+  if (show_mat) {
+    cv::Mat masked;
+    match_result.copyTo(masked, shifted_mask);
+
+    log_mat((reinterpret_cast<size_t>(this) * 100) + 5, match_result);
+    log_mat((reinterpret_cast<size_t>(this) * 100) + 6, masked);
+    cv::Mat to_show1 = (match_result - min_val) / value;
+    cv::Mat to_show2 = (masked - min_val) / value;
+    log_mat((reinterpret_cast<size_t>(this) * 100) + 7, to_show1);
+    log_mat((reinterpret_cast<size_t>(this) * 100) + 8, to_show2);
+  }
+#endif
+
+
+  if (value <= threshold) {
     return false;
   }
+
   // TODO return false also when minumum is shallow (i.e. not unique match)
 
   /* Actual match is in the middle of the template */
-  *result = Point2(min_loc.x, min_loc.y) + Point2(tpl.radius, tpl.radius);
+  const auto loc = (method == CV_TM_SQDIFF_NORMED) ? min_loc :
+      (method == CV_TM_CCORR_NORMED) ? max_loc :
+      (method == CV_TM_CCOEFF_NORMED) ? (max_loc) : cv::Point();
+
+  cv::Point tpl_offset = -tpl.TopLeft(cv::Point(0, 0));
+  *result = Point2(loc.x, loc.y) + Point2(tpl_offset.x, tpl_offset.y);
   /* ...and has offset of the ROI */
-  *result = *result + Point2(cropped_roi.x, cropped_roi.y);
+  *result = *result + Point2(extended_roi.x, extended_roi.y);
 
   if (quality) {
-    *quality = min_diff;
+    // FIXME definition of quality
+    *quality = value;
   }
   
   return true;

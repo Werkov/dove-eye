@@ -13,6 +13,22 @@ class TemplateTracker : public InnerTracker {
   struct TemplateData : public TrackerData {
     cv::Mat search_template;
     double radius;
+
+    /**
+     * @param   point   position of template object
+     * @return          top-left corner of the template
+     */
+    inline cv::Point TopLeft(const cv::Point point = cv::Point(0, 0)) const {
+      return point - cv::Point(radius, radius);
+    }
+
+    /**
+     * @param   point   position of template object
+     * @return          bottom-right corner of the template
+     */
+    inline cv::Point BottomRight(const cv::Point point = cv::Point(0, 0)) const {
+      return point + cv::Point(radius, radius);
+    }
   };
 
   explicit TemplateTracker(const Parameters &parameters)
@@ -53,7 +69,7 @@ class TemplateTracker : public InnerTracker {
 
   TemplateData data_;
   cv::Point2f previous_match_;
-
+  
   cv::Mat EpilineToMask(const cv::Mat &data, const Epiline epiline) const;
 
   bool TakeTemplate(const cv::Mat &data, const Point2 point, const double radius);
