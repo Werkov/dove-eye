@@ -250,7 +250,7 @@ bool TemplateTracker::Match(
   }
 #endif
 
-  DEBUG("quality: %f\t%f\t%f\t%f", value, min_val, max_val, std_dev[0]);
+  //DEBUG("quality: %f\t%f\t%f\t%f", value, min_val, max_val, std_dev[0]);
 
   if (value <= threshold) {
     log_mat(reinterpret_cast<size_t>(this) * 100 + 1, data(extended_roi));

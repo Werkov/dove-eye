@@ -6,11 +6,13 @@
 #include <QTimerEvent>
 
 #include "dove_eye/inner_tracker.h"
+#include "dove_eye/location.h"
 
 using dove_eye::CalibrationData;
 using dove_eye::CameraIndex;
 using dove_eye::Frameset;
 using dove_eye::InnerTracker;
+using dove_eye::Location;
 using dove_eye::Parameters;
 using gui::GuiMark;
 using std::unique_ptr;
@@ -88,12 +90,12 @@ void Controller::SetCalibrationData(const CalibrationData calibration_data) {
   assert(tracker_);
   tracker_->calibration_data(new_calibration_data);
 
+  assert(localization_);
+  localization_->calibration_data(new_calibration_data);
+
   CalibrationDataToProviders(new_calibration_data);
 
-  // TODO set reference to localization
-
-  calibration_data_ =
-      std::move(unique_ptr<CalibrationData>(new_calibration_data));
+  calibration_data_.reset(new_calibration_data);
 }
 
 void Controller::timerEvent(QTimerEvent *event) {
@@ -137,8 +139,10 @@ void Controller::timerEvent(QTimerEvent *event) {
       positset = tracker_->Track(frameset);
       emit PositsetReady(positset);
 
-      auto location = localization_->Locate(positset);
-      emit LocationReady(location);
+      Location location;
+      if (localization_->Locate(positset, &location)) {
+        emit LocationReady(location);
+      }
       break;
     }
     case kNonexistent:

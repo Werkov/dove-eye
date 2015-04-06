@@ -41,11 +41,12 @@ class CalibrationData {
  public:
   explicit CalibrationData(const CameraIndex arity = 0)
       : arity_(arity),
-        camera_parameters_(arity),
-        pair_parameters_(arity),
+        camera_parameters_(arity_),
+        pair_parameters_(arity_),
         globals_initialized_(false),
-        rotations_(arity),
-        translations_(arity) {
+        rotations_(arity_),
+        translations_(arity_),
+        projections_(arity_) {
     position_ = cv::Mat::zeros(3, 1, CV_64F);
     rotation_ = cv::Mat::eye(3, 3, CV_64F);
   }
@@ -93,6 +94,17 @@ class CalibrationData {
 
     return translations_[cam];
   }
+
+  inline const cv::Mat &ProjectionMatrix(const CameraIndex cam) const {
+    assert(cam < Arity());
+
+    if (!globals_initialized_) {
+      CalculateGlobals();
+    }
+
+    return projections_[cam];
+  }
+ 
  private:
   typedef std::vector<cv::Mat> CvMatVector;
 
@@ -111,6 +123,7 @@ class CalibrationData {
   mutable bool globals_initialized_;
   mutable CvMatVector rotations_;
   mutable CvMatVector translations_;
+  mutable CvMatVector projections_;
 
 
   inline void position(const cv::Mat &value) {

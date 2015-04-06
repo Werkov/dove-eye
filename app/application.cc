@@ -148,7 +148,7 @@ void Application::SetupController(VideoProvidersContainer &&providers) {
 
   TemplateTracker inner_tracker(parameters_);
   auto tracker = new Tracker(arity_, inner_tracker);
-  auto localization = new Localization;
+  auto localization = new Localization(arity_);
 
   auto new_controller = new Controller(parameters_, aggregator, calibration,
                                        tracker, localization);
