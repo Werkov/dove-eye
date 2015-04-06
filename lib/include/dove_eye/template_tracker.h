@@ -33,20 +33,14 @@ class TemplateTracker : public InnerTracker {
   };
 
   explicit TemplateTracker(const Parameters &parameters)
-      : parameters_(parameters),
-        initialized_(false),
-        mark_set_(false) {
+      : InnerTracker(parameters),
+        initialized_(false) {
   }
 
-  inline void SetMark(const Mark mark) override {
-    mark_set_ = true;
-    mark_ = mark;
-  }
-  
-  inline const TrackerData *tracker_data() const override {
+  inline const TrackerData *tracker_data() const {
     return &data_;
   }
-  
+ 
   bool InitializeTracking(const Frame &frame, Posit *result) override;
 
   bool InitializeTracking(
@@ -62,16 +56,10 @@ class TemplateTracker : public InnerTracker {
   InnerTracker *Clone() const override;
 
  private:
-  const Parameters &parameters_;
-  bool initialized_;
-
-  bool mark_set_;
-  Mark mark_;
-
   TemplateData data_;
   KalmanFilter<Point2> kalman_filter_;
   
-  cv::Mat EpilineToMask(const cv::Mat &data, const Epiline epiline) const;
+  bool initialized_;
 
   bool TakeTemplate(const cv::Mat &data, const Point2 point, const double radius);
 

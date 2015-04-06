@@ -15,16 +15,18 @@ using dove_eye::Parameters;
 namespace dove_eye {
 
 bool TemplateTracker::InitializeTracking(const Frame &frame, Posit *result) {
-  assert(mark_set_);
+  assert(mark_set());
 
-  const auto radius = parameters_.Get(Parameters::TEMPLATE_RADIUS);
-  if (!TakeTemplate(frame.data, static_cast<Point2>(mark_), radius)) {
+  const auto radius = parameters().Get(Parameters::TEMPLATE_RADIUS);
+  const Point2 point(mark());
+
+  if (!TakeTemplate(frame.data, point, radius)) {
     return false;
   }
 
   initialized_ = true;
 
-  *result = mark_;
+  *result = point;
   kalman_filter_.Reset(frame.timestamp, *result);
 
   return true;
@@ -37,10 +39,14 @@ bool TemplateTracker::InitializeTracking(
       Posit *result) {
 
   const auto template_data = static_cast<const TemplateData *>(tracker_data);
-  const auto epiline_mask = EpilineToMask(frame.data, epiline);
+  // FIXME Possibly use diffent parameters to specify epiline mask
+  auto thickness = parameters().Get(Parameters::TEMPLATE_RADIUS) *
+      parameters().Get(Parameters::TEMPLATE_SEARCH_FACTOR);
+
+  const auto epiline_mask = EpilineToMask(frame.data.size(), thickness, epiline);
 
   // FIXME Use different threshold for foreign match?
-  const auto thr = parameters_.Get(Parameters::TEMPLATE_THRESHOLD);
+  const auto thr = parameters().Get(Parameters::TEMPLATE_THRESHOLD);
 
   Point2 match_point;
   if (!Match(frame.data, *template_data, nullptr, &epiline_mask, thr,
@@ -49,7 +55,7 @@ bool TemplateTracker::InitializeTracking(
   }
 
   /* Store template from current frame for future matching */
-  const auto radius = parameters_.Get(Parameters::TEMPLATE_RADIUS);
+  const auto radius = parameters().Get(Parameters::TEMPLATE_RADIUS);
   if (!TakeTemplate(frame.data, match_point, radius)) {
     return false;
   }
@@ -64,8 +70,8 @@ bool TemplateTracker::InitializeTracking(
 bool TemplateTracker::Track(const Frame &frame, Posit *result) {
   assert(initialized_);
 
-  const auto f = parameters_.Get(Parameters::TEMPLATE_SEARCH_FACTOR);
-  const auto thr = parameters_.Get(Parameters::TEMPLATE_THRESHOLD);
+  const auto f = parameters().Get(Parameters::TEMPLATE_SEARCH_FACTOR);
+  const auto thr = parameters().Get(Parameters::TEMPLATE_THRESHOLD);
 
   auto exp = kalman_filter_.Predict(frame.timestamp);
   Point2 match_point;
@@ -86,7 +92,7 @@ bool TemplateTracker::Track(const Frame &frame, Posit *result) {
 bool TemplateTracker::ReinitializeTracking(const Frame &frame, Posit *result) {
   assert(initialized_);
 
-  const auto thr = parameters_.Get(Parameters::TEMPLATE_THRESHOLD);
+  const auto thr = parameters().Get(Parameters::TEMPLATE_THRESHOLD);
 
   Point2 match_point;
   if (!Match(frame.data, data_, nullptr, nullptr, thr, &match_point)) {
@@ -102,44 +108,6 @@ InnerTracker *TemplateTracker::Clone() const {
   assert(!initialized_);
 
   return new TemplateTracker(*this);
-}
-
-cv::Mat TemplateTracker::EpilineToMask(const cv::Mat &data,
-                                       const Epiline epiline) const {
-  /*
-   * Epiline:
-   *    a*x + b*y + c = 0
-   *
-   *    y = (a*x + c) / -b
-   *    x = (b*y + c) / -a
-   */
-
-  Point2 p1;
-  Point2 p2;
-  if (abs(epiline[1]) > 1e-1) {
-    p1.x = 0;
-    p1.y = (epiline[0] * p1.x + epiline[2]) / -epiline[1];
-
-    p2.x = data.cols;
-    p2.y = (epiline[0] * p2.x + epiline[2]) / -epiline[1];
-  } else {
-    p1.y = 0;
-    p1.x = (epiline[1] * p1.y + epiline[2]) / -epiline[0];
-
-    p2.y = data.rows;
-    p2.x = (epiline[1] * p2.y + epiline[2]) / -epiline[0];
-  }
-  
-  cv::Mat mask(data.size(), CV_8U);
-  mask.setTo(cv::Scalar(0, 0, 0));
-
-  // FIXME Possibly use diffent parameters to specify epiline mask
-  auto thickness = parameters_.Get(Parameters::TEMPLATE_RADIUS) *
-      parameters_.Get(Parameters::TEMPLATE_SEARCH_FACTOR);
-
-  line(mask, p1, p2, cv::Scalar(255, 255, 255), thickness);
-
-  return mask;
 }
 
 bool TemplateTracker::TakeTemplate(const cv::Mat &data, const Point2 point,
@@ -207,6 +175,7 @@ bool TemplateTracker::Match(
   cv::Point max_loc;
   cv::Scalar std_dev;
 
+  cv::Mat shifted_mask;
   if (mask) {
     /* Mask is first cropped with same ROI as image */
     auto cropped_mask = (*mask)(extended_roi);
@@ -220,7 +189,7 @@ bool TemplateTracker::Match(
     shift_rect.width += 1;
     shift_rect.height += 1;
 
-    auto shifted_mask = cropped_mask(shift_rect);
+    shifted_mask = cropped_mask(shift_rect);
 
     assert(match_result.rows == shifted_mask.rows);
     assert(match_result.cols == shifted_mask.cols);
@@ -237,7 +206,7 @@ bool TemplateTracker::Match(
       (method == CV_TM_CCOEFF_NORMED) ? (max_val - min_val) : 0;
 
 #if 0
-  if (show_mat) {
+  if (mask) {
     cv::Mat masked;
     match_result.copyTo(masked, shifted_mask);
 
