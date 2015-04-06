@@ -74,6 +74,7 @@ void ParametersDialog::CreateControls() {
     spinBox->setMinimum(param.min_value);
     spinBox->setMaximum(param.max_value);
     spinBox->setSingleStep((param.max_value - param.min_value) / kSteps);
+    spinBox->setDecimals(3);
 
     if (param.unit != "") {
       spinBox->setSuffix((" " + param.unit).c_str());

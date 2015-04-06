@@ -16,7 +16,7 @@ namespace dove_eye {
 
 const Parameters::Parameter Parameters::parameters[] = {
   DEFINE_PARAM(
-      TEMPLATE_RADIUS,        "template.radius",        30,       "px", 2, 100 ),
+      TEMPLATE_RADIUS,        "template.radius",        15,       "px", 2, 100 ),
   DEFINE_PARAM(
       TEMPLATE_SEARCH_FACTOR, "template.search_factor", 2,         "",    1, 3 ),
   DEFINE_PARAM(
