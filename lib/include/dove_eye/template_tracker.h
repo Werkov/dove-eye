@@ -53,7 +53,7 @@ class TemplateTracker : public SearchingTracker {
       const cv::Rect *roi,
       const cv::Mat *mask,
       const double threshold,
-      Point2 *result,
+      Mark *result,
       double *quality = nullptr) const override;
 
   inline Posit MarkToPosit(const Mark &mark) const override {

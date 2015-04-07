@@ -46,7 +46,7 @@ bool TemplateTracker::Search(
       const cv::Rect *roi,
       const cv::Mat *mask,
       const double threshold,
-      Point2 *result,
+      Mark *result,
       double *quality) const {
 
   const TemplateData &tpl = static_cast<const TemplateData &>(tracker_data);
@@ -137,10 +137,13 @@ bool TemplateTracker::Search(
       (method == CV_TM_CCOEFF_NORMED) ? (max_loc) : cv::Point();
 
   cv::Point tpl_offset = -tpl.TopLeft(cv::Point(0, 0));
-  *result = Point2(loc.x, loc.y) + Point2(tpl_offset.x, tpl_offset.y);
+  auto match_point = Point2(loc.x, loc.y) + Point2(tpl_offset.x, tpl_offset.y);
   /* ...and has offset of the ROI */
-  *result = *result + Point2(extended_roi.x, extended_roi.y);
+  match_point += Point2(extended_roi.x, extended_roi.y);
 
+  result->type = Mark::kCircle;
+  result->center = match_point;
+  result->radius = tpl.radius;
 
   if (quality) {
     // FIXME definition of quality

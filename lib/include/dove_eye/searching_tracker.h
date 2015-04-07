@@ -55,7 +55,7 @@ class SearchingTracker : public InnerTracker {
    *                            image too)
    * @param[in]   threshold value [0,1] to accept the match (the higher, the
    *                            better)
-   * @param[out]  result    image point of the best match
+   * @param[out]  result    mark positioned to the best match
    * @param[out]  quality   (optional) value in [0,1], the higher the better
    *
    * @return      true if sufficient match was found, false otherwise
@@ -66,7 +66,7 @@ class SearchingTracker : public InnerTracker {
       const cv::Rect *roi,
       const cv::Mat *mask,
       const double threshold,
-      Point2 *result,
+      Mark *result,
       double *quality = nullptr) const = 0;
 
   virtual Posit MarkToPosit(const Mark &mark) const = 0;
