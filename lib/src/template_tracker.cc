@@ -7,12 +7,9 @@
 
 // #define LOG_MATCH_MAT
 
-using cv::line;
 using cv::matchTemplate;
 using cv::meanStdDev;
 using cv::minMaxLoc;
-using cv::setIdentity;
-using dove_eye::Parameters;
 
 namespace dove_eye {
 

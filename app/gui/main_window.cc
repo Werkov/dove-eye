@@ -33,8 +33,9 @@ MainWindow::MainWindow(Application *application, QWidget *parent)
           this, &MainWindow::SetupPipeline);
   connect(application_, &Application::CalibrationDataReady,
           this, &MainWindow::CalibrationDataReady);
-  connect(application_, &Application::CalibrationDataReady,
-          ui_->scene_viewer, &SceneViewer::SetCalibrationData);
+  ui_->scene_viewer->hide();
+//  connect(application_, &Application::CalibrationDataReady,
+//          ui_->scene_viewer, &SceneViewer::SetCalibrationData);
 
   /* Dialog connections */
   connect(cameras_setup_dialog_, &CamerasSetupDialog::SelectedProviders,
@@ -86,8 +87,8 @@ void MainWindow::SetupPipeline() {
   connect(application_->controller(), &Controller::PairCalibrationProgressed,
           calibration_status_, &CalibrationStatus::PairCalibrationProgressed);
 
-  connect(application_->controller(), &Controller::LocationReady,
-          ui_->scene_viewer, &SceneViewer::SetLocation);
+//  connect(application_->controller(), &Controller::LocationReady,
+//          ui_->scene_viewer, &SceneViewer::SetLocation);
 
 
   connect(this, &MainWindow::SetControllerMode,

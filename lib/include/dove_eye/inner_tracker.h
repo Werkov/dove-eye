@@ -10,7 +10,11 @@
 
 namespace dove_eye {
 
-/** Implementation specific data of tracker (e.g. shape, template,...) */
+/** Implementation specific data of tracker (e.g. shape, template,...)
+ *
+ * @note TrackerData can be destroyed only directly on particular
+ *       implementation.
+ */
 struct TrackerData {
 };
 

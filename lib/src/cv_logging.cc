@@ -1,5 +1,6 @@
 #include "dove_eye/cv_logging.h"
 
+#include <iostream>
 #include <sstream>
 
 using std::stringstream;
@@ -24,6 +25,34 @@ void log_mat(int id, const cv::Mat &mat) {
   auto window_name = window_names[id];
   cv::imshow(window_name, mat);
   //cv::waitKey(1);
+#endif
+}
+
+/**
+ * @note Not thread-safe!
+ */
+void log_color_hist(int id, const cv::Mat &hist, const int hsize) {
+#ifndef NDEBUG
+  using namespace cv;
+
+  Mat histimg = Mat::zeros(200, 320, CV_8UC3);
+
+  histimg = Scalar::all(0);
+  int binW = histimg.cols / hsize;
+  Mat buf(1, hsize, CV_8UC3);
+  for( int i = 0; i < hsize; i++ )
+    buf.at<Vec3b>(i) = Vec3b(saturate_cast<uchar>(i*180./hsize), 255, 255);
+
+  cvtColor(buf, buf, CV_HSV2BGR);
+
+  for( int i = 0; i < hsize; i++ ) {
+    int val = saturate_cast<int>(hist.at<float>(i)*histimg.rows/255);
+    rectangle(histimg, Point(i*binW, histimg.rows),
+              Point((i+1)*binW, histimg.rows - val),
+              Scalar(buf.at<Vec3b>(i)), -1, 8);
+  }
+
+  log_mat(id, histimg);
 #endif
 }
 }

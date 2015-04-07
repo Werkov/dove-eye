@@ -64,8 +64,9 @@ class TemplateTracker : public SearchingTracker {
   inline cv::Rect DataToRoi(const TrackerData &tracker_data, const Point2 exp,
                             const double search_factor) const override {
     const auto f = search_factor;
-    return cv::Rect(exp.x - f * data_.radius, exp.y - f * data_.radius,
-                    2 * f * data_.radius, 2 * f * data_.radius);
+    const auto &data = static_cast<const TemplateData &>(tracker_data);
+    return cv::Rect(exp.x - f * data.radius, exp.y - f * data.radius,
+                    2 * f * data.radius, 2 * f * data.radius);
   }
 
  private:

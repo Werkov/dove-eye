@@ -12,8 +12,6 @@
 #include "dove_eye/calibration_data.h"
 #include "dove_eye/parameters.h"
 #include "dove_eye/localization.h"
-#include "dove_eye/template_tracker.h"
-#include "dove_eye/tracker.h"
 #include "dove_eye/types.h"
 #include "dove_eye/video_provider.h"
 #include "frameset_converter.h"
