@@ -18,7 +18,21 @@ struct TrackerData {
 class InnerTracker {
  public:
   /** Mark is an object in input frame that can initialize tracking */
-  typedef Point2 Mark;
+  struct Mark {
+    enum Type {
+      kInvalid,
+      kCircle
+    };
+
+    Type type;
+    Point2 center;
+    double radius;
+
+    Mark(const Type type = kInvalid)
+        : type(type) {
+    }
+  };
+
 
   /** Vector of a, b, c for image line ax + by + c = 0 */
   typedef Vector3 Epiline;
@@ -28,12 +42,15 @@ class InnerTracker {
         mark_set_(false) {
   }
 
+  virtual ~InnerTracker() {
+  }
+
   inline void SetMark(const Mark mark) {
     mark_set_ = true;
     mark_ = mark;
   }
 
-  virtual const TrackerData *tracker_data() const = 0;
+  virtual const TrackerData &tracker_data() const = 0;
 
   /** Global initialization from mark */
   virtual bool InitializeTracking(const Frame &frame, Posit *result) = 0;
@@ -42,7 +59,7 @@ class InnerTracker {
   virtual bool InitializeTracking(
       const Frame &frame,
       const Epiline epiline,
-      const TrackerData *tracker_data,
+      const TrackerData &tracker_data,
       Posit *result) = 0;
 
   /** Track the given frame */

@@ -5,6 +5,8 @@
 #include "dove_eye/cv_logging.h"
 #include "dove_eye/logging.h"
 
+// #define LOG_MATCH_MAT
+
 using cv::line;
 using cv::matchTemplate;
 using cv::meanStdDev;
@@ -14,104 +16,13 @@ using dove_eye::Parameters;
 
 namespace dove_eye {
 
-bool TemplateTracker::InitializeTracking(const Frame &frame, Posit *result) {
-  assert(mark_set());
 
-  const auto radius = parameters().Get(Parameters::TEMPLATE_RADIUS);
-  const Point2 point(mark());
+bool TemplateTracker::InitTrackerData(const cv::Mat &data, const Mark &mark) {
+  assert(mark.type == Mark::kCircle);
 
-  if (!TakeTemplate(frame.data, point, radius)) {
-    return false;
-  }
+  const auto point = mark.center;
+  const auto radius = mark.radius;
 
-  initialized_ = true;
-
-  *result = point;
-  kalman_filter_.Reset(frame.timestamp, *result);
-
-  return true;
-}
-
-bool TemplateTracker::InitializeTracking(
-      const Frame &frame,
-      const Epiline epiline,
-      const TrackerData *tracker_data,
-      Posit *result) {
-
-  const auto template_data = static_cast<const TemplateData *>(tracker_data);
-  // FIXME Possibly use diffent parameters to specify epiline mask
-  auto thickness = parameters().Get(Parameters::TEMPLATE_RADIUS) *
-      parameters().Get(Parameters::TEMPLATE_SEARCH_FACTOR);
-
-  const auto epiline_mask = EpilineToMask(frame.data.size(), thickness, epiline);
-
-  // FIXME Use different threshold for foreign match?
-  const auto thr = parameters().Get(Parameters::TEMPLATE_THRESHOLD);
-
-  Point2 match_point;
-  if (!Match(frame.data, *template_data, nullptr, &epiline_mask, thr,
-             &match_point)) {
-    return false;
-  }
-
-  /* Store template from current frame for future matching */
-  const auto radius = parameters().Get(Parameters::TEMPLATE_RADIUS);
-  if (!TakeTemplate(frame.data, match_point, radius)) {
-    return false;
-  }
-  initialized_ = true;
-
-  *result = match_point;
-  kalman_filter_.Reset(frame.timestamp, *result);
-
-  return true;
-}
-
-bool TemplateTracker::Track(const Frame &frame, Posit *result) {
-  assert(initialized_);
-
-  const auto f = parameters().Get(Parameters::TEMPLATE_SEARCH_FACTOR);
-  const auto thr = parameters().Get(Parameters::TEMPLATE_THRESHOLD);
-
-  auto exp = kalman_filter_.Predict(frame.timestamp);
-  Point2 match_point;
-
-  cv::Rect roi(exp.x - f * data_.radius, exp.y - f * data_.radius,
-           2 * f * data_.radius, 2 * f * data_.radius);
-
-  double quality;
-  if (!Match(frame.data, data_, &roi, nullptr, thr, &match_point, &quality)) {
-    return false;
-  }
-
-  *result = match_point;
-  kalman_filter_.Update(frame.timestamp, *result);
-  return true;
-}
-
-bool TemplateTracker::ReinitializeTracking(const Frame &frame, Posit *result) {
-  assert(initialized_);
-
-  const auto thr = parameters().Get(Parameters::TEMPLATE_THRESHOLD);
-
-  Point2 match_point;
-  if (!Match(frame.data, data_, nullptr, nullptr, thr, &match_point)) {
-    return false;
-  }
-
-  *result = match_point;
-  kalman_filter_.Update(frame.timestamp, *result);
-  return true;
-}
-
-InnerTracker *TemplateTracker::Clone() const {
-  assert(!initialized_);
-
-  return new TemplateTracker(*this);
-}
-
-bool TemplateTracker::TakeTemplate(const cv::Mat &data, const Point2 point,
-                                   const double radius) {
   if (point.x < radius || point.x >= data.cols - radius ||
       point.y < radius || point.y >= data.rows - radius) {
     return false;
@@ -127,29 +38,18 @@ bool TemplateTracker::TakeTemplate(const cv::Mat &data, const Point2 point,
 }
 
 /** Wrapper for OpenCV function matchTemplate
- *
- * @param[in]   data      image to search for template
- * @param[in]   tpl       template data (data and parameters)
- * @param[in]   roi       (optional) region of interest that should be searched
- *                            (in the image)
- * @param[in]   mask      (optional) boolean mask restricting search (in the
- *                            image too)
- * @param[in]   threshold value [0,1] to accept the match (the higher, the
- *                            better)
- * @param[out]  result    image point of the best match
- * @param[out]  quality   (optional) value in [0,1], the higher the better
- *
- * @return      true if sufficient match was found, false otherwise
+ * @see SearchingTracker::Search()
  */
-bool TemplateTracker::Match(
+bool TemplateTracker::Search(
       const cv::Mat &data,
-      const TemplateData &tpl,
+      const TrackerData &tracker_data,
       const cv::Rect *roi,
       const cv::Mat *mask,
       const double threshold,
       Point2 *result,
       double *quality) const {
 
+  const TemplateData &tpl = static_cast<const TemplateData &>(tracker_data);
   auto extended_roi = cv::Rect(cv::Point(0, 0), data.size());
   if (roi) {
     extended_roi = cv::Rect(tpl.TopLeft(roi->tl()), tpl.BottomRight(roi->br()));
@@ -205,7 +105,7 @@ bool TemplateTracker::Match(
       (method == CV_TM_CCORR_NORMED) ? max_val :
       (method == CV_TM_CCOEFF_NORMED) ? (max_val - min_val) : 0;
 
-#if 0
+#ifdef LOG_MATCH_MAT
   if (mask) {
     cv::Mat masked;
     match_result.copyTo(masked, shifted_mask);
@@ -222,9 +122,10 @@ bool TemplateTracker::Match(
   //DEBUG("quality: %f\t%f\t%f\t%f", value, min_val, max_val, std_dev[0]);
 
   if (value <= threshold) {
+#ifdef LOG_MATCH_MAT
     log_mat(reinterpret_cast<size_t>(this) * 100 + 1, data(extended_roi));
     log_mat(reinterpret_cast<size_t>(this) * 100 + 2, tpl.search_template);
-
+#endif
     return false;
   }
 

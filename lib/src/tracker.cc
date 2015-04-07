@@ -19,6 +19,7 @@ Tracker::Tracker(const CameraIndex arity, const InnerTracker &inner_tracker)
       positset_(arity_),
       trackstates_(arity_, kUninitialized),
       trackers_(arity_),
+      marks_(arity_),
       distorted_input_(false),
       calibration_data_(nullptr),
       location_valid_(false) {
@@ -35,7 +36,7 @@ bool Tracker::SetMark(const CameraIndex cam, const InnerTracker::Mark mark,
                       bool project_other) {
   assert(cam < arity_);
 
-  positset_[cam] = mark;
+  marks_[cam] = mark;
   positset_.SetValid(cam, false);
 
   trackstates_[cam] = kMarkSet;
@@ -53,7 +54,7 @@ bool Tracker::SetMark(const CameraIndex cam, const InnerTracker::Mark mark,
     marked_cam_ = cam;
   }
 
-  DEBUG("%s(%i, (%f, %f), %i)", __func__, cam, mark.x, mark.y, project_other);
+  //DEBUG("%s(%i, (%f, %f), %i)", __func__, cam, mark.x, mark.y, project_other);
   return true;
 }
 
@@ -66,7 +67,7 @@ Positset Tracker::Track(const Frameset &frameset) {
    * can be used to project again.
    */
   if (project_other_ && frameset.IsValid(marked_cam_)) {
-    DEBUG("%s, project_other set", __func__);
+    //DEBUG("%s, project_other set", __func__);
     TrackSingle(marked_cam_, frameset[marked_cam_]);
   }
 
@@ -89,7 +90,7 @@ Positset Tracker::Track(const Frameset &frameset) {
    * keep projection request until next iteration
    */
   project_other_ = project_other_ & !all_projected;
-  DEBUG("%s, project_other set to value %i", __func__, project_other_);
+  //DEBUG("%s, project_other set to value %i", __func__, project_other_);
 
   return positset_;
 }
@@ -97,7 +98,7 @@ Positset Tracker::Track(const Frameset &frameset) {
 bool Tracker::TrackSingle(const CameraIndex cam, const Frame &frame) {
   auto tracker = trackers_[cam].get();
 
-  DEBUG("%s(%i) entry state: %i", __func__, cam, trackstates_[cam]);
+  //DEBUG("%s(%i) entry state: %i", __func__, cam, trackstates_[cam]);
 
   switch (trackstates_[cam]) {
     case kUninitialized: {
@@ -106,7 +107,7 @@ bool Tracker::TrackSingle(const CameraIndex cam, const Frame &frame) {
     }
 
     case kMarkSet: {
-      tracker->SetMark(positset_[cam]);
+      tracker->SetMark(marks_[cam]);
       if (tracker->InitializeTracking(frame, &positset_[cam])) {
         trackstates_[cam] = kTracking;
         positset_.SetValid(cam, true);
@@ -125,7 +126,7 @@ bool Tracker::TrackSingle(const CameraIndex cam, const Frame &frame) {
       }
 
       auto epiline = CalculateEpiline(positset_[marked_cam_], marked_cam_, cam);
-      auto tracker_data = trackers_[marked_cam_]->tracker_data();
+      auto &tracker_data = trackers_[marked_cam_]->tracker_data();
 
       if (tracker->InitializeTracking(frame, epiline, tracker_data,
                                       &positset_[cam])) {
@@ -141,6 +142,7 @@ bool Tracker::TrackSingle(const CameraIndex cam, const Frame &frame) {
     case kTracking: {
       if (!tracker->Track(frame, &positset_[cam])) {
         trackstates_[cam] = kLost;
+        DEBUG("tracker(%i) lost", cam);
         positset_.SetValid(cam, false);
       }
       break;
@@ -152,6 +154,7 @@ bool Tracker::TrackSingle(const CameraIndex cam, const Frame &frame) {
         auto guess = ReprojectLocation(location_, cam);
         if (tracker->ReinitializeTracking(frame, guess, &positset_[cam])) {
           trackstates_[cam] = kTracking;
+          DEBUG("tracker(%i) found from projection", cam);
           positset_.SetValid(cam, true);
           break;
         }
@@ -176,6 +179,7 @@ bool Tracker::TrackSingle(const CameraIndex cam, const Frame &frame) {
         auto epiline = CalculateEpiline(positset_[o_cam], o_cam, cam);
         if (tracker->ReinitializeTracking(frame, epiline, &positset_[cam])) {
           trackstates_[cam] = kTracking;
+          DEBUG("tracker(%i) found from epiline of %i", cam, o_cam);
           positset_.SetValid(cam, true);
           break;
         }
@@ -186,6 +190,7 @@ bool Tracker::TrackSingle(const CameraIndex cam, const Frame &frame) {
        */
       if (tracker->ReinitializeTracking(frame, &positset_[cam])) {
         trackstates_[cam] = kTracking;
+        DEBUG("tracker(%i) found from global search", cam);
         positset_.SetValid(cam, true);
         break;
       }
@@ -199,8 +204,8 @@ bool Tracker::TrackSingle(const CameraIndex cam, const Frame &frame) {
     positset_[cam] = Undistort(positset_[cam], cam);
   }
 
-  DEBUG("%s(%i) exit state: %i, return: %i", __func__, cam, trackstates_[cam],
-        positset_.IsValid(cam));
+  //DEBUG("%s(%i) exit state: %i, return: %i", __func__, cam, trackstates_[cam],
+   //     positset_.IsValid(cam));
 
   return positset_.IsValid(cam);
 }

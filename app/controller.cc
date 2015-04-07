@@ -36,7 +36,12 @@ void Controller::SetMark(const dove_eye::CameraIndex cam,
     return;
   }
 
-  InnerTracker::Mark mark(gui_mark.pos.x(), gui_mark.pos.y());
+  // FIXME support for various GuiMarks (not only fixed-size circle)
+  InnerTracker::Mark mark(InnerTracker::Mark::kCircle);
+  mark.center.x = gui_mark.pos.x();
+  mark.center.y = gui_mark.pos.y();
+  mark.radius = parameters_.Get(Parameters::TEMPLATE_RADIUS);
+
   bool project_other = false;
   if (gui_mark.flags & GuiMark::kCtrl) {
     project_other = true;

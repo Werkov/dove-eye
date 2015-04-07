@@ -62,6 +62,7 @@ class Tracker {
   typedef std::vector<TrackState> StateVector;
   typedef std::unique_ptr<InnerTracker> InnerTrackerPtr;
   typedef std::vector<InnerTrackerPtr> TrackerVector;
+  typedef std::vector<InnerTracker::Mark> MarkVector;
 
   const CameraIndex arity_;
   
@@ -71,6 +72,8 @@ class Tracker {
   StateVector trackstates_;
 
   TrackerVector trackers_;
+
+  MarkVector marks_;
 
   bool distorted_input_;
 

@@ -3,13 +3,11 @@
 
 #include <opencv2/opencv.hpp>
 
-#include "dove_eye/inner_tracker.h"
-#include "dove_eye/kalman_filter.h"
-#include "dove_eye/parameters.h"
+#include "dove_eye/searching_tracker.h"
 
 namespace dove_eye {
 
-class TemplateTracker : public InnerTracker {
+class TemplateTracker : public SearchingTracker {
  public:
   struct TemplateData : public TrackerData {
     cv::Mat search_template;
@@ -33,44 +31,46 @@ class TemplateTracker : public InnerTracker {
   };
 
   explicit TemplateTracker(const Parameters &parameters)
-      : InnerTracker(parameters),
-        initialized_(false) {
+      : SearchingTracker(parameters) {
   }
 
-  inline const TrackerData *tracker_data() const {
-    return &data_;
+  inline const TrackerData &tracker_data() const override {
+    return data_;
   }
  
-  bool InitializeTracking(const Frame &frame, Posit *result) override;
+  InnerTracker *Clone() const override {
+    assert(!initialized());
 
-  bool InitializeTracking(
-      const Frame &frame,
-      const Epiline epiline,
-      const TrackerData *tracker_data,
-      Posit *result) override;
- 
-  bool Track(const Frame &frame, Posit *result) override;
+    return new TemplateTracker(*this);
+  }
 
-  bool ReinitializeTracking(const Frame &frame, Posit *result) override;
+ protected:
+  bool InitTrackerData(const cv::Mat &data, const Mark &mark) override;
 
-  InnerTracker *Clone() const override;
-
- private:
-  TemplateData data_;
-  KalmanFilter<Point2> kalman_filter_;
-  
-  bool initialized_;
-
-  bool TakeTemplate(const cv::Mat &data, const Point2 point, const double radius);
-
-  bool Match(
+  bool Search(
       const cv::Mat &data,
-      const TemplateData &tpl,
+      const TrackerData &tracker_data,
       const cv::Rect *roi,
       const cv::Mat *mask,
       const double threshold,
       Point2 *result,
-      double *quality = nullptr) const;
+      double *quality = nullptr) const override;
+
+  inline Posit MarkToPosit(const Mark &mark) const override {
+    assert(mark.type == Mark::kCircle);
+    return mark.center;
+  }
+
+  inline cv::Rect DataToRoi(const TrackerData &tracker_data, const Point2 exp,
+                            const double search_factor) const override {
+    const auto f = search_factor;
+    return cv::Rect(exp.x - f * data_.radius, exp.y - f * data_.radius,
+                    2 * f * data_.radius, 2 * f * data_.radius);
+  }
+
+ private:
+  TemplateData data_;
+  
 
 };
 
