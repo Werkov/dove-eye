@@ -1,7 +1,10 @@
 #ifndef GUI_GUI_MARK_H_
 #define GUI_GUI_MARK_H_
 
+#include <algorithm>
+
 #include <QPoint>
+#include <QSize>
 
 namespace gui {
 
@@ -12,11 +15,22 @@ struct GuiMark {
     kShift = 0x2
   };
 
+  QPoint press_pos;
+  QPoint release_pos;
+  Flags flags;
+
   GuiMark() : flags(kNoFlags) {
   }
 
-  QPoint pos;
-  Flags flags;
+  inline QPoint TopLeft() const {
+    return QPoint(std::min(press_pos.x(), release_pos.x()),
+                  std::min(press_pos.y(), release_pos.y()));
+  }
+
+  inline QSize Size() const {
+    return QSize(std::abs(press_pos.x() - release_pos.x()),
+                 std::abs(press_pos.y() - release_pos.y()));
+  }
 };
 
 inline GuiMark::Flags operator|(const GuiMark::Flags lhs, const GuiMark::Flags rhs) {

@@ -36,11 +36,7 @@ void Controller::SetMark(const dove_eye::CameraIndex cam,
     return;
   }
 
-  // FIXME support for various GuiMarks (not only fixed-size circle)
-  InnerTracker::Mark mark(InnerTracker::Mark::kCircle);
-  mark.center.x = gui_mark.pos.x();
-  mark.center.y = gui_mark.pos.y();
-  mark.radius = parameters_.Get(Parameters::TEMPLATE_RADIUS);
+  auto mark = GuiMarkToMark(gui_mark);
 
   bool project_other = false;
   if (gui_mark.flags & GuiMark::kCtrl) {
@@ -86,6 +82,10 @@ void Controller::SetUndistortMode(const UndistortMode undistort_mode) {
       UndistortToProviders(false);
       break;
   }
+}
+
+void Controller::SetTrackerMarkType(const TrackerMarkType mark_type) {
+  tracker_mark_type_ = mark_type;
 }
 
 void Controller::SetCalibrationData(const CalibrationData calibration_data) {
@@ -193,4 +193,38 @@ void Controller::UndistortToProviders(const bool undistort) {
     provider->undistort(undistort);
   }
 }
+
+InnerTracker::Mark Controller::GuiMarkToMark(const GuiMark &gui_mark) const {
+  switch (tracker_mark_type_) {
+    case kCircle: {
+      InnerTracker::Mark mark(InnerTracker::Mark::kCircle);
+      if (gui_mark.Size().isEmpty()) {
+        mark.center.x = gui_mark.release_pos.x();
+        mark.center.y = gui_mark.release_pos.y();
+        mark.radius = parameters_.Get(Parameters::TEMPLATE_RADIUS);
+      } else {
+        /* Inscribed circle */
+        mark.center.x = gui_mark.TopLeft().x() + gui_mark.Size().width() / 2;
+        mark.center.y = gui_mark.TopLeft().y() + gui_mark.Size().height() / 2;
+        mark.radius = std::min(gui_mark.Size().width(), gui_mark.Size().height());
+      }
+      
+      return mark;
+    }
+
+    case kRectangle: {
+      InnerTracker::Mark mark(InnerTracker::Mark::kRectangle);
+      mark.top_left.x = gui_mark.TopLeft().x();
+      mark.top_left.y = gui_mark.TopLeft().y();
+      mark.size.x = gui_mark.Size().width();
+      mark.size.y = gui_mark.Size().height();
+
+      return mark;
+    }
+
+    default:
+      assert(false);
+  }
+}
+
 

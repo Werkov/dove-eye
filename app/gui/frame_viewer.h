@@ -22,7 +22,8 @@ class FrameViewer : public QWidget {
  public:
   explicit FrameViewer(QWidget *parent = nullptr)
       : QWidget(parent),
-        converter_(nullptr) {
+        converter_(nullptr),
+        pressed_(false) {
   }
 
   void SetConverter(FramesetConverter *converter, dove_eye::CameraIndex cam);
@@ -35,12 +36,23 @@ class FrameViewer : public QWidget {
 
   void resizeEvent(QResizeEvent *event) override;
 
+  void mousePressEvent(QMouseEvent *event) override;
+  void mouseMoveEvent(QMouseEvent *event) override;
   void mouseReleaseEvent(QMouseEvent *event) override;
 
  private:
   QImage image_;
   FramesetConverter *converter_;
   dove_eye::CameraIndex cam_;
+
+  GuiMark mark_;
+  bool pressed_;
+
+  void InitMark(QMouseEvent *event);
+
+  void UpdateMark(QMouseEvent *event);
+
+  void DrawMark(QPainter &painter);
 };
 
 } // namespace gui

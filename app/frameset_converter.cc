@@ -45,11 +45,13 @@ void FramesetConverter::PropagateMark(const dove_eye::CameraIndex cam,
 
   
   GuiMark new_mark(mark);
-  new_mark.pos *= scale;
+  new_mark.press_pos *= scale;
+  new_mark.release_pos *= scale;
 
   /* Check boundaries, assume zero-based indexing */
-  if (new_mark.pos.x() < frame_size.width() &&
-      new_mark.pos.y() < frame_size.height()) {
+  QRect frame_rect(0, 0, frame_size.width(), frame_size.height());
+  if (frame_rect.contains(new_mark.press_pos, true) &&
+      frame_rect.contains(new_mark.release_pos, true)) {
     emit MarkCreated(cam, new_mark);
   }
 }

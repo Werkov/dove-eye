@@ -28,6 +28,9 @@ void FrameViewer::SetConverter(FramesetConverter *converter,
 void FrameViewer::paintEvent(QPaintEvent *event) {
   QPainter painter(this);
   painter.drawImage(0, 0, image_);
+  if (pressed_) {
+    DrawMark(painter);
+  }
   image_ = QImage();
 }
 
@@ -37,21 +40,52 @@ void FrameViewer::resizeEvent(QResizeEvent *event) {
   }
 }
 
+void FrameViewer::mousePressEvent(QMouseEvent *event) {
+  pressed_ = true;
+  InitMark(event);
+}
+
+void FrameViewer::mouseMoveEvent(QMouseEvent *event) {
+  if (!pressed_) {
+    return;
+  }
+  UpdateMark(event);
+}
+
 void FrameViewer::mouseReleaseEvent(QMouseEvent *event) {
+  pressed_ = false;
+  UpdateMark(event);
+
   if (converter_) {
-    GuiMark mark;
-    mark.pos = event->pos();
-
-    if (event->modifiers() & Qt::ControlModifier) {
-      mark.flags |= GuiMark::kCtrl;
-    }
-    if (event->modifiers() & Qt::ShiftModifier) {
-      mark.flags |= GuiMark::kShift;
-    }
-
-    converter_->PropagateMark(cam_, mark);
+    converter_->PropagateMark(cam_, mark_);
   }
 }
 
+void FrameViewer::InitMark(QMouseEvent *event) {
+  mark_.press_pos = event->pos();
+  mark_.release_pos = event->pos();
+}
+
+void FrameViewer::UpdateMark(QMouseEvent *event) {
+  mark_.release_pos = event->pos();
+
+  if (event->modifiers() & Qt::ControlModifier) {
+    mark_.flags |= GuiMark::kCtrl;
+  }
+  if (event->modifiers() & Qt::ShiftModifier) {
+    mark_.flags |= GuiMark::kShift;
+  }
+}
+
+void FrameViewer::DrawMark(QPainter &painter) {
+  auto brush = painter.brush();
+
+  QColor color(32, 32, 32, 128);
+  painter.setBrush(color);
+
+  painter.drawRect(QRect(mark_.TopLeft(), mark_.Size()));
+
+  painter.setBrush(brush);
+}
 } // namespace gui
 

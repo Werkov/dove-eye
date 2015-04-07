@@ -152,6 +152,7 @@ void Application::SetupController(VideoProvidersContainer &&providers) {
 
   auto new_controller = new Controller(parameters_, aggregator, calibration,
                                        tracker, localization);
+  new_controller->SetTrackerMarkType(Controller::kCircle);
 
   connect(new_controller, &Controller::CalibrationDataReady,
           this, &Application::SetCalibrationData);

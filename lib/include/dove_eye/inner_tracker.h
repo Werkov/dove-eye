@@ -21,12 +21,19 @@ class InnerTracker {
   struct Mark {
     enum Type {
       kInvalid,
-      kCircle
+      kCircle,
+      kRectangle
     };
 
     Type type;
+
+    /* Circle */
     Point2 center;
     double radius;
+
+    /* Rectangle */
+    Point2 top_left;
+    Point2 size;
 
     Mark(const Type type = kInvalid)
         : type(type) {

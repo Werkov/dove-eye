@@ -42,6 +42,11 @@ class Controller : public QObject {
     kUndistortVideo
   };
 
+  enum TrackerMarkType {
+    kCircle,
+    kRectangle
+  };
+
   /**
    * @note Controller takes ownership of all ctor arguments given by pointer
    */
@@ -54,6 +59,7 @@ class Controller : public QObject {
         parameters_(parameters),
         mode_(kIdle),
         undistort_mode_(kIgnoreDistortion),
+        tracker_mark_type_(kCircle),
         arity_(aggregator->Arity()),
         frameset_iterator_(aggregator->Arity()),
         frameset_end_iterator_(aggregator->Arity()),
@@ -100,6 +106,8 @@ class Controller : public QObject {
 
   void SetUndistortMode(const UndistortMode undistort_mode);
 
+  void SetTrackerMarkType(const TrackerMarkType mark_type);
+
   void SetCalibrationData(const dove_eye::CalibrationData calibration_data);
 
  protected:
@@ -107,9 +115,13 @@ class Controller : public QObject {
 
  private:
   const dove_eye::Parameters &parameters_;
+
   Mode mode_;
   UndistortMode undistort_mode_;
+  TrackerMarkType tracker_mark_type_;
+
   const dove_eye::CameraIndex arity_;
+
   /** Pointer to calibration data
    * Reasons for pointer over reference:
    *   - it may not be initialized at the beginning
@@ -135,6 +147,8 @@ class Controller : public QObject {
       const dove_eye::CalibrationData *calibration_data);
 
   void UndistortToProviders(const bool undistort);
+
+  dove_eye::InnerTracker::Mark GuiMarkToMark(const gui::GuiMark &gui_mark) const;
 
 };
 
