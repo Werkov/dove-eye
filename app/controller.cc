@@ -146,6 +146,7 @@ void Controller::timerEvent(QTimerEvent *event) {
 
       Location location;
       if (localization_->Locate(positset, &location)) {
+        DEBUG("loc: %f %f %f", location.x, location.y, location.z);
         emit LocationReady(location);
       }
       break;
