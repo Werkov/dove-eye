@@ -37,12 +37,18 @@ class SceneViewer : public QGLViewer {
   bool draw_trajectory_;
 
   QVector<dove_eye::Location> trajectory_;
+  qglviewer::Vec trajectory_min_;
+  qglviewer::Vec trajectory_max_;
 
   dove_eye::Location location_;
 
   CamerasVector cameras_;
 
   void CreateCameras(const dove_eye::CalibrationData &data);
+
+  void TrajectoryClear();
+
+  void TrajectoryAppend(const dove_eye::Location &location);
 
   static void PositionCamera(const cv::Mat &r, const cv::Mat &t,
                              qglviewer::Camera *camera);
