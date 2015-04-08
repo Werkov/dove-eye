@@ -2,17 +2,15 @@
 
 #include <opencv2/opencv.hpp>
 
+#include "config.h"
 #include "dove_eye/cv_logging.h"
 #include "dove_eye/logging.h"
-
-#define LOG_MATCH_MAT
 
 using cv::matchTemplate;
 using cv::meanStdDev;
 using cv::minMaxLoc;
 
 namespace dove_eye {
-
 
 bool TemplateTracker::InitTrackerData(const cv::Mat &data, const Mark &mark) {
   assert(mark.type == Mark::kCircle);
@@ -43,8 +41,7 @@ bool TemplateTracker::Search(
       const cv::Rect *roi,
       const cv::Mat *mask,
       const double threshold,
-      Mark *result,
-      double *quality) const {
+      Mark *result) const {
 
   const TemplateData &tpl = static_cast<const TemplateData &>(tracker_data);
   auto extended_roi = cv::Rect(cv::Point(0, 0), data.size());
@@ -58,6 +55,7 @@ bool TemplateTracker::Search(
     return false;
   }
 
+  /* Experimentally CV_TM_CCOEFF_NORMED gave best results */
   //const int method = CV_TM_SQDIFF_NORMED;
   //const int method = CV_TM_CCORR_NORMED
   const int method = CV_TM_CCOEFF_NORMED;
@@ -102,7 +100,7 @@ bool TemplateTracker::Search(
       (method == CV_TM_CCORR_NORMED) ? max_val :
       (method == CV_TM_CCOEFF_NORMED) ? (max_val - min_val) : 0;
 
-#ifdef LOG_MATCH_MAT
+#ifdef CONFIG_DEBUG_HIGHGUI
   if (mask) {
     cv::Mat masked;
     match_result.copyTo(masked, shifted_mask);
@@ -114,10 +112,9 @@ bool TemplateTracker::Search(
   }
 #endif
 
-  //DEBUG("quality: %f\t%f\t%f\t%f", value, min_val, max_val, std_dev[0]);
 
   if (value <= threshold) {
-#ifdef LOG_MATCH_MAT
+#ifdef CONFIG_DEBUG_HIGHGUI
     log_mat(reinterpret_cast<size_t>(this) * 100 + 1, data(extended_roi));
     log_mat(reinterpret_cast<size_t>(this) * 100 + 2, tpl.search_template);
 #endif
@@ -126,24 +123,18 @@ bool TemplateTracker::Search(
 
   // TODO return false also when minumum is shallow (i.e. not unique match)
 
-  /* Actual match is in the middle of the template */
   const auto loc = (method == CV_TM_SQDIFF_NORMED) ? min_loc :
       (method == CV_TM_CCORR_NORMED) ? max_loc :
       (method == CV_TM_CCOEFF_NORMED) ? (max_loc) : cv::Point();
 
+  /* Transform coordinates of found matchpoint to whole image */
   cv::Point tpl_offset = -tpl.TopLeft(cv::Point(0, 0));
   auto match_point = Point2(loc.x, loc.y) + Point2(tpl_offset.x, tpl_offset.y);
-  /* ...and has offset of the ROI */
   match_point += Point2(extended_roi.x, extended_roi.y);
 
   result->type = Mark::kCircle;
   result->center = match_point;
   result->radius = tpl.radius;
-
-  if (quality) {
-    // FIXME definition of quality
-    *quality = value;
-  }
   
   return true;
 }

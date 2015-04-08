@@ -5,7 +5,7 @@
 #include <cassert>
 #include <cstdint>
 
-
+#include "config.h"
 #include "dove_eye/types.h"
 
 namespace dove_eye {
@@ -23,7 +23,7 @@ class Tuple {
   typedef T *iterator;
   typedef const T *const_iterator;
 
-  static const CameraIndex kMaxArity = 4;
+  static const CameraIndex kMaxArity = CONFIG_MAX_ARITY;
 
   /*
    * Because of the const member arity_ we have to provide the Big Five

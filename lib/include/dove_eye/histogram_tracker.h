@@ -1,6 +1,8 @@
 #ifndef DOVE_EYE_HISTOGRAM_TRACKER_H_
 #define DOVE_EYE_HISTOGRAM_TRACKER_H_
 
+#include <vector>
+
 #include <opencv2/opencv.hpp>
 
 #include "dove_eye/searching_tracker.h"
@@ -17,8 +19,8 @@ class HistogramTracker : public SearchingTracker {
     double vrange[2];
 
     cv::Mat histogram;
+    /** Size of region from which histogram was taken */
     cv::Size size;
-
   };
 
   explicit HistogramTracker(const Parameters &parameters)
@@ -44,8 +46,7 @@ class HistogramTracker : public SearchingTracker {
       const cv::Rect *roi,
       const cv::Mat *mask,
       const double threshold,
-      Mark *result,
-      double *quality = nullptr) const override;
+      Mark *result) const override;
 
   inline Posit MarkToPosit(const Mark &mark) const override {
     assert(mark.type == Mark::kRectangle);
@@ -58,18 +59,21 @@ class HistogramTracker : public SearchingTracker {
     const auto &data = static_cast<const HistogramData &>(tracker_data);
 
     cv::Size new_size(data.size.width * f, data.size.height * f);
-    return cv::Rect(exp - 0.5 * Point2(data.size), new_size);
+    return cv::Rect(exp - 0.5 * Point2(new_size), new_size);
   }
 
  private:
+  typedef std::vector<cv::Point> Contour;
+  typedef std::vector<Contour> ContourVector;
+
   HistogramData data_;
   
   cv::Mat PreprocessImage(const cv::Mat &data,
                           const HistogramData &hist_data,
                           cv::Mat *mask) const;
 
-  void ContoursToResult(const std::vector<std::vector<cv::Point>> contours,
-                         Mark *result) const;
+  void ContoursToResult(const ContourVector &contours,
+                        Mark *result) const;
 };
 
 } // namespace dove_eye

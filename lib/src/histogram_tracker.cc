@@ -1,28 +1,27 @@
 #include "dove_eye/histogram_tracker.h"
 
 #include <cassert>
-#include <vector>
 
 #include <opencv2/opencv.hpp>
 
+#include "config.h"
 #include "dove_eye/cv_logging.h"
 #include "dove_eye/logging.h"
-
-#define LOG_SEARCH_MAT
 
 using cv::calcBackProject;
 using cv::calcHist;
 using cv::cvtColor;
 using cv::mixChannels;
 using cv::normalize;
+using cv::Scalar;
 using std::vector;
 
 namespace dove_eye {
 
-
 bool HistogramTracker::InitTrackerData(const cv::Mat &data, const Mark &mark) {
   assert(mark.type == Mark::kRectangle);
 
+  /* Check the size of mark doesn't extend size of the image */
   cv::Rect roi(mark.top_left, mark.top_left + mark.size);
 
   if (roi.br().x >= data.cols ||
@@ -30,8 +29,13 @@ bool HistogramTracker::InitTrackerData(const cv::Mat &data, const Mark &mark) {
     return false;
   }
 
-  auto roi_data = data(roi);
+  data_.size = roi.size();
 
+  /*
+   * Calculate (H)SV ranges of selected area and then histogram of H(ue)
+   * component.
+   */
+  auto roi_data = data(roi);
 
   cv::Mat hsv;
   cvtColor(roi_data, hsv, cv::COLOR_BGR2HSV);
@@ -41,19 +45,15 @@ bool HistogramTracker::InitTrackerData(const cv::Mat &data, const Mark &mark) {
   minMaxLoc(hsv_components[1], &data_.srange[0], &data_.srange[1]);
   minMaxLoc(hsv_components[2], &data_.vrange[0], &data_.vrange[1]);
 
-  data_.srange[0] = std::max(10.0, data_.srange[0]);
-
   DEBUG("sat: %f:%f\tval: %f:%f",
         data_.srange[0],
         data_.srange[1],
         data_.vrange[0],
         data_.vrange[1]);
 
-  cv::Mat hue(hsv.size(), hsv.depth());
-  
-  const float *prange = data_.hrange;
-
   /* Calculate histogram */
+  cv::Mat hue(hsv.size(), hsv.depth());
+  const float *prange = data_.hrange;
   calcHist(&hsv_components[0],
            1, /* no. of images */
            nullptr, /* channels, can be nullptr when dims == no. of images */
@@ -65,17 +65,15 @@ bool HistogramTracker::InitTrackerData(const cv::Mat &data, const Mark &mark) {
 
   normalize(data_.histogram, data_.histogram, 0, 255, CV_MINMAX);
 
-#ifdef LOG_SEARCH_MAT
+#ifdef CONFIG_DEBUG_HIGHGUI
   log_color_hist(reinterpret_cast<size_t>(this) * 100 + 10,
                  data_.histogram, data_.histogram_size);
 #endif
 
-  data_.size = roi.size();
-
   return true;
 }
 
-/** Wrapper for OpenCV function CamShift
+/** Wrapper for OpenCV function calcBackProject
  * @see SearchingTracker::Search()
  */
 bool HistogramTracker::Search(
@@ -84,20 +82,16 @@ bool HistogramTracker::Search(
       const cv::Rect *roi,
       const cv::Mat *mask,
       const double threshold,
-      Mark *result,
-      double *quality) const {
-
-  using cv::Scalar;
+      Mark *result) const {
 
   const HistogramData &hist_data = static_cast<const HistogramData &>(tracker_data);
   auto extended_roi = cv::Rect(cv::Point(0, 0), data.size());
   if (roi) {
-    extended_roi &= cv::Rect(cv::Point(0, 0), data.size());
+    extended_roi &= *roi;
   }
 
-  // FIXME is this condition necessary?
-  if (extended_roi.width < hist_data.size.width ||
-      extended_roi.height < hist_data.size.height) {
+  if (extended_roi.area() == 0) {
+    DEBUG("%s zero-area", __func__);
     return false;
   }
 
@@ -122,17 +116,20 @@ bool HistogramTracker::Search(
   /* sigma = 0 -> compute from size */
   cv::GaussianBlur(backproj, backproj, blur_size, 0);
   log_mat(reinterpret_cast<size_t>(this) * 100 + 3, backproj);
-  cv::threshold(backproj, backproj, 128, 255, cv::THRESH_BINARY);
+
+  cv::threshold(backproj, backproj, threshold * 255, 255, cv::THRESH_BINARY);
   log_mat(reinterpret_cast<size_t>(this) * 100 + 4, backproj);
 
   if (mask) {
-    log_mat(reinterpret_cast<size_t>(this) * 100 + 5, *mask);
+    auto mask_roi = (*mask)(extended_roi);
+
+    log_mat(reinterpret_cast<size_t>(this) * 100 + 5, mask_roi);
     cv::Mat tmp;
-    mask->copyTo(tmp, backproj);
+    mask_roi.copyTo(tmp, backproj);
     backproj = tmp.clone();
     log_mat(reinterpret_cast<size_t>(this) * 100 + 66, backproj);
 
-    vector<vector<cv::Point>> contours;
+    ContourVector contours;
     cv::findContours(backproj, contours,
                      cv::noArray(), /* hierarchy */
                      CV_RETR_LIST,
@@ -158,21 +155,20 @@ bool HistogramTracker::Search(
   log_mat(reinterpret_cast<size_t>(this) * 100 + 7, hsv_mask);
 #endif
 
-
+  DEBUG("%s no-mask", __func__);
   return false;
-
-  if (quality) {
-    // FIXME definition of quality
-    *quality = 1;
-  }
-  
-  return true;
 }
 
+/**
+ * @param[in]   data      image to preprocess
+ * @param[in]   hist_data histogram data
+ * @param[out]  mask      (H)SV mask of image from histogram data
+ *
+ * @return  hue component of the image
+ */
 cv::Mat HistogramTracker::PreprocessImage(const cv::Mat &data,
                                           const HistogramData &hist_data,
                                           cv::Mat *mask) const {
-  using cv::Scalar;
   cv::Mat hsv;
 
   cvtColor(data, hsv, cv::COLOR_BGR2HSV);
@@ -192,11 +188,11 @@ cv::Mat HistogramTracker::PreprocessImage(const cv::Mat &data,
 }
 
 void HistogramTracker::ContoursToResult(
-    const vector<vector<cv::Point>> contours,
+    const ContourVector &contours,
     Mark *result) const {
 
   double max_area = 0;
-  const vector<cv::Point> *best_contour;
+  const Contour *best_contour;
 
   for (auto &contour: contours) {
     auto area = cv::contourArea(contour);
@@ -213,4 +209,5 @@ void HistogramTracker::ContoursToResult(
   result->top_left = rect.tl();
   result->size = rect.br() - rect.tl();
 }
+
 } // namespace dove_eye

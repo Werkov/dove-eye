@@ -3,6 +3,8 @@
 #include <iostream>
 #include <sstream>
 
+#include "config.h"
+
 using std::stringstream;
 
 namespace dove_eye {
@@ -13,7 +15,7 @@ static std::map<int, std::string> window_names;
  * @note Not thread-safe!
  */
 void log_mat(int id, const cv::Mat &mat) {
-#ifndef NDEBUG
+#ifdef CONFIG_DEBUG_HIGHGUI
   if (window_names.count(id) == 0) {
     stringstream ss;
     ss << "log_window_" << id;
@@ -24,7 +26,6 @@ void log_mat(int id, const cv::Mat &mat) {
 
   auto window_name = window_names[id];
   cv::imshow(window_name, mat);
-  //cv::waitKey(1);
 #endif
 }
 
@@ -32,7 +33,7 @@ void log_mat(int id, const cv::Mat &mat) {
  * @note Not thread-safe!
  */
 void log_color_hist(int id, const cv::Mat &hist, const int hsize) {
-#ifndef NDEBUG
+#ifdef CONFIG_DEBUG_HIGHGUI
   using namespace cv;
 
   Mat histimg = Mat::zeros(200, 320, CV_8UC3);

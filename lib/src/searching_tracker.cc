@@ -42,7 +42,6 @@ bool SearchingTracker::InitializeTracking(
   }
 
   /* Store template from current frame for future matching */
-
   if (!InitTrackerData(frame.data, match_mark)) {
     return false;
   }
@@ -65,11 +64,9 @@ bool SearchingTracker::Track(const Frame &frame, Posit *result) {
   const auto roi = DataToRoi(tracker_data(), expected, f);
 
   cv::Mat fg_mask;
-  DEBUG("%s", __func__);
   bg_subtractor()(frame.data.clone(), fg_mask, -1);
 
   Mark match_mark;
-  
   if (!Search(frame.data, tracker_data(), &roi, &fg_mask, thr, &match_mark)) {
     return false;
   }
@@ -85,11 +82,9 @@ bool SearchingTracker::ReinitializeTracking(const Frame &frame, Posit *result) {
   const auto thr = parameters().Get(Parameters::TEMPLATE_THRESHOLD);
 
   cv::Mat fg_mask;
-  DEBUG("%s", __func__);
   bg_subtractor()(frame.data.clone(), fg_mask, -1);
 
   Mark match_mark;
-
   if (!Search(frame.data, tracker_data(), nullptr, &fg_mask, thr, &match_mark)) {
     /* Fallback without mask */
     if (!Search(frame.data, tracker_data(), nullptr, nullptr, thr, &match_mark)) {

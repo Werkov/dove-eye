@@ -14,8 +14,7 @@ class SearchingTracker : public InnerTracker {
  public:
   explicit SearchingTracker(const Parameters &parameters)
       : InnerTracker(parameters),
-        initialized_(false),
-        bg_subtractor_(30, 10, 0.1, 5) {
+        initialized_(false) {
   }
 
   bool InitializeTracking(const Frame &frame, Posit *result) override;
@@ -28,7 +27,7 @@ class SearchingTracker : public InnerTracker {
  
   bool Track(const Frame &frame, Posit *result) override;
 
-  // TODO override other ReinitializeTracking overloads
+  // FIXME override other ReinitializeTracking overloads
   bool ReinitializeTracking(const Frame &frame, Posit *result) override;
 
  protected:
@@ -73,8 +72,7 @@ class SearchingTracker : public InnerTracker {
       const cv::Rect *roi,
       const cv::Mat *mask,
       const double threshold,
-      Mark *result,
-      double *quality = nullptr) const = 0;
+      Mark *result) const = 0;
 
   virtual Posit MarkToPosit(const Mark &mark) const = 0;
 

@@ -5,7 +5,6 @@
 
 #include "dove_eye/camera_calibration.h"
 #include "dove_eye/camera_video_provider.h"
-#include "dove_eye/camshift_tracker.h"
 #include "dove_eye/chessboard_pattern.h"
 #include "dove_eye/histogram_tracker.h"
 #include "dove_eye/template_tracker.h"
@@ -16,7 +15,6 @@ using dove_eye::CalibrationData;
 using dove_eye::CameraCalibration;
 using dove_eye::CameraIndex;
 using dove_eye::CameraVideoProvider;
-using dove_eye::CamshiftTracker;
 using dove_eye::ChessboardPattern;
 using dove_eye::HistogramTracker;
 using dove_eye::Localization;
@@ -128,18 +126,22 @@ void Application::SetCalibrationData(const CalibrationData calibration_data) {
 }
 
 void Application::MoveToNewThread(QObject* object) {
+#ifndef CONFIG_SINGLE_THREADED
   QThread* thread = new QThread(this);
 
   MoveToThread(object, thread);
 
   thread->start();
   threads_ << thread;
+#endif
 }
 
 void Application::MoveToThread(QObject* object, QThread* thread) {
+#ifndef CONFIG_SINGLE_THREADED
   object->setParent(nullptr);
-  //object->moveToThread(thread);
+  object->moveToThread(thread);
   objects_in_threads_ << object;
+#endif
 }
 
 
@@ -153,7 +155,6 @@ void Application::SetupController(VideoProvidersContainer &&providers) {
   auto calibration = new CameraCalibration(parameters_, arity_, pattern);
 
   //TemplateTracker inner_tracker(parameters_);
-  //CamshiftTracker inner_tracker(parameters_);
   HistogramTracker inner_tracker(parameters_);
   auto tracker = new Tracker(arity_, inner_tracker);
   auto localization = new Localization(arity_);

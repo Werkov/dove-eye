@@ -53,8 +53,7 @@ class TemplateTracker : public SearchingTracker {
       const cv::Rect *roi,
       const cv::Mat *mask,
       const double threshold,
-      Mark *result,
-      double *quality = nullptr) const override;
+      Mark *result) const override;
 
   inline Posit MarkToPosit(const Mark &mark) const override {
     assert(mark.type == Mark::kCircle);
@@ -72,7 +71,6 @@ class TemplateTracker : public SearchingTracker {
  private:
   TemplateData data_;
   
-
 };
 
 } // namespace dove_eye
