@@ -153,6 +153,10 @@ void MainWindow::SceneShowCameras() {
       ui_->action_scene_show_cameras->isChecked());
 }
 
+void MainWindow::SceneClearTrajectory() {
+  ui_->scene_viewer->TrajectoryClear();
+}
+
 void MainWindow::ParametersModify() {
   parameters_dialog_->LoadValues();
   parameters_dialog_->show();
@@ -244,6 +248,8 @@ void MainWindow::SetupMenu() {
           this, &MainWindow::GroupDistortion);
   connect(ui_->action_scene_show_cameras, &QAction::triggered,
           this, &MainWindow::SceneShowCameras);
+  connect(ui_->action_scene_clear_trajectory, &QAction::triggered,
+          this, &MainWindow::SceneClearTrajectory);
 
   /* Synchronize stateful menus */
   SceneShowCameras();

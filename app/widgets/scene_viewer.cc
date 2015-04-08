@@ -7,6 +7,7 @@
 #include <opencv2/opencv.hpp>
 
 #include "dove_eye/types.h"
+#include "dove_eye/logging.h"
 
 using dove_eye::CameraIndex;
 using dove_eye::Location;
@@ -55,7 +56,7 @@ void SceneViewer::init() {
 }
 
 void SceneViewer::draw() {
-  if (draw_trajectory_) {
+  if (draw_trajectory_ && trajectory_.size() > 1) {
     glLineWidth(3.0);
     glBegin(GL_LINE_STRIP);
       glColor3f(0.5, 0.5, 0.5);
@@ -107,7 +108,9 @@ void SceneViewer::TrajectoryClear() {
   trajectory_.clear();
   auto inf = std::numeric_limits<double>::infinity();
   trajectory_min_ = Vec(inf, inf, inf);
-  trajectory_max_ = Vec(+inf, +inf, +inf);
+  trajectory_max_ = Vec(-inf, -inf, -inf);
+  has_location_ = false;
+  DEBUG("%s", __func__);
 }
 
 void SceneViewer::TrajectoryAppend(const dove_eye::Location &location) {
@@ -117,15 +120,12 @@ void SceneViewer::TrajectoryAppend(const dove_eye::Location &location) {
   // FIXME use some cyclic/limited buffer
   trajectory_.push_back(location);
 
-  trajectory_min_.x = min(static_cast<qreal>(location.x), trajectory_min_.x);
-  trajectory_min_.y = min(static_cast<qreal>(location.y), trajectory_min_.y);
-  trajectory_min_.z = min(static_cast<qreal>(location.z), trajectory_min_.z);
-  
-  trajectory_max_.x = max(static_cast<qreal>(location.x), trajectory_max_.x);
-  trajectory_max_.y = max(static_cast<qreal>(location.y), trajectory_max_.y);
-  trajectory_max_.z = max(static_cast<qreal>(location.z), trajectory_max_.z);
+  Vec loc(location.x, location.y, location.z);
+  trajectory_min_ = VecMin(loc, trajectory_min_);
+  trajectory_max_ = VecMax(loc, trajectory_min_);
 
-  setSceneBoundingBox(trajectory_min_, trajectory_max_);
+  setSceneCenter(Vec(0, 0, 0));
+  setSceneRadius(max(trajectory_min_.norm(), trajectory_max_.norm()));
 }
 
 /** Put camera to position specified by r and t matrices

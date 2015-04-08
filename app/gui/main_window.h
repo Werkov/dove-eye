@@ -43,6 +43,7 @@ class MainWindow : public QMainWindow {
   void CalibrationSave();
   void GroupDistortion(QAction *action);
   void SceneShowCameras();
+  void SceneClearTrajectory();
   void ParametersModify();
   void ParametersLoad();
   void ParametersSave();

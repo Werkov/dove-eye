@@ -27,6 +27,7 @@ class SceneViewer : public QGLViewer {
 
   void SetCalibrationData(const dove_eye::CalibrationData &data);
 
+  void TrajectoryClear();
 
  protected:
   void init() override;
@@ -50,12 +51,31 @@ class SceneViewer : public QGLViewer {
 
   void CreateCameras(const dove_eye::CalibrationData &data);
 
-  void TrajectoryClear();
 
   void TrajectoryAppend(const dove_eye::Location &location);
 
   static void PositionCamera(const cv::Mat &r, const cv::Mat &t,
                              qglviewer::Camera *camera);
+
+  static inline qglviewer::Vec VecMin(const qglviewer::Vec &a,
+                                      const qglviewer::Vec &b) {
+    using std::min;
+    qglviewer::Vec result;
+    result.x = min(a.x, b.x);
+    result.y = min(a.y, b.y);
+    result.z = min(a.z, b.z);
+    return result;
+  }
+
+  static inline qglviewer::Vec VecMax(const qglviewer::Vec &a,
+                                      const qglviewer::Vec &b) {
+    using std::max;
+    qglviewer::Vec result;
+    result.x = max(a.x, b.x);
+    result.y = max(a.y, b.y);
+    result.z = max(a.z, b.z);
+    return result;
+  }
 
 };
 

@@ -123,6 +123,7 @@
      <string>Scene viewer</string>
     </property>
     <addaction name="action_scene_show_cameras"/>
+    <addaction name="action_scene_clear_trajectory"/>
    </widget>
    <addaction name="menu_providers"/>
    <addaction name="menu_calibration"/>
@@ -222,6 +223,11 @@
    </property>
    <property name="text">
     <string>Show cameras</string>
+   </property>
+  </action>
+  <action name="action_scene_clear_trajectory">
+   <property name="text">
+    <string>Clear trajectory</string>
    </property>
   </action>
  </widget>
