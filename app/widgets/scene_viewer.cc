@@ -18,6 +18,7 @@ namespace widgets {
 
 void SceneViewer::SetLocation(const dove_eye::Location &location) {
   location_ = location;
+  has_location_ = true;
 
   if (draw_trajectory_) {
     TrajectoryAppend(location_);
@@ -37,7 +38,12 @@ void SceneViewer::SetDrawCameras(const bool value) {
 
 void SceneViewer::SetCalibrationData(const dove_eye::CalibrationData &data) {
   CreateCameras(data);
-  // TODO something else?
+  
+  /* Same view as 0-th camera, behind it */
+  assert(cameras_.size() > 0);
+  camera()->setViewDirection(cameras_[0]->viewDirection());
+  camera()->setUpVector(cameras_[0]->upVector());
+  camera()->setPosition(Vec(0,0,-1));
 }
 
 void SceneViewer::init() {
@@ -45,7 +51,7 @@ void SceneViewer::init() {
   setAxisIsDrawn();
   startAnimation();
   SetDrawTrajectory();
-  SetDrawCameras();
+  has_location_ = false;
 }
 
 void SceneViewer::draw() {
@@ -60,13 +66,15 @@ void SceneViewer::draw() {
   }
 
   /* Draw point */
-  glPointSize(10.0f);
-  glDisable(GL_LIGHTING);
-  glBegin(GL_POINTS);
-    glColor3f(1.0, 0.2f, 0);
-    glVertex3f(location_.x, location_.y, location_.z);
-  glEnd();
-  glEnable(GL_LIGHTING);
+  if (has_location_) {
+    glPointSize(10.0f);
+    glDisable(GL_LIGHTING);
+    glBegin(GL_POINTS);
+      glColor3f(1.0, 0.2f, 0);
+      glVertex3f(location_.x, location_.y, location_.z);
+    glEnd();
+    glEnable(GL_LIGHTING);
+  }
 
   /* Draw cameras */
   if (draw_cameras_) {

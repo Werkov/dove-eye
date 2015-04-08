@@ -15,7 +15,8 @@ class SceneViewer : public QGLViewer {
   Q_OBJECT
  public:
   explicit SceneViewer(QWidget *parent = nullptr)
-      : QGLViewer(parent) {
+      : QGLViewer(parent),
+        draw_cameras_(false) {
   }
 
  public slots:
@@ -42,6 +43,7 @@ class SceneViewer : public QGLViewer {
   qglviewer::Vec trajectory_min_;
   qglviewer::Vec trajectory_max_;
 
+  bool has_location_;
   dove_eye::Location location_;
 
   CamerasVector cameras_;
