@@ -5,6 +5,7 @@
 #include <QFileDialog>
 #include <QtDebug>
 
+#include "config.h"
 #include "controller.h"
 #include "dove_eye/types.h"
 #include "frameset_viewer.h"
@@ -33,9 +34,12 @@ MainWindow::MainWindow(Application *application, QWidget *parent)
           this, &MainWindow::SetupPipeline);
   connect(application_, &Application::CalibrationDataReady,
           this, &MainWindow::CalibrationDataReady);
+#ifdef CONFIG_DEBUG_HIGHGUI
   ui_->scene_viewer->hide();
-//  connect(application_, &Application::CalibrationDataReady,
-//          ui_->scene_viewer, &SceneViewer::SetCalibrationData);
+#else
+  connect(application_, &Application::CalibrationDataReady,
+          ui_->scene_viewer, &SceneViewer::SetCalibrationData);
+#endif
 
   /* Dialog connections */
   connect(cameras_setup_dialog_, &CamerasSetupDialog::SelectedProviders,
@@ -87,8 +91,10 @@ void MainWindow::SetupPipeline() {
   connect(application_->controller(), &Controller::PairCalibrationProgressed,
           calibration_status_, &CalibrationStatus::PairCalibrationProgressed);
 
-//  connect(application_->controller(), &Controller::LocationReady,
-//          ui_->scene_viewer, &SceneViewer::SetLocation);
+#ifndef CONFIG_DEBUG_HIGHGUI
+  connect(application_->controller(), &Controller::LocationReady,
+          ui_->scene_viewer, &SceneViewer::SetLocation);
+#endif
 
 
   connect(this, &MainWindow::SetControllerMode,
