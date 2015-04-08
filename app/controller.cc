@@ -171,7 +171,8 @@ void Controller::DecorateFrameset(dove_eye::Frameset &frameset,
     if (positset.IsValid(cam)) {
       cv::circle(frameset[cam].data, positset[cam],
                  parameters_.Get(Parameters::TEMPLATE_RADIUS),
-                 cv::Scalar(0, 255, 0));
+                 cv::Scalar(0, 0, 255),
+                 3);
     }
   }
 
