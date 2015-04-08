@@ -72,8 +72,8 @@ class HistogramTracker : public SearchingTracker {
                           const HistogramData &hist_data,
                           cv::Mat *mask) const;
 
-  void ContoursToResult(const ContourVector &contours,
-                        Mark *result) const;
+  void ContoursToMark(const ContourVector &contours,
+                        Mark *mark) const;
 };
 
 } // namespace dove_eye

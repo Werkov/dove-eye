@@ -83,8 +83,17 @@ bool HistogramTracker::Search(
       const cv::Mat *mask,
       const double threshold,
       Mark *result) const {
-
   const HistogramData &hist_data = static_cast<const HistogramData &>(tracker_data);
+
+  DEBUG("%s([%i, %i], [%i, %i], %p[%i, %i]@[%i, %i], %p, %f, res)",
+        __func__,
+        data.cols, data.rows,
+        hist_data.size.width, hist_data.size.height,
+        roi, (roi ? roi->width : 0), (roi ? roi->height : 0),
+             (roi ? roi->x : 0),     (roi ? roi->y : 0),
+        mask,
+        threshold);
+
   auto extended_roi = cv::Rect(cv::Point(0, 0), data.size());
   if (roi) {
     extended_roi &= *roi;
@@ -107,56 +116,55 @@ bool HistogramTracker::Search(
                   backproj,
                   &prange);
 
+  /* Apply HSV mask before blurring */
+  backproj &= hsv_mask;
+
+  /* Gaussiuan blur
+   * sigma = 0 -> calculated from size
+   */
   auto radius = parameters().Get(Parameters::TEMPLATE_RADIUS);
   cv::Size blur_size(radius, radius);
 
   blur_size.width += 1 - (blur_size.width % 2);
   blur_size.height += 1 - (blur_size.height % 2);
 
-  /* sigma = 0 -> compute from size */
   cv::GaussianBlur(backproj, backproj, blur_size, 0);
-  log_mat(reinterpret_cast<size_t>(this) * 100 + 3, backproj);
 
+  /* Apply threshold */
   cv::threshold(backproj, backproj, threshold * 255, 255, cv::THRESH_BINARY);
-  log_mat(reinterpret_cast<size_t>(this) * 100 + 4, backproj);
+  log_mat(reinterpret_cast<size_t>(this) * 100 + 1, backproj);
 
+  /* Apply (motion) mask */
   if (mask) {
     auto mask_roi = (*mask)(extended_roi);
-
-    log_mat(reinterpret_cast<size_t>(this) * 100 + 5, mask_roi);
-    cv::Mat tmp;
-    mask_roi.copyTo(tmp, backproj);
-    backproj = tmp.clone();
-    log_mat(reinterpret_cast<size_t>(this) * 100 + 66, backproj);
-
-    ContourVector contours;
-    cv::findContours(backproj, contours,
-                     cv::noArray(), /* hierarchy */
-                     CV_RETR_LIST,
-                     CV_CHAIN_APPROX_SIMPLE);
-    log_mat(reinterpret_cast<size_t>(this) * 100 + 68, backproj);
-
-    cv::drawContours(data_roi, contours, -1, Scalar(255, 100, 0), 2);
-
-    if (contours.size() > 0) {
-      ContoursToResult(contours, result);
-      return true;
-    }
+    backproj &= mask_roi;
+    log_mat(reinterpret_cast<size_t>(this) * 100 + 2, backproj);
   }
-  log_mat(reinterpret_cast<size_t>(this) * 100 + 67, backproj);
 
+  log_mat(reinterpret_cast<size_t>(this) * 100 + 3, backproj);
 
-  
-#ifdef LOG_SEARCH_MAT
-  log_mat(reinterpret_cast<size_t>(this) * 100 + 1, data_hue);
-  log_mat(reinterpret_cast<size_t>(this) * 100 + 2, data_roi);
+  ContourVector contours;
+  cv::findContours(backproj, contours,
+                   cv::noArray(), /* hierarchy */
+                   CV_RETR_LIST,
+                   CV_CHAIN_APPROX_SIMPLE);
 
-  log_mat(reinterpret_cast<size_t>(this) * 100 + 6, backproj);
-  log_mat(reinterpret_cast<size_t>(this) * 100 + 7, hsv_mask);
+#ifdef CONFIG_DEBUG_HIGHGUI
+  cv::drawContours(data_roi, contours, -1, Scalar(255, 100, 0), 2);
 #endif
 
-  DEBUG("%s no-mask", __func__);
-  return false;
+  if (contours.size() == 0) {
+    DEBUG("%s no-contours", __func__);
+    return false;
+  }
+
+  ContoursToMark(contours, result);
+
+  /* Apply ROI offset */
+  result->top_left.x += extended_roi.x;
+  result->top_left.y += extended_roi.y;
+
+  return true;
 }
 
 /**
@@ -187,9 +195,9 @@ cv::Mat HistogramTracker::PreprocessImage(const cv::Mat &data,
   return hue;
 }
 
-void HistogramTracker::ContoursToResult(
+void HistogramTracker::ContoursToMark(
     const ContourVector &contours,
-    Mark *result) const {
+    Mark *mark) const {
 
   double max_area = 0;
   const Contour *best_contour;
@@ -205,9 +213,9 @@ void HistogramTracker::ContoursToResult(
 
   assert(best_contour);
   auto rect = cv::boundingRect(*best_contour);
-  result->type = Mark::kRectangle;
-  result->top_left = rect.tl();
-  result->size = rect.br() - rect.tl();
+  mark->type = Mark::kRectangle;
+  mark->top_left = rect.tl();
+  mark->size = rect.br() - rect.tl();
 }
 
 } // namespace dove_eye
