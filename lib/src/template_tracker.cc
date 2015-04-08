@@ -5,7 +5,7 @@
 #include "dove_eye/cv_logging.h"
 #include "dove_eye/logging.h"
 
-// #define LOG_MATCH_MAT
+#define LOG_MATCH_MAT
 
 using cv::matchTemplate;
 using cv::meanStdDev;
@@ -107,8 +107,6 @@ bool TemplateTracker::Search(
     cv::Mat masked;
     match_result.copyTo(masked, shifted_mask);
 
-    log_mat((reinterpret_cast<size_t>(this) * 100) + 5, match_result);
-    log_mat((reinterpret_cast<size_t>(this) * 100) + 6, masked);
     cv::Mat to_show1 = (match_result - min_val) / value;
     cv::Mat to_show2 = (masked - min_val) / value;
     log_mat((reinterpret_cast<size_t>(this) * 100) + 7, to_show1);

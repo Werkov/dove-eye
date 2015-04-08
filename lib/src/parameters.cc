@@ -32,7 +32,7 @@ const Parameters::Parameter Parameters::parameters[] = {
   DEFINE_PARAM(
       CALIBRATION_SIZE,       "calibration.size",   0.026,        "m", 1e-2, 1e-1 ),
   DEFINE_PARAM(
-      CALIBRATION_FRAMES,     "calibration.frames",     3, "frame(s)",   10, 100 ),
+      CALIBRATION_FRAMES,     "calibration.frames",    10, "frame(s)",   10, 100 ),
   DEFINE_PARAM(
       CALIBRATION_SKIP,       "calibration.skip",      15, "frame(s)",    0, 50  ),
   

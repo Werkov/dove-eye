@@ -7,6 +7,7 @@
 #include "dove_eye/camera_video_provider.h"
 #include "dove_eye/camshift_tracker.h"
 #include "dove_eye/chessboard_pattern.h"
+#include "dove_eye/histogram_tracker.h"
 #include "dove_eye/template_tracker.h"
 #include "dove_eye/tracker.h"
 #include "metatypes.h"
@@ -17,6 +18,7 @@ using dove_eye::CameraIndex;
 using dove_eye::CameraVideoProvider;
 using dove_eye::CamshiftTracker;
 using dove_eye::ChessboardPattern;
+using dove_eye::HistogramTracker;
 using dove_eye::Localization;
 using dove_eye::Parameters;
 using dove_eye::TemplateTracker;
@@ -136,7 +138,7 @@ void Application::MoveToNewThread(QObject* object) {
 
 void Application::MoveToThread(QObject* object, QThread* thread) {
   object->setParent(nullptr);
-  object->moveToThread(thread);
+  //object->moveToThread(thread);
   objects_in_threads_ << object;
 }
 
@@ -151,12 +153,14 @@ void Application::SetupController(VideoProvidersContainer &&providers) {
   auto calibration = new CameraCalibration(parameters_, arity_, pattern);
 
   //TemplateTracker inner_tracker(parameters_);
-  CamshiftTracker inner_tracker(parameters_);
+  //CamshiftTracker inner_tracker(parameters_);
+  HistogramTracker inner_tracker(parameters_);
   auto tracker = new Tracker(arity_, inner_tracker);
   auto localization = new Localization(arity_);
 
   auto new_controller = new Controller(parameters_, aggregator, calibration,
                                        tracker, localization);
+  //new_controller->SetTrackerMarkType(Controller::kCircle);
   new_controller->SetTrackerMarkType(Controller::kRectangle);
 
   connect(new_controller, &Controller::CalibrationDataReady,

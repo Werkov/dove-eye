@@ -1,6 +1,7 @@
 #ifndef DOVE_EYE_SEARCHING_TRACKER_H_
 #define DOVE_EYE_SEARCHING_TRACKER_H_
 
+#include <memory>
 #include <opencv2/opencv.hpp>
 
 #include "dove_eye/inner_tracker.h"
@@ -13,7 +14,8 @@ class SearchingTracker : public InnerTracker {
  public:
   explicit SearchingTracker(const Parameters &parameters)
       : InnerTracker(parameters),
-        initialized_(false) {
+        initialized_(false),
+        bg_subtractor_(30, 10, 0.1, 5) {
   }
 
   bool InitializeTracking(const Frame &frame, Posit *result) override;
@@ -32,13 +34,18 @@ class SearchingTracker : public InnerTracker {
  protected:
   typedef KalmanFilter<Point2> KalmanFilterT;
 
+  inline bool initialized() const  {
+    return initialized_;
+  }
+
   inline KalmanFilterT &kalman_filter() {
     return kalman_filter_;
   }
 
-  inline bool initialized() const  {
-    return initialized_;
+  inline cv::BackgroundSubtractor &bg_subtractor() {
+    return bg_subtractor_;
   }
+
 
   /** Initialize tracker data
    * @return  false when initialization failed
@@ -77,6 +84,7 @@ class SearchingTracker : public InnerTracker {
  private:
   bool initialized_;
   KalmanFilterT kalman_filter_;
+  cv::BackgroundSubtractorMOG bg_subtractor_;
 
   inline void initialized(const bool value) {
     initialized_ = value;
