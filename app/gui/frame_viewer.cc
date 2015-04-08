@@ -69,6 +69,7 @@ void FrameViewer::InitMark(QMouseEvent *event) {
 void FrameViewer::UpdateMark(QMouseEvent *event) {
   mark_.release_pos = event->pos();
 
+  mark_.flags = GuiMark::kNoFlags;
   if (event->modifiers() & Qt::ControlModifier) {
     mark_.flags |= GuiMark::kCtrl;
   }
