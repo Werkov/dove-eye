@@ -22,6 +22,7 @@ class SceneViewer : public QGLViewer {
   void SetLocation(const dove_eye::Location &location);
 
   void SetDrawTrajectory(const bool value = true);
+  void SetDrawCameras(const bool value = true);
 
   void SetCalibrationData(const dove_eye::CalibrationData &data);
 
@@ -35,6 +36,7 @@ class SceneViewer : public QGLViewer {
   typedef std::vector<CameraPtr> CamerasVector;
 
   bool draw_trajectory_;
+  bool draw_cameras_;
 
   QVector<dove_eye::Location> trajectory_;
   qglviewer::Vec trajectory_min_;

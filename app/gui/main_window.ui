@@ -118,10 +118,17 @@
     <addaction name="separator"/>
     <addaction name="menu_distortion"/>
    </widget>
+   <widget class="QMenu" name="menu_scene_viewer">
+    <property name="title">
+     <string>Scene viewer</string>
+    </property>
+    <addaction name="action_scene_show_cameras"/>
+   </widget>
    <addaction name="menu_providers"/>
    <addaction name="menu_calibration"/>
    <addaction name="menu_localization"/>
    <addaction name="menu_parameters"/>
+   <addaction name="menu_scene_viewer"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_parameters_modify">
@@ -204,6 +211,17 @@
    </property>
    <property name="text">
     <string>Undistort &amp;data only</string>
+   </property>
+  </action>
+  <action name="action_scene_show_cameras">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Show cameras</string>
    </property>
   </action>
  </widget>

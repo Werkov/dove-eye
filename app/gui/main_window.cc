@@ -148,6 +148,11 @@ void MainWindow::GroupDistortion(QAction *action) {
   }
 }
 
+void MainWindow::SceneShowCameras() {
+  ui_->scene_viewer->SetDrawCameras(
+      ui_->action_scene_show_cameras->isChecked());
+}
+
 void MainWindow::ParametersModify() {
   parameters_dialog_->LoadValues();
   parameters_dialog_->show();
@@ -237,6 +242,11 @@ void MainWindow::SetupMenu() {
           this, &MainWindow::SetupCameras);
   connect(action_group_distortion_, &QActionGroup::triggered,
           this, &MainWindow::GroupDistortion);
+  connect(ui_->action_scene_show_cameras, &QAction::triggered,
+          this, &MainWindow::SceneShowCameras);
 
+  /* Synchronize stateful menus */
+  SceneShowCameras();
 }
+
 } // end namespace gui
