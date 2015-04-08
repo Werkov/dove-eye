@@ -14,6 +14,7 @@ bool SearchingTracker::InitializeTracking(const Frame &frame, Posit *result) {
 
   initialized(true);
 
+  InitializeKalmanFilter();
   const auto posit = MarkToPosit(mark());
   *result = kalman_filter().Reset(frame.timestamp, posit);
 
@@ -47,6 +48,7 @@ bool SearchingTracker::InitializeTracking(
   }
   initialized(true);
 
+  InitializeKalmanFilter();
   const auto posit = MarkToPosit(match_mark);
   *result = kalman_filter().Reset(frame.timestamp, posit);
 
@@ -65,8 +67,8 @@ bool SearchingTracker::Track(const Frame &frame, Posit *result) {
   auto expected = kalman_filter().Predict(frame.timestamp);
   auto velocity = kalman_filter().PredictChange(frame.timestamp);
   const auto roi = DataToRoi(tracker_data(), expected, f);
-  DEBUG("%s, expected: [%f, %f], velociy [%f, %f]",
-        __func__,
+  DEBUG("%p->%s, expected: [%f, %f], velociy [%f, %f]",
+        this, __func__,
         expected.x, expected.y,
         velocity.x, velocity.y);
 
@@ -109,8 +111,14 @@ bool SearchingTracker::ReinitializeTracking(const Frame &frame, Posit *result) {
   }
 
   auto posit = MarkToPosit(match_mark);
-  *result = kalman_filter().Reset(frame.timestamp, posit);
+  *result = kalman_filter().Update(frame.timestamp, posit);
   return true;
 }
 
+void SearchingTracker::InitializeKalmanFilter() {
+  const auto process_var = parameters().Get(Parameters::SEARCH_KF_PROC_V);
+  const auto observation_var = parameters().Get(Parameters::SEARCH_KF_OBS_V);
+
+  kalman_filter().Init(process_var, observation_var);
+}
 } // end namespace dove_eye

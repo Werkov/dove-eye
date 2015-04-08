@@ -19,13 +19,18 @@ class KalmanFilter {
 
   T Predict(const double time) const {
     auto delta = time - prev_time_;
-    return prev_state_ + derivative_ * delta;
+    return prev_state_ + PredictChange(prev_time_) * delta;
   }
 
-  void Update(const double time, const T observation) {
+  T PredictChange(const double time) const {
+    /* Linear approximation */
+    return derivative_;
+  }
+
+  T Update(const double time, const T observation) {
     if (prev_time_ == 0) {
       Reset(time, observation);
-      return;
+      return observation;
     }
 
     auto delta = time - prev_time_;
@@ -33,12 +38,14 @@ class KalmanFilter {
     derivative_ = (observation - prev_state_) * (1 / delta);
     prev_state_ = observation;
     prev_time_ = time;
+    return observation;
   }
 
-  void Reset(const double time = 0, const T observation = T()) {
+  T Reset(const double time = 0, const T observation = T()) {
     derivative_ = T();
     prev_time_ = time;
     prev_state_ = observation;
+    return observation;
   }
 
  private:

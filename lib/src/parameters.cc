@@ -18,11 +18,15 @@ const Parameters::Parameter Parameters::parameters[] = {
   DEFINE_PARAM(
       TEMPLATE_RADIUS,        "track.template.radius",  15,       "px", 2, 100 ),
   DEFINE_PARAM(
-      SEARCH_FACTOR,          "track.search.factor",     2,         "",    1, 3 ),
+      SEARCH_FACTOR,          "track.search.factor",     3,         "",    2, 10 ),
   DEFINE_PARAM(
       SEARCH_THRESHOLD,       "track.search.threshold",0.5,         "",    0, 1 ),
   DEFINE_PARAM(
-      SEARCH_MIN_SPEED,       "track.search.min_speed",20,      "px/s",    5, 100 ),
+      SEARCH_MIN_SPEED,       "track.search.min_speed",  1,      "px/f",   0.1, 10 ),
+  DEFINE_PARAM(
+      SEARCH_KF_PROC_V,       "track.search.kf.proc_v",1e-2,     "px?",    1e-4, 1 ),
+  DEFINE_PARAM(
+      SEARCH_KF_OBS_V,        "track.search.kf.obs_v",  1,       "px?",    1e-2, 10 ),
   DEFINE_PARAM(
       AGGREGATOR_WINDOW,      "aggregator.window",     0.1,        "s",   0, 5 ),
   DEFINE_PARAM_ARRAY(

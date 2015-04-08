@@ -14,6 +14,9 @@ namespace dove_eye {
 
 bool TemplateTracker::InitTrackerData(const cv::Mat &data, const Mark &mark) {
   assert(mark.type == Mark::kCircle);
+  DEBUG("%p->%s(data, %f@[%f,%f])", this, __func__,
+        mark.radius,
+        mark.center.x, mark.center.y);
 
   const auto point = mark.center;
   const auto radius = mark.radius;
@@ -44,8 +47,8 @@ bool TemplateTracker::Search(
       Mark *result) const {
   const TemplateData &tpl = static_cast<const TemplateData &>(tracker_data);
 
-  DEBUG("%s([%i, %i], %f, %p[%i, %i]@[%i, %i], %p, %f, res)",
-        __func__,
+  DEBUG("%p->%s([%i, %i], %f, %p[%i, %i]@[%i, %i], %p, %f, res)",
+        this, __func__,
         data.cols, data.rows,
         tpl.radius,
         roi, (roi ? roi->width : 0), (roi ? roi->height : 0),
@@ -62,7 +65,7 @@ bool TemplateTracker::Search(
 
   if (extended_roi.width < tpl.search_template.cols ||
       extended_roi.height < tpl.search_template.rows) {
-    DEBUG("%s small-roi", __func__);
+    DEBUG("%p->%s small-roi", this, __func__);
     return false;
   }
 
@@ -112,24 +115,27 @@ bool TemplateTracker::Search(
       (method == CV_TM_CCOEFF_NORMED) ? (max_val - min_val) : 0;
 
 #ifdef CONFIG_DEBUG_HIGHGUI
+  cv::Mat to_show;
   if (mask) {
     cv::Mat masked;
     match_result.copyTo(masked, shifted_mask);
 
-    cv::Mat to_show1 = (match_result - min_val) / value;
-    cv::Mat to_show2 = (masked - min_val) / value;
-    log_mat((reinterpret_cast<size_t>(this) * 100) + 7, to_show1);
-    log_mat((reinterpret_cast<size_t>(this) * 100) + 8, to_show2);
+    to_show = (masked - min_val) / value;
+    log_mat((reinterpret_cast<size_t>(this) * 100) + 10, to_show);
+  } else {
+    to_show = (match_result - min_val) / value;
+    log_mat((reinterpret_cast<size_t>(this) * 100) + 10, to_show);
   }
 #endif
 
 
   if (value <= threshold) {
 #ifdef CONFIG_DEBUG_HIGHGUI
-    log_mat(reinterpret_cast<size_t>(this) * 100 + 1, data(extended_roi));
+    log_mat(reinterpret_cast<size_t>(this) * 100 + 1, data(extended_roi).clone());
     log_mat(reinterpret_cast<size_t>(this) * 100 + 2, tpl.search_template);
+    log_mat(reinterpret_cast<size_t>(this) * 100 + 2, to_show.clone());
 #endif
-    DEBUG("%s low value (%f/%f)", __func__, value, threshold);
+    DEBUG("%p->%s low value (%f/%f)", this, __func__, value, threshold);
     return false;
   }
 
@@ -148,7 +154,7 @@ bool TemplateTracker::Search(
   result->center = match_point;
   result->radius = tpl.radius;
   
-  DEBUG("%s matched (%f/%f)", __func__, value, threshold);
+  DEBUG("%p->%s matched (%f/%f)", this, __func__, value, threshold);
   return true;
 }
 

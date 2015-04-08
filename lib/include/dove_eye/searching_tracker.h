@@ -5,7 +5,7 @@
 #include <opencv2/opencv.hpp>
 
 #include "dove_eye/inner_tracker.h"
-#include "dove_eye/kalman_filter.h"
+#include "dove_eye/cv_kalman_filter.h"
 #include "dove_eye/parameters.h"
 
 namespace dove_eye {
@@ -31,7 +31,7 @@ class SearchingTracker : public InnerTracker {
   bool ReinitializeTracking(const Frame &frame, Posit *result) override;
 
  protected:
-  typedef KalmanFilter<Point2> KalmanFilterT;
+  typedef CvKalmanFilter KalmanFilterT;
 
   inline bool initialized() const  {
     return initialized_;
@@ -87,6 +87,8 @@ class SearchingTracker : public InnerTracker {
   inline void initialized(const bool value) {
     initialized_ = value;
   }
+
+  void InitializeKalmanFilter();
 };
 
 } // namespace dove_eye
