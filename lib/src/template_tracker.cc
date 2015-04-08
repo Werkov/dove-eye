@@ -42,8 +42,18 @@ bool TemplateTracker::Search(
       const cv::Mat *mask,
       const double threshold,
       Mark *result) const {
-
   const TemplateData &tpl = static_cast<const TemplateData &>(tracker_data);
+
+  DEBUG("%s([%i, %i], %f, %p[%i, %i]@[%i, %i], %p, %f, res)",
+        __func__,
+        data.cols, data.rows,
+        tpl.radius,
+        roi, (roi ? roi->width : 0), (roi ? roi->height : 0),
+             (roi ? roi->x : 0),     (roi ? roi->y : 0),
+        mask,
+        threshold);
+
+
   auto extended_roi = cv::Rect(cv::Point(0, 0), data.size());
   if (roi) {
     extended_roi = cv::Rect(tpl.TopLeft(roi->tl()), tpl.BottomRight(roi->br()));
@@ -52,6 +62,7 @@ bool TemplateTracker::Search(
 
   if (extended_roi.width < tpl.search_template.cols ||
       extended_roi.height < tpl.search_template.rows) {
+    DEBUG("%s small-roi", __func__);
     return false;
   }
 
@@ -118,6 +129,7 @@ bool TemplateTracker::Search(
     log_mat(reinterpret_cast<size_t>(this) * 100 + 1, data(extended_roi));
     log_mat(reinterpret_cast<size_t>(this) * 100 + 2, tpl.search_template);
 #endif
+    DEBUG("%s low value (%f/%f)", __func__, value, threshold);
     return false;
   }
 
@@ -136,6 +148,7 @@ bool TemplateTracker::Search(
   result->center = match_point;
   result->radius = tpl.radius;
   
+  DEBUG("%s matched (%f/%f)", __func__, value, threshold);
   return true;
 }
 

@@ -16,25 +16,27 @@ namespace dove_eye {
 
 const Parameters::Parameter Parameters::parameters[] = {
   DEFINE_PARAM(
-      TEMPLATE_RADIUS,        "template.radius",        15,       "px", 2, 100 ),
+      TEMPLATE_RADIUS,        "track.template.radius",  15,       "px", 2, 100 ),
   DEFINE_PARAM(
-      TEMPLATE_SEARCH_FACTOR, "template.search_factor", 2,         "",    1, 3 ),
+      SEARCH_FACTOR,          "track.search.factor",     2,         "",    1, 3 ),
   DEFINE_PARAM(
-      TEMPLATE_THRESHOLD,     "template.threshold",     0.5,       "",    0, 1 ),
+      SEARCH_THRESHOLD,       "track.search.threshold",0.5,         "",    0, 1 ),
   DEFINE_PARAM(
-      AGGREGATOR_WINDOW,      "aggregator.window",      0.1,      "s",   0, 5 ),
+      SEARCH_MIN_SPEED,       "track.search.min_speed",20,      "px/s",    5, 100 ),
+  DEFINE_PARAM(
+      AGGREGATOR_WINDOW,      "aggregator.window",     0.1,        "s",   0, 5 ),
   DEFINE_PARAM_ARRAY(
-      CAM_OFFSET,             "aggregator.offset",      0,        "s",   0, 5 ),
+      CAM_OFFSET,             "aggregator.offset",       0,        "s",   0, 5 ),
   DEFINE_PARAM(
-      CALIBRATION_ROWS,       "calibration.rows",       6,         "",    1, 10 ),
+      CALIBRATION_ROWS,       "calibration.rows",        6,         "",    1, 10 ),
   DEFINE_PARAM(
-      CALIBRATION_COLS,       "calibration.cols",       9,         "",    1, 10 ),
+      CALIBRATION_COLS,       "calibration.cols",        9,         "",    1, 10 ),
   DEFINE_PARAM(
-      CALIBRATION_SIZE,       "calibration.size",   0.026,        "m", 1e-2, 1e-1 ),
+      CALIBRATION_SIZE,       "calibration.size",    0.026,        "m", 1e-2, 1e-1 ),
   DEFINE_PARAM(
-      CALIBRATION_FRAMES,     "calibration.frames",    10, "frame(s)",   10, 100 ),
+      CALIBRATION_FRAMES,     "calibration.frames",     10, "frame(s)",   10, 100 ),
   DEFINE_PARAM(
-      CALIBRATION_SKIP,       "calibration.skip",      15, "frame(s)",    0, 50  ),
+      CALIBRATION_SKIP,       "calibration.skip",       15, "frame(s)",    0, 50  ),
   
   {Parameters::_MAX_KEY, Parameters::_MAX_KEY}
 };
