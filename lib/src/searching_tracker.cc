@@ -47,7 +47,7 @@ bool SearchingTracker::InitializeTracking(
   }
   initialized(true);
 
-  const auto posit = MarkToPosit(mark());
+  const auto posit = MarkToPosit(match_mark);
   *result = kalman_filter().Reset(frame.timestamp, posit);
 
   return true;
