@@ -14,13 +14,19 @@ class HistogramTracker : public SearchingTracker {
   struct HistogramData : public TrackerData {
     const int histogram_size = 16;
     /* Hue range is float because of calcBackProject API */
-    float hrange[2] = {0, 180};
+    float hrange[2];
     double srange[2];
     double vrange[2];
 
     cv::Mat histogram;
     /** Size of region from which histogram was taken */
     cv::Size size;
+
+    HistogramData() {
+        /* Because of MSVC bug with error C2536, use struct ctor. */
+	hrange[0] = 0;
+	hrange[1] = 180;
+    }
   };
 
   explicit HistogramTracker(const Parameters &parameters)

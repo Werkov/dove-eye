@@ -3,6 +3,10 @@
 
 #include <stdio.h>
 
+#ifdef WIN32
+#define __func__ __FUNCTION__
+#endif
+
 //TODO Replace "\n" with platform independent constant
 #ifndef NDEBUG
 #define DEBUG(...) do {              \

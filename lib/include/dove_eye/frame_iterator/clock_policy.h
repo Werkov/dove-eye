@@ -27,7 +27,7 @@ class ClockPolicy {
 
  private:
   typedef std::chrono::steady_clock Clock;
-  typedef std::chrono::time_point<Clock> TimePoint;
+  typedef decltype(Clock::now()) TimePoint;
 
   TimePoint start_;
 };

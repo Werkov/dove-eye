@@ -45,7 +45,7 @@ class VideoProvider {
   }
 
   inline void camera_parameters(const CameraParameters *value) {
-    camera_parameters_ = value;
+    camera_parameters_ = const_cast<CameraParameters *>(value);
   }
 
   /** Every frame of provider should be passed (by iterator) to this function
@@ -56,7 +56,7 @@ class VideoProvider {
   void PreprocessFrame(Frame *frame) const;
 
  private:
-  std::atomic<const CameraParameters *> camera_parameters_;
+  std::atomic<CameraParameters *> camera_parameters_;
   std::atomic<bool> undistort_;
 };
 

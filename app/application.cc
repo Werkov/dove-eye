@@ -50,7 +50,7 @@ Application::~Application() {
 Application::VideoProvidersVector Application::AvailableVideoProviders() {
   if (available_providers_.size() == 0) {
     /* Scan device IDs from 0 to first invalid (with at most skip errors) */
-    const int skip = 10;
+    const int skip = CONFIG_MAX_ARITY;
     int device = 0;
     int errors = 0;
     while (true) {
