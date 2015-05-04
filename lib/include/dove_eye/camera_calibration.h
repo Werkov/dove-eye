@@ -68,7 +68,11 @@ class CameraCalibration {
 
   std::unique_ptr<const CalibrationPattern> pattern_;
 
-  std::vector<std::vector<Point2Vector>> image_points_;
+  typedef std::vector<Point2Vector> ImagePoints;
+  /** Image points per camera */
+  std::vector<ImagePoints> image_points_;
+  /** Image points per camera pair */
+  std::vector<std::pair<ImagePoints, ImagePoints>> image_points_pair_;
 
   std::vector<MeasurementState> camera_states_;
   std::vector<MeasurementState> pair_states_;
