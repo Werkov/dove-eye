@@ -30,6 +30,7 @@ class MainWindow : public QMainWindow {
 
  signals:
   void SetControllerMode(const Controller::Mode mode);
+  void SetLocalizationActive(const bool value);
   void SetUndistortMode(const Controller::UndistortMode undistort_mode);
 
  public slots:
@@ -41,6 +42,8 @@ class MainWindow : public QMainWindow {
   void Calibrate();
   void CalibrationLoad();
   void CalibrationSave();
+  void LocalizationStart();
+  void LocalizationStop();
   void GroupDistortion(QAction *action);
   void SceneShowCameras();
   void SceneClearTrajectory();

@@ -99,6 +99,8 @@ void MainWindow::SetupPipeline() {
 
   connect(this, &MainWindow::SetControllerMode,
           application_->controller(), &Controller::SetMode);
+  connect(this, &MainWindow::SetLocalizationActive,
+          application_->controller(), &Controller::SetLocalizationActive);
   connect(this, &MainWindow::SetUndistortMode,
           application_->controller(), &Controller::SetUndistortMode);
 }
@@ -136,6 +138,18 @@ void MainWindow::CalibrationSave() {
 
   application_->calibration_data_storage()
       ->SaveToFile(filename, application_->calibration_data());
+}
+
+void MainWindow::LocalizationStart() {
+  emit SetLocalizationActive(true);
+  ui_->action_localization_start->setVisible(false);
+  ui_->action_localization_stop->setVisible(true);
+}
+
+void MainWindow::LocalizationStop() {
+  emit SetLocalizationActive(false);
+  ui_->action_localization_start->setVisible(true);
+  ui_->action_localization_stop->setVisible(false);
 }
 
 void MainWindow::GroupDistortion(QAction *action) {
@@ -203,6 +217,8 @@ void MainWindow::ControllerModeChanged(const Controller::Mode mode) {
   }
 }
 
+/** Called to notify status of calibration data (are they ready?)
+ */
 void MainWindow::SetCalibration(const bool value) {
   ui_->action_calibration_save->setEnabled(value);
 
@@ -236,6 +252,10 @@ void MainWindow::SetupMenu() {
           this, &MainWindow::CalibrationLoad);
   connect(ui_->action_calibration_save, &QAction::triggered,
           this, &MainWindow::CalibrationSave);
+  connect(ui_->action_localization_start, &QAction::triggered,
+          this, &MainWindow::LocalizationStart);
+  connect(ui_->action_localization_stop, &QAction::triggered,
+          this, &MainWindow::LocalizationStop);
   connect(ui_->action_parameters_modify, &QAction::triggered,
           this, &MainWindow::ParametersModify);
   connect(ui_->action_parameters_load, &QAction::triggered,
@@ -253,6 +273,7 @@ void MainWindow::SetupMenu() {
 
   /* Synchronize stateful menus */
   SceneShowCameras();
+  LocalizationStop();
 }
 
 } // end namespace gui

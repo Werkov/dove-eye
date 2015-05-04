@@ -60,6 +60,7 @@ class Controller : public QObject {
         mode_(kIdle),
         undistort_mode_(kIgnoreDistortion),
         tracker_mark_type_(kCircle),
+        localization_active_(false),
         arity_(aggregator->Arity()),
         frameset_iterator_(aggregator->Arity()),
         frameset_end_iterator_(aggregator->Arity()),
@@ -95,10 +96,7 @@ class Controller : public QObject {
   void CalibrationDataReady(const dove_eye::CalibrationData);
 
  public slots:
-  // TODO remove start/stop?
   void Start();
-
-  void Stop();
 
   void SetMark(const dove_eye::CameraIndex cam, const gui::GuiMark mark);
 
@@ -107,6 +105,8 @@ class Controller : public QObject {
   void SetUndistortMode(const UndistortMode undistort_mode);
 
   void SetTrackerMarkType(const TrackerMarkType mark_type);
+
+  void SetLocalizationActive(const bool value);
 
   void SetCalibrationData(const dove_eye::CalibrationData calibration_data);
 
@@ -119,6 +119,7 @@ class Controller : public QObject {
   Mode mode_;
   UndistortMode undistort_mode_;
   TrackerMarkType tracker_mark_type_;
+  bool localization_active_;
 
   const dove_eye::CameraIndex arity_;
 
@@ -130,6 +131,7 @@ class Controller : public QObject {
    *           because of destruction order (mind other threads)
    */
   std::unique_ptr<dove_eye::CalibrationData> calibration_data_;
+
 
   QBasicTimer timer_;
   Aggregator::Iterator frameset_iterator_;

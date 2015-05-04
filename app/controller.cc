@@ -18,16 +18,16 @@ using gui::GuiMark;
 using std::unique_ptr;
 
 
+/** Start main controller loop
+ *
+ * There's currently no stop method, controller is just destroyed
+ */
 void Controller::Start() {
   frameset_iterator_ = aggregator_->begin();
   frameset_end_iterator_ = aggregator_->end();
 
   SetMode(kIdle);
   timer_.start(0, this);
-}
-
-void Controller::Stop() {
-  timer_.stop();
 }
 
 void Controller::SetMark(const dove_eye::CameraIndex cam,
@@ -88,6 +88,10 @@ void Controller::SetTrackerMarkType(const TrackerMarkType mark_type) {
   tracker_mark_type_ = mark_type;
 }
 
+void Controller::SetLocalizationActive(const bool value) {
+  localization_active_ = value;
+}
+
 void Controller::SetCalibrationData(const CalibrationData calibration_data) {
   /* Before we delete old calibration_data update references. */
   auto new_calibration_data = new CalibrationData(calibration_data);
@@ -103,6 +107,8 @@ void Controller::SetCalibrationData(const CalibrationData calibration_data) {
   calibration_data_.reset(new_calibration_data);
 }
 
+/** Main capture-track-localize loop
+ */
 void Controller::timerEvent(QTimerEvent *event) {
   if (event->timerId() != timer_.timerId()) {
     return;
@@ -144,10 +150,12 @@ void Controller::timerEvent(QTimerEvent *event) {
       positset = tracker_->Track(frameset);
       emit PositsetReady(positset);
 
-      Location location;
-      if (localization_->Locate(positset, &location)) {
-        DEBUG("loc: %f %f %f", location.x, location.y, location.z);
-        emit LocationReady(location);
+      if (localization_active_) {
+        Location location;
+        if (localization_->Locate(positset, &location)) {
+          DEBUG("loc: %f %f %f", location.x, location.y, location.z);
+          emit LocationReady(location);
+        }
       }
       break;
     }
