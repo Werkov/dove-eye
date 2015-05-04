@@ -11,7 +11,8 @@ namespace dove_eye {
 
 /* Provider */
 FileVideoProvider::FileVideoProvider(const std::string &filename)
-    : filename_(filename) {
+    : VideoProvider(),
+      filename_(filename) {
 }
 
 FrameIterator FileVideoProvider::begin() {

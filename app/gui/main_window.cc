@@ -43,7 +43,7 @@ MainWindow::MainWindow(Application *application, QWidget *parent)
 
   /* Dialog connections */
   connect(cameras_setup_dialog_, &CamerasSetupDialog::SelectedProviders,
-          application_, &Application::UseCameraProviders);
+          application_, &Application::Initialize);
 
   SetupMenu();
 

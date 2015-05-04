@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 
+#include <QEventLoop>
 #include <QList>
 #include <QObject>
 #include <QThread>
@@ -70,7 +71,9 @@ class Application : public QObject {
  public slots:
   VideoProvidersVector AvailableVideoProviders();
 
-  void UseCameraProviders(const VideoProvidersVector &providers);
+  void InitializeEmpty();
+
+  void Initialize(const VideoProvidersVector &providers);
 
   void SetCalibrationData(const dove_eye::CalibrationData calibration_data);
 
@@ -94,10 +97,12 @@ class Application : public QObject {
   void MoveToThread(QObject* object, QThread* thread);
 
   void SetupController(VideoProvidersContainer &&providers);
+  void TeardownController();
   void SetupConverter();
+  void TeardownConverter();
 
   template<typename T>
-  void SwapAndDestroy(T **object_ptr, T *new_object) {
+  void SwapAndDestroy(T **object_ptr, T *new_object, bool blocking = false) {
     assert(object_ptr);
     /*
      * Queue old object for destruction (it's safe to call it again in
@@ -107,10 +112,27 @@ class Application : public QObject {
     T *old_object = *object_ptr;
 
     if (old_object != nullptr) {
-      auto thread = old_object->thread();
-      old_object->deleteLater();
-      MoveToThread(new_object, thread);
-    } else {
+      auto obj_thread = old_object->thread();
+
+      objects_in_threads_.removeAll(old_object);
+      if (blocking) {
+        old_object->deleteLater();
+        /* Ugly hack:
+         * We cannot technically wait for actual destruction of the object, the
+         * destroyed signal is emitted right *before* the member fields are
+         * destroyed and member fields are those that could block (e.g.
+         * Aggregator and its AsyncPolicy. Thus use sleep "ensure" the object
+         * is properly destroyed.
+         */
+        thread()->msleep(200);
+      } else {
+        old_object->deleteLater();
+      }
+
+      if (new_object != nullptr) {
+        MoveToThread(new_object, obj_thread);
+      }
+    } else if (new_object != nullptr) {
       MoveToNewThread(new_object);
     }
 

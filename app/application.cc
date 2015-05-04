@@ -48,26 +48,28 @@ Application::~Application() {
 }
 
 Application::VideoProvidersVector Application::AvailableVideoProviders() {
-  if (available_providers_.size() == 0) {
-    /* Scan device IDs from 0 to first invalid (with at most skip errors) */
-    const int skip = CONFIG_MAX_ARITY;
-    int device = 0;
-    int errors = 0;
-    while (true) {
-      auto provider = new CameraVideoProvider(device);
-      if (provider->begin() != provider->end()) {
-        available_providers_.push_back(
-            VideoProvidersVectorOwning::value_type(provider));
-        qDebug() << "Found working camera device" << device;
-      } else {
-        delete provider;
-        qDebug() << "Camera device" << device << "not working";
-        if (++errors >= skip) {
-          break;
-        }
+  InitializeEmpty();
+
+  assert(available_providers_.size() == 0);
+
+  /* Scan device IDs from 0 to first invalid (with at most skip errors) */
+  const int skip = CONFIG_MAX_ARITY;
+  int device = 0;
+  int errors = 0;
+  while (true) {
+    auto provider = new CameraVideoProvider(device);
+    if (provider->begin() != provider->end()) {
+      available_providers_.push_back(
+          VideoProvidersVectorOwning::value_type(provider));
+      qDebug() << "Found working camera device" << device;
+    } else {
+      delete provider;
+      qDebug() << "Camera device" << device << "not working";
+      if (++errors >= skip) {
+        break;
       }
-      ++device;
     }
+    ++device;
   }
 
   VideoProvidersVector result;
@@ -77,9 +79,23 @@ Application::VideoProvidersVector Application::AvailableVideoProviders() {
   return result;
 }
 
-void Application::UseCameraProviders(const VideoProvidersVector &providers) {
+void Application::InitializeEmpty() {
+  available_providers_.clear();
+
+  arity_ = 0;
+  TeardownConverter();
+  TeardownController();
+
+  emit SetupPipeline();
+}
+
+void Application::Initialize(const VideoProvidersVector &providers) {
   VideoProvidersContainer used_providers;
 
+  /*
+   * Move ownership of chosen providers from application to controller and
+   * dispose remaining providers
+   */
   for (auto provider : providers) {
     bool released = false;
     for (auto &provider_owner : available_providers_) {
@@ -93,12 +109,9 @@ void Application::UseCameraProviders(const VideoProvidersVector &providers) {
     used_providers.push_back(
         std::move(VideoProvidersContainer::value_type(provider)));
   }
-  /*
-   * Release unused providers, so that available_providers_ is empty for next
-   * discovery.
-   */
   available_providers_.clear();
 
+  /* Setup components */
   arity_ = used_providers.size();
 
   SetupController(std::move(used_providers));
@@ -146,6 +159,8 @@ void Application::MoveToThread(QObject* object, QThread* thread) {
 
 
 void Application::SetupController(VideoProvidersContainer &&providers) {
+  assert(providers.size() > 0);
+
   auto aggregator = new Controller::Aggregator(std::move(providers), parameters_);
 
   auto pattern = new ChessboardPattern(
@@ -172,6 +187,10 @@ void Application::SetupController(VideoProvidersContainer &&providers) {
   SwapAndDestroy(&controller_, new_controller);
 }
 
+void Application::TeardownController() {
+  SwapAndDestroy(&controller_, static_cast<Controller *>(nullptr), true);
+}
+
 void Application::SetupConverter() {
   assert(controller_);
 
@@ -184,4 +203,10 @@ void Application::SetupConverter() {
                    controller_, &Controller::SetMark);
 
 }
+
+void Application::TeardownConverter() {
+  SwapAndDestroy(&converter_, static_cast<FramesetConverter *>(nullptr), true);
+}
+
+
 

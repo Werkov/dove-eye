@@ -10,7 +10,8 @@ namespace dove_eye {
 
 /* Provider */
 CameraVideoProvider::CameraVideoProvider(const int device)
-    : device_(device) {
+    : VideoProvider(),
+      device_(device) {
   std::stringstream ss;
   ss << "Device " << device;
   id_ = ss.str();

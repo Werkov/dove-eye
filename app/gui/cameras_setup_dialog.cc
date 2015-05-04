@@ -21,6 +21,13 @@ CamerasSetupDialog::~CamerasSetupDialog() {
 
 void CamerasSetupDialog::SetProviders(
     const Application::VideoProvidersVector &providers) {
+  auto children = ui_->frame->findChildren<QWidget *>();
+  for (auto widget : children) {
+    if (widget->parent() == ui_->frame) {
+      delete widget;
+    }
+  }
+
   auto layout = new QVBoxLayout();
 
   QWidget *first_widget = nullptr;
