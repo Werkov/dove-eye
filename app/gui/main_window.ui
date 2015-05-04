@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Dove-eye</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -178,6 +178,9 @@
   <action name="action_open_video_file">
    <property name="text">
     <string>Video &amp;file</string>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
    </property>
   </action>
   <action name="action_parameters_load">
