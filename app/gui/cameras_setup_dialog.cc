@@ -1,10 +1,12 @@
 #include "gui/cameras_setup_dialog.h"
 
 #include <QLabel>
+#include <QList>
 #include <QPushButton>
 
+#include "dove_eye/camera_video_provider.h"
 #include "ui_cameras_setup_dialog.h"
-#include "widgets/video_provider.h"
+#include "widgets/camera_video_provider.h"
 
 namespace gui {
 
@@ -21,18 +23,28 @@ CamerasSetupDialog::~CamerasSetupDialog() {
 
 void CamerasSetupDialog::SetProviders(
     const Application::VideoProvidersVector &providers) {
+  /*
+   * Really? Isn't there better API to delete (direct) children of a widget?
+   */
   auto children = ui_->frame->findChildren<QWidget *>();
+  QList<QWidget *> to_delete;
   for (auto widget : children) {
     if (widget->parent() == ui_->frame) {
-      delete widget;
+      to_delete.append(widget);
     }
   }
+  for (auto widget: to_delete) {
+    delete widget;
+  }
 
+  /* Now create new widgets for every provider */
   auto layout = new QVBoxLayout();
 
   QWidget *first_widget = nullptr;
   for (auto provider : providers) {
-    auto widget = new widgets::VideoProvider(provider);
+    auto camera_provider = dynamic_cast<dove_eye::CameraVideoProvider *>(provider);
+    assert(camera_provider);
+    auto widget = new widgets::CameraVideoProvider(camera_provider);
     if (!first_widget) {
       first_widget = widget;
     }
@@ -54,8 +66,9 @@ void CamerasSetupDialog::SetProviders(
 void CamerasSetupDialog::OnAccepted() const {
   Application::VideoProvidersVector result;
 
-  for (auto video_provider : this->findChildren<widgets::VideoProvider *>()) {
+  for (auto video_provider : this->findChildren<widgets::CameraVideoProvider *>()) {
     if (video_provider->Selected()) {
+      video_provider->ApplySettings();
       result.push_back(video_provider->provider());
     }
   }

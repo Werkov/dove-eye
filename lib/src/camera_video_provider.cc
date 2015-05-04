@@ -21,11 +21,35 @@ FrameIterator CameraVideoProvider::begin() {
   typedef CvFrameIterator<frame_iterator::ClockPolicy,
                           frame_iterator::NonblockingPolicy> CvIterator;
 
-  return FrameIterator(this, new CvIterator(device_));
+  auto cv_iterator = new CvIterator(device_);
+
+  /* Apply settings */
+  if (resolution_.width > 0 && resolution_.height > 0) {
+    auto &capture = cv_iterator->CvVideoCapture();
+    capture.set(CV_CAP_PROP_FRAME_WIDTH, resolution().width);
+    capture.set(CV_CAP_PROP_FRAME_HEIGHT, resolution().height);
+  }
+
+  return FrameIterator(this, cv_iterator);
 }
 
 FrameIterator CameraVideoProvider::end() {
   return FrameIterator(this);
+}
+
+CameraVideoProvider::ResolutionVector
+CameraVideoProvider::AvailableResolutions() const {
+  /*
+   * OpenCV API doesn't allow access to available resolutions, so just use some
+   * most common values.
+   */
+  return {
+    Resolution(160, 120),
+    Resolution(320, 240),
+    Resolution(640, 480),
+    Resolution(640, 360),
+    Resolution(1280, 720)
+  };
 }
 
 } // namespace dove_eye

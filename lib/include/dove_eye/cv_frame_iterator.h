@@ -34,20 +34,24 @@ class CvFrameIterator : public FrameIteratorImpl {
     }
   }
 
-  Frame GetFrame() const override {
+  inline Frame GetFrame() const override {
     /* Use separate data buffer (for various processings) */
     return frame_.Clone();
   }
 
-  void MoveNext() override {
+  inline void MoveNext() override {
     valid_ = video_capture_->grab();
     valid_ = valid_ && video_capture_->retrieve(frame_.data);
     frame_.timestamp = timestamp_policy_.GetTimestamp();
     blocking_policy_.Wait();
   }
 
-  bool IsValid() override {
+  inline bool IsValid() override {
     return valid_;
+  }
+
+  inline cv::VideoCapture &CvVideoCapture() {
+    return *video_capture_;
   }
 
  private:
