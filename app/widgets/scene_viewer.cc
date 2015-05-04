@@ -124,7 +124,9 @@ void SceneViewer::TrajectoryAppend(const dove_eye::Location &location) {
   trajectory_min_ = VecMin(loc, trajectory_min_);
   trajectory_max_ = VecMax(loc, trajectory_min_);
 
-  setSceneCenter(Vec(0, 0, 0));
+  Vec center((trajectory_min_ + trajectory_max_) / 2);
+  Vec radius(trajectory_max_ - center);
+  setSceneCenter(center);
   setSceneRadius(max(trajectory_min_.norm(), trajectory_max_.norm()));
 }
 
