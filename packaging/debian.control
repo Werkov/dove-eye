@@ -1,0 +1,19 @@
+Source: dove-eye
+Section: unknown
+Priority: optional
+Maintainer: Michal Koutný <xm.koutny@gmail.com>
+Build-Depends: debhelper (>= 8.0.0),
+  binutils,
+  cmake,
+  cmake-data
+Standards-Version: 3.9.4
+Homepage: https://werkov.github.io/dove-eye/
+Vcs-Git: git://git@github.com:Werkov/dove-eye.git
+Vcs-Browser: https://github.com/Werkov/dove-eye
+
+
+Package: dove-eye
+Architecture: any
+Depends: ${shlibs-core:Depends}
+Description: Multiple camera object tracking
+
