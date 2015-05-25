@@ -20,3 +20,6 @@ add_definitions("-DHAVE_GUI")
 if(WIN32)
 	include_directories(${OpenCV_INCLUDE_DIRS})
 endif()
+
+install(TARGETS dove-eye_exec
+	DESTINATION bin)
