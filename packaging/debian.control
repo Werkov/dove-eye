@@ -1,5 +1,5 @@
 Source: dove-eye
-Section: unknown
+Section: video
 Priority: optional
 Maintainer: Michal Koutný <xm.koutny@gmail.com>
 Build-Depends: appmenu-qt5,
