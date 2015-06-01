@@ -15,7 +15,7 @@ Detection of position and location is tracking and localization respectively.*
   1. First setup your cameras so that they capture your scene of interest.
 
   2. Then start `dove-eye` and in menu choose **Providers**, there you set up
-  connected cameras.
+     connected cameras.
     * Cameras are identified by device indices.
     * You may run into problems (*No space left on device*) if you have a single
       USB controller and use large resolution of cameras. For this reason, I
