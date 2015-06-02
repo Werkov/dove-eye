@@ -69,9 +69,9 @@ simple as follows.
     $ # after install just launch it
     $ dove-eye
 
-Currently, [there are builds][1] for Ubuntu 14.04 Trusty and Ubuntu 15.04 Vivid.
+Currently, [there are builds][pkg] for Ubuntu 14.04 Trusty and Ubuntu 15.04 Vivid.
 
-[1]: https://github.com/Werkov/dove-eye-installer/blob/master/README.md
+[pkg]: https://github.com/Werkov/dove-eye-installer/blob/master/README.md
 
 ## Windows
 
