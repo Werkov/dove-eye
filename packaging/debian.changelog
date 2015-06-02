@@ -1,3 +1,9 @@
+dove-eye (0.1-2~vivid) vivid; urgency=medium
+
+  * Marked for vivid
+
+ -- Michal Koutný <xm.koutny@gmail.com> Mon, 1 June 2015 22:39:00 +0200
+
 dove-eye (0.1-2) trusty; urgency=low
 
   * Fixed dependencies
