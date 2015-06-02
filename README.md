@@ -69,7 +69,9 @@ simple as follows.
     $ # after install just launch it
     $ dove-eye
 
-Currently, there are builds for Ubuntu 14.04 Trusty and Ubuntu 15.04 Vivid.
+Currently, [there are builds][1] for Ubuntu 14.04 Trusty and Ubuntu 15.04 Vivid.
+
+[1]: https://github.com/Werkov/dove-eye-installer/blob/master/README.md
 
 ## Windows
 
@@ -176,7 +178,7 @@ There are several threads running in the application:
 Any communication between different threads must be done only via Qt's
 signal-slot mechanism, which ensures implicit synchronization, furthermore
 OpenCV `cv::Mat` class is also thread-safe and can be shared among threads.
-Otherwise explicit synchronization must be done.
+Otherwise explicit synchronization must be done (e.g. in `FramesetAggregator`).
 
 ## Tracking and localization
 
