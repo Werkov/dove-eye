@@ -53,16 +53,16 @@ class SearchingTracker : public InnerTracker {
 
   /** Generic search for an matching object
    *
-   * @param[in]   data      image to search for object
+   * @param[in]   data         image to search for object
    * @param[in]   tracker_data search query (implementation specific)
-   * @param[in]   roi       (optional) region of interest that should be searched
-   *                            (in the image)
-   * @param[in]   mask      (optional) boolean mask restricting search (in the
-   *                            image too)
-   * @param[in]   threshold value [0,1] to accept the match (the higher, the
-   *                            better)
-   * @param[out]  result    mark positioned to the best match
-   * @param[out]  quality   (optional) value in [0,1], the higher the better
+   * @param[in]   roi          (optional) region of interest that should be searched
+   *                           (in the image)
+   * @param[in]   mask         (optional) boolean mask restricting search (in the
+   *                           image too)
+   * @param[in]   threshold    value [0,1] to accept the match (the higher, the
+   *                           better)
+   * @param[out]  result       mark positioned to the best match
+   * @param[out]  quality      (optional) value in [0,1], the higher the better
    *
    * @return      true if sufficient match was found, false otherwise
    */

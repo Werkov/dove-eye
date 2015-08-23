@@ -5,6 +5,7 @@
 
 #include "dove_eye/camera_calibration.h"
 #include "dove_eye/camera_video_provider.h"
+#include "dove_eye/circle_tracker.h"
 #include "dove_eye/chessboard_pattern.h"
 #include "dove_eye/histogram_tracker.h"
 #include "dove_eye/template_tracker.h"
@@ -16,6 +17,7 @@ using dove_eye::CameraCalibration;
 using dove_eye::CameraIndex;
 using dove_eye::CameraVideoProvider;
 using dove_eye::ChessboardPattern;
+using dove_eye::CircleTracker;
 using dove_eye::HistogramTracker;
 using dove_eye::Localization;
 using dove_eye::Parameters;
@@ -170,14 +172,15 @@ void Application::SetupController(VideoProvidersContainer &&providers) {
   auto calibration = new CameraCalibration(parameters_, arity_, pattern);
 
   //TemplateTracker inner_tracker(parameters_);
-  HistogramTracker inner_tracker(parameters_);
+  //HistogramTracker inner_tracker(parameters_);
+  CircleTracker inner_tracker(parameters_);
   auto tracker = new Tracker(arity_, inner_tracker);
   auto localization = new Localization(arity_);
 
   auto new_controller = new Controller(parameters_, aggregator, calibration,
                                        tracker, localization);
-  //new_controller->SetTrackerMarkType(Controller::kCircle);
-  new_controller->SetTrackerMarkType(Controller::kRectangle);
+  new_controller->SetTrackerMarkType(Controller::kCircle);
+  //new_controller->SetTrackerMarkType(Controller::kRectangle);
 
   connect(new_controller, &Controller::CalibrationDataReady,
           this, &Application::SetCalibrationData);

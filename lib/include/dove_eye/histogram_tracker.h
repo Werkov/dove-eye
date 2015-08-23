@@ -23,9 +23,9 @@ class HistogramTracker : public SearchingTracker {
     cv::Size size;
 
     HistogramData() {
-        /* Because of MSVC bug with error C2536, use struct ctor. */
-	hrange[0] = 0;
-	hrange[1] = 180;
+      /* Because of MSVC bug with error C2536, use struct ctor. */
+      hrange[0] = 0;
+      hrange[1] = 180;
     }
   };
 
