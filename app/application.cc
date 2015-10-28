@@ -56,6 +56,7 @@ Application::VideoProvidersVector Application::AvailableVideoProviders() {
 
   /* Scan device IDs from 0 to first invalid (with at most skip errors) */
   const int skip = CONFIG_MAX_ARITY;
+  const int tests = 2 * CONFIG_MAX_ARITY;
   int device = 0;
   int errors = 0;
   while (true) {
@@ -71,7 +72,9 @@ Application::VideoProvidersVector Application::AvailableVideoProviders() {
         break;
       }
     }
-    ++device;
+    if (++device >= tests) {
+      break;
+    }
   }
 
   VideoProvidersVector result;
