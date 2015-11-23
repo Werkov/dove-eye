@@ -100,7 +100,7 @@ Please note that the snippet above assumes, you have all libraries installed in
 system paths. (You may alternatively use `cmake` parameter
 `-DQGLViewer_ROOT=<path to your installation of libQGLViewer>`.)
 
-### Gothas in Ubuntu
+### Gotchas in Ubuntu
 
 libQGLViewer that is packaged in Ubuntu (14.*, 15.04) is linked agaist Qt4 --
 you might build `dove-eye`, however, it'll segfault during ABI
