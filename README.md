@@ -102,7 +102,7 @@ system paths. (You may alternatively use `cmake` parameter
 
 ### Gotchas in Ubuntu
 
-libQGLViewer that is packaged in Ubuntu (14.*, 15.04) is linked agaist Qt4 --
+libQGLViewer that is packaged in Ubuntu (14.\*, 15.04) is linked agaist Qt4 --
 you might build `dove-eye`, however, it'll segfault during ABI
 incompatibilities! Thus it is recommended to compile libQGLViewer locally with
 Qt5 libraries.
@@ -123,9 +123,23 @@ Other libraries can be installed from packages: TODO (note -dev versions).
 
 ## Windows
 
-You can compile `dove-eye` with `cmake` and MS Visual Studio on Windows.
-You must setup correct paths to libraries in `cmake` GUI and then generate MS
-VS project. The project can be normally built. 
+Download and install compiled binaries for OpenCV 2.4 (not 3.0),
+do the same for Qt framework, version 5.
+
+Then you must download and install Qt Creator. Once you have it,
+download sources for libQGLViewer library and compile it using the Qt Creator.
+
+Now you have dependency libraries ready and you can compile `dove-eye` itself.
+Start cmake-gui and open `CMakeLists.txt` in the root directory of the
+`dove-eye` project.
+You need to set proper paths to the libraries above, so that CMake can find
+them during configure step. When configuration succeeds you can generate a
+Visual Studio project.
+
+[Screenshot of configured CMake project](https://raw.githubusercontent.com/Werkov/dove-eye/master/doc/win-cmake-configured.png)
+
+The project can be then normally built in VS (FIXME probably, I don't remember
+any problems now, it's been a while).
 
 NOTE: I had some problems with debug versions of system libraries and 32b
 builds on Windows 7.
