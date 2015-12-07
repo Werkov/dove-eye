@@ -7,6 +7,7 @@
 #include "dove_eye/camera_video_provider.h"
 #include "dove_eye/circle_tracker.h"
 #include "dove_eye/chessboard_pattern.h"
+#include "dove_eye/frameset.h"
 #include "dove_eye/histogram_tracker.h"
 #include "dove_eye/template_tracker.h"
 #include "dove_eye/tracker.h"
@@ -18,6 +19,7 @@ using dove_eye::CameraIndex;
 using dove_eye::CameraVideoProvider;
 using dove_eye::ChessboardPattern;
 using dove_eye::CircleTracker;
+using dove_eye::Frameset;
 using dove_eye::HistogramTracker;
 using dove_eye::Localization;
 using dove_eye::Parameters;
@@ -55,8 +57,8 @@ Application::VideoProvidersVector Application::AvailableVideoProviders() {
   assert(available_providers_.size() == 0);
 
   /* Scan device IDs from 0 to first invalid (with at most skip errors) */
-  const int skip = CONFIG_MAX_ARITY;
-  const int tests = 2 * CONFIG_MAX_ARITY;
+  const int skip = Frameset::kMaxArity;
+  const int tests = 2 * Frameset::kMaxArity;
   int device = 0;
   int errors = 0;
   while (true) {
