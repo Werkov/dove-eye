@@ -2,3 +2,7 @@
 - save localization results to file and not stderr/stdout
 - 3rd calibration step to obtain absolute position of cameras and orientation
 - store intrinsic and pair calibration results separately
+- make tracker selection in runtime, not compile time
+- offline video processing
+- video recording (concerned, isn't it mixing too much functionality?)
+
