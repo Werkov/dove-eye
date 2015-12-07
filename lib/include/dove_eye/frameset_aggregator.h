@@ -76,6 +76,7 @@ class FramesetAggregator {
         auto window_size =
             aggregator_->parameters_.Get(Parameters::AGGREGATOR_WINDOW);
 
+        /* Move the window forwards? */
         if (frame.timestamp > window_start_ + window_size) {
           window_start_ = frame.timestamp - window_size;
           frameset_created = PrepareFrameset();
