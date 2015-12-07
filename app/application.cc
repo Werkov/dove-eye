@@ -100,8 +100,10 @@ void Application::Initialize(const VideoProvidersVector &providers) {
   VideoProvidersContainer used_providers;
 
   /*
+   * We should obtain a subset of providers that exist in available_providers_.
    * Move ownership of chosen providers from application to controller and
-   * dispose remaining providers
+   * dispose remaining providers (by clearing available_providers_).
+   *
    */
   for (auto provider : providers) {
     bool released = false;

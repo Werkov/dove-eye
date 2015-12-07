@@ -68,7 +68,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>25</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_parameters">
@@ -85,7 +85,7 @@
      <string>P&amp;roviders</string>
     </property>
     <addaction name="action_setup_cameras"/>
-    <addaction name="action_open_video_file"/>
+    <addaction name="action_open_video_files"/>
    </widget>
    <widget class="QMenu" name="menu_localization">
     <property name="tearOffEnabled">
@@ -175,12 +175,12 @@
     <string>Stop</string>
    </property>
   </action>
-  <action name="action_open_video_file">
-   <property name="text">
-    <string>Video &amp;file</string>
-   </property>
+  <action name="action_open_video_files">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Video &amp;file(s)</string>
    </property>
   </action>
   <action name="action_parameters_load">

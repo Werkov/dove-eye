@@ -63,6 +63,12 @@ class Application : public QObject {
     return converter_;
   }
 
+  // TODO replace this pointer harakiri with properly encapsulated class
+  //      ProvidersRepo that'll support ownership and outer access.
+  inline VideoProvidersVectorOwning *ProvidersContainer() {
+    return &available_providers_;
+  }
+
  signals:
   void SetupPipeline();
   // TODO implement loading from file

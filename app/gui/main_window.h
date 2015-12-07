@@ -8,10 +8,11 @@
 #include <QThread>
 
 #include "application.h"
+#include "cameras_setup_dialog.h"
 #include "dove_eye/calibration_data.h"
 #include "dove_eye/types.h"
+#include "open_videos_dialog.h"
 #include "parameters_dialog.h"
-#include "cameras_setup_dialog.h"
 #include "widgets/calibration_status.h"
 #include "widgets/controller_status.h"
 
@@ -47,6 +48,7 @@ class MainWindow : public QMainWindow {
   void GroupDistortion(QAction *action);
   void SceneShowCameras();
   void SceneClearTrajectory();
+  void OpenVideoFiles();
   void ParametersModify();
   void ParametersLoad();
   void ParametersSave();
@@ -62,6 +64,7 @@ class MainWindow : public QMainWindow {
   QActionGroup *action_group_distortion_;
   ParametersDialog *parameters_dialog_;
   CamerasSetupDialog *cameras_setup_dialog_;
+  OpenVideosDialog *open_videos_dialog_;
 
   widgets::ControllerStatus *controller_status_;
   widgets::CalibrationStatus *calibration_status_;

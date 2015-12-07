@@ -7,12 +7,14 @@
 
 #include "config.h"
 #include "controller.h"
+#include "dove_eye/frameset.h"
 #include "dove_eye/types.h"
 #include "frameset_viewer.h"
 #include "ui_main_window.h"
 
 using dove_eye::CalibrationData;
 using dove_eye::CameraIndex;
+using dove_eye::Frameset;
 using dove_eye::Parameters;
 using gui::FramesetViewer;
 using widgets::CalibrationStatus;
@@ -26,7 +28,8 @@ MainWindow::MainWindow(Application *application, QWidget *parent)
       application_(application),
       ui_(new Ui::MainWindow),
       parameters_dialog_(new ParametersDialog(application->parameters(), this)),
-      cameras_setup_dialog_(new CamerasSetupDialog(this)) {
+      cameras_setup_dialog_(new CamerasSetupDialog(this)),
+      open_videos_dialog_(new OpenVideosDialog(this)) {
   ui_->setupUi(this);
   SetupStatusBar();
 
@@ -43,6 +46,8 @@ MainWindow::MainWindow(Application *application, QWidget *parent)
 
   /* Dialog connections */
   connect(cameras_setup_dialog_, &CamerasSetupDialog::SelectedProviders,
+          application_, &Application::Initialize);
+  connect(open_videos_dialog_, &OpenVideosDialog::SelectedProviders,
           application_, &Application::Initialize);
 
   SetupMenu();
@@ -171,6 +176,12 @@ void MainWindow::SceneClearTrajectory() {
   ui_->scene_viewer->TrajectoryClear();
 }
 
+void MainWindow::OpenVideoFiles() {
+  open_videos_dialog_->SetMaxArity(Frameset::kMaxArity);
+  open_videos_dialog_->SetProvidersContainer(application_->ProvidersContainer());
+  open_videos_dialog_->show();
+}
+
 void MainWindow::ParametersModify() {
   parameters_dialog_->LoadValues();
   parameters_dialog_->show();
@@ -256,6 +267,8 @@ void MainWindow::SetupMenu() {
           this, &MainWindow::LocalizationStart);
   connect(ui_->action_localization_stop, &QAction::triggered,
           this, &MainWindow::LocalizationStop);
+  connect(ui_->action_open_video_files, &QAction::triggered,
+          this, &MainWindow::OpenVideoFiles);
   connect(ui_->action_parameters_modify, &QAction::triggered,
           this, &MainWindow::ParametersModify);
   connect(ui_->action_parameters_load, &QAction::triggered,
