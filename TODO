@@ -5,4 +5,6 @@
 - make tracker selection in runtime, not compile time
 - offline video processing
 - video recording (concerned, isn't it mixing too much functionality?)
+- time calibration (synchronization)
+- RPM package for openSUSE (Tumbleweed?, Leap)
 

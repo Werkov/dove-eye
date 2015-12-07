@@ -121,6 +121,15 @@ With local version of libQGLViewer you need to set cmake accordingly
 
 Other libraries can be installed from packages: TODO (note -dev versions).
 
+### Gothas in openSUSE
+
+These packages are required:
+
+  * opencv-qt5-devel (must -qt5- vesion),
+  * libqt5-qtbase-devel.
+
+libQGLViewer has to be manually compiled with Qt5.
+
 ## Windows
 
 Download and install compiled binaries for OpenCV 2.4 (not 3.0),
