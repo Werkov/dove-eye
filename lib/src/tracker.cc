@@ -19,7 +19,6 @@ Tracker::Tracker(const CameraIndex arity, const InnerTracker &inner_tracker)
       positset_(arity_),
       trackstates_(arity_, kUninitialized),
       trackers_(arity_),
-      marks_(arity_),
       distorted_input_(false),
       calibration_data_(nullptr),
       location_valid_(false) {
@@ -32,65 +31,49 @@ Tracker::Tracker(const CameraIndex arity, const InnerTracker &inner_tracker)
 /**
  * @return  true when mark is accepted, false otherwise
  */
-bool Tracker::SetMark(const CameraIndex cam, const InnerTracker::Mark mark,
-                      bool project_other) {
+Positset Tracker::SetMark(const Frameset &frameset, const CameraIndex cam,
+                      const InnerTracker::Mark mark, bool project_other) {
   assert(cam < arity_);
 
-  marks_[cam] = mark;
-  positset_.SetValid(cam, false);
+  auto tracker = trackers_[cam].get();
+  auto success = tracker->InitializeTracking(frameset[cam], mark, &positset_[cam]);
+  positset_.SetValid(cam, success);
+  DEBUG("%i, %i init", cam, success);
+  if (success) {
+    trackstates_[cam] = kTracking;
+  }
 
-  trackstates_[cam] = kMarkSet;
-  project_other_ = project_other;
-
-  if (project_other) {
+  if (success && project_other) {
     for (CameraIndex o_cam = 0; o_cam < arity_; ++o_cam) {
       if (o_cam == cam) {
         continue;
       }
-      trackstates_[o_cam] = kMarkSetEpiline;
-      positset_.SetValid(o_cam, false);
-    }
+      auto epiline = CalculateEpiline(positset_[cam], cam, o_cam);
+      auto &tracker_data = trackers_[cam]->tracker_data();
+      auto o_success = trackers_[o_cam]->InitializeTracking(frameset[o_cam],
+                                                            epiline,
+                                                            tracker_data,
+                                                            &positset_[o_cam]);
+      positset_.SetValid(o_cam, o_success);
+      DEBUG("%i, %i init", o_cam, o_success);
+      if (o_success) {
+        trackstates_[o_cam] = kTracking;
+      }
 
-    marked_cam_ = cam;
+      /* All projections must succeed to accept the mark */
+      success = success && o_success;
+    }
   }
 
-  //DEBUG("%s(%i, (%f, %f), %i)", __func__, cam, mark.x, mark.y, project_other);
-  return true;
+  return positset_;
 }
 
 Positset Tracker::Track(const Frameset &frameset) {
   assert(frameset.Arity() == arity_);
 
-  /*
-   * If projection of the mark is set up, we have to process marked camera
-   * first, so that others can use its data. Once this is done only new mark
-   * can be used to project again.
-   */
-  if (project_other_ && frameset.IsValid(marked_cam_)) {
-    //DEBUG("%s, project_other set", __func__);
-    TrackSingle(marked_cam_, frameset[marked_cam_]);
-  }
-
-  bool all_projected = true;
   for (CameraIndex cam = 0; cam < arity_; ++cam) {
-    if (project_other_ && cam == marked_cam_) {
-      continue;
-    }
-    if (!frameset.IsValid(cam)) {
-      all_projected = false;
-      continue;
-    }
-
-    bool success = TrackSingle(cam, frameset[cam]);
-    all_projected = all_projected && success;
+    (void)TrackSingle(cam, frameset[cam]);
   }
-
-  /*
-   * If some cameras not succeded with projection initialization,
-   * keep projection request until next iteration
-   */
-  project_other_ = project_other_ & !all_projected;
-  //DEBUG("%s, project_other set to value %i", __func__, project_other_);
 
   return positset_;
 }
@@ -103,39 +86,6 @@ bool Tracker::TrackSingle(const CameraIndex cam, const Frame &frame) {
   switch (trackstates_[cam]) {
     case kUninitialized: {
       /* empty */
-      break;
-    }
-
-    case kMarkSet: {
-      tracker->SetMark(marks_[cam]);
-      if (tracker->InitializeTracking(frame, &positset_[cam])) {
-        trackstates_[cam] = kTracking;
-        positset_.SetValid(cam, true);
-      } else {
-        /* If initialization failed, do not change state and try next time. */
-        positset_.SetValid(cam, false);
-      }
-      break;
-    }
-
-    case kMarkSetEpiline: {
-      if (!positset_.IsValid(marked_cam_)) {
-        positset_.SetValid(cam, false);
-        trackstates_[cam] = kUninitialized;
-        break;
-      }
-
-      auto epiline = CalculateEpiline(positset_[marked_cam_], marked_cam_, cam);
-      auto &tracker_data = trackers_[marked_cam_]->tracker_data();
-
-      if (tracker->InitializeTracking(frame, epiline, tracker_data,
-                                      &positset_[cam])) {
-        trackstates_[cam] = kTracking;
-        positset_.SetValid(cam, true);
-      } else {
-        /* If initialization failed, do not change state and try next time. */
-        positset_.SetValid(cam, false);
-      }
       break;
     }
 

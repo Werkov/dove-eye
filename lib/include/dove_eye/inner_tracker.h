@@ -49,24 +49,25 @@ class InnerTracker {
   typedef Vector3 Epiline;
 
   explicit InnerTracker(const Parameters &parameters)
-      : parameters_(parameters),
-        mark_set_(false) {
+      : parameters_(parameters) {
   }
 
   virtual ~InnerTracker() {
   }
 
-  inline void SetMark(const Mark mark) {
-    mark_set_ = true;
-    mark_ = mark;
-  }
-
   virtual const TrackerData &tracker_data() const = 0;
 
-  /** Global initialization from mark */
-  virtual bool InitializeTracking(const Frame &frame, Posit *result) = 0;
+  /** Global initialization from mark
+   *
+   * Reset internal state of tracker (for stateful trackers).
+   */
+  virtual bool InitializeTracking(const Frame &frame, const Mark mark,
+                                  Posit *result) = 0;
   
-  /** Epiline initialization from other tracker's data */
+  /** Epiline initialization on epiline with other tracker's data
+   *
+   * Reset internal state of tracker (for stateful trackers).
+   */
   virtual bool InitializeTracking(
       const Frame &frame,
       const Epiline epiline,
@@ -106,21 +107,8 @@ class InnerTracker {
     return parameters_;
   }
 
-  inline const Mark &mark() const {
-    assert(mark_set());
-    return mark_;
-  }
-
-  inline bool mark_set() const {
-    return mark_set_;
-  }
-
  private:
   const Parameters &parameters_;
-
-  bool mark_set_;
-  Mark mark_;
-
 };
 
 } // namespace dove_eye

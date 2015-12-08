@@ -21,6 +21,10 @@ class Localization {
     return arity_;
   }
 
+  inline CameraIndex PositsRequired() const {
+    return 2;
+  }
+
   inline void calibration_data(const CalibrationData *value) {
     calibration_data_ = value;
   }

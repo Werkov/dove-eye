@@ -106,6 +106,14 @@ class Tuple {
     return validity_[cam];
   }
 
+  inline CameraIndex ValidCount() const {
+    CameraIndex result = 0;
+    for (CameraIndex cam = 0; cam < arity_; ++cam) {
+      result += validity_[cam] ? 1 : 0;
+    }
+    return result;
+  }
+
   inline CameraIndex Arity() const {
     return arity_;
   }

@@ -5,17 +5,16 @@
 
 namespace dove_eye {
 
-bool SearchingTracker::InitializeTracking(const Frame &frame, Posit *result) {
-  assert(mark_set());
-  
-  if (!InitTrackerData(frame.data, mark())) {
+bool SearchingTracker::InitializeTracking(const Frame &frame, const Mark mark,
+                                          Posit *result) {
+  if (!InitTrackerData(frame.data, mark)) {
     return false;
   }
 
   initialized(true);
 
   InitializeKalmanFilter();
-  const auto posit = MarkToPosit(mark());
+  const auto posit = MarkToPosit(mark);
   *result = kalman_filter().Reset(frame.timestamp, posit);
 
   return true;

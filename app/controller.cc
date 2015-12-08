@@ -70,9 +70,20 @@ void Controller::SetMark(const dove_eye::CameraIndex cam,
     project_other = true;
   }
 
-  if (tracker_->SetMark(cam, mark, project_other)) {
+  if (frameset_iterator_ == frameset_end_iterator_) {
+    return;
+  }
+
+  auto frameset = *frameset_iterator_;
+  dove_eye::Positset positset(Arity());
+
+  positset = tracker_->SetMark(frameset, cam, mark, project_other);
+  // TODO this fragment is similar to that in FramesetLoop should be refactored
+  if (positset.ValidCount() >= localization_->PositsRequired()) {
     SetMode(kTracking);
   }
+
+  DecorateFrameset(frameset, positset);
 }
 
 void Controller::SetMode(const Mode mode) {

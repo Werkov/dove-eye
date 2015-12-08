@@ -17,7 +17,8 @@ class SearchingTracker : public InnerTracker {
         initialized_(false) {
   }
 
-  bool InitializeTracking(const Frame &frame, Posit *result) override;
+  bool InitializeTracking(const Frame &frame, const Mark mark,
+                          Posit *result) override;
 
   bool InitializeTracking(
       const Frame &frame,
@@ -62,7 +63,6 @@ class SearchingTracker : public InnerTracker {
    * @param[in]   threshold    value [0,1] to accept the match (the higher, the
    *                           better)
    * @param[out]  result       mark positioned to the best match
-   * @param[out]  quality      (optional) value in [0,1], the higher the better
    *
    * @return      true if sufficient match was found, false otherwise
    */

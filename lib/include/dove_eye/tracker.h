@@ -23,8 +23,8 @@ class Tracker {
  public:
   explicit Tracker(const CameraIndex arity, const InnerTracker &inner_tracker);
 
-  bool SetMark(const CameraIndex cam, const InnerTracker::Mark mark,
-               bool project_other = false);
+  Positset SetMark(const Frameset &frameset, const CameraIndex cam,
+               const InnerTracker::Mark mark, bool project_other = false);
 
   bool SetLocation(const Location location);
 
@@ -53,8 +53,6 @@ class Tracker {
  private:
   enum TrackState {
     kUninitialized,
-    kMarkSet,
-    kMarkSetEpiline,
     kTracking,
     kLost
   };
@@ -62,7 +60,6 @@ class Tracker {
   typedef std::vector<TrackState> StateVector;
   typedef std::unique_ptr<InnerTracker> InnerTrackerPtr;
   typedef std::vector<InnerTrackerPtr> TrackerVector;
-  typedef std::vector<InnerTracker::Mark> MarkVector;
 
   const CameraIndex arity_;
   
@@ -73,14 +70,9 @@ class Tracker {
 
   TrackerVector trackers_;
 
-  MarkVector marks_;
-
   bool distorted_input_;
 
   const CalibrationData *calibration_data_;
-
-  CameraIndex marked_cam_;
-  bool project_other_;
 
   Location location_;
   bool location_valid_;
