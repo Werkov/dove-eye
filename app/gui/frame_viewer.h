@@ -22,6 +22,7 @@ class FrameViewer : public QWidget {
  public:
   explicit FrameViewer(QWidget *parent = nullptr)
       : QWidget(parent),
+        undrawn_image_(false),
         converter_(nullptr),
         pressed_(false) {
   }
@@ -42,6 +43,7 @@ class FrameViewer : public QWidget {
 
  private:
   QImage image_;
+  bool undrawn_image_;
   FramesetConverter *converter_;
   dove_eye::CameraIndex cam_;
 

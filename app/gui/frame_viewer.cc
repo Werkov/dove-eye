@@ -12,10 +12,11 @@ namespace gui {
 
 
 void FrameViewer::SetImage(const QImage &image) {
-  if (!image_.isNull()) {
+  if (undrawn_image_) {
     DEBUG("Viewer dropped a frame!");
   }
   image_ = image;
+  undrawn_image_ = true;
   update();
 }
 
@@ -31,7 +32,7 @@ void FrameViewer::paintEvent(QPaintEvent *event) {
   if (pressed_) {
     DrawMark(painter);
   }
-  image_ = QImage();
+  undrawn_image_ = false;
 }
 
 void FrameViewer::resizeEvent(QResizeEvent *event) {
@@ -50,6 +51,8 @@ void FrameViewer::mouseMoveEvent(QMouseEvent *event) {
     return;
   }
   UpdateMark(event);
+  /* This results in paintEvent() being queued. */
+  update();
 }
 
 void FrameViewer::mouseReleaseEvent(QMouseEvent *event) {
@@ -76,6 +79,8 @@ void FrameViewer::UpdateMark(QMouseEvent *event) {
   if (event->modifiers() & Qt::ShiftModifier) {
     mark_.flags |= GuiMark::kShift;
   }
+
+  update();
 }
 
 void FrameViewer::DrawMark(QPainter &painter) {
