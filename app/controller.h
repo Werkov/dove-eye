@@ -7,7 +7,7 @@
 #include <QObject>
 #include <QPoint>
 
-#include "dove_eye/async_policy.h"
+#include "dove_eye/blocking_policy.h"
 #include "dove_eye/calibration_data.h"
 #include "dove_eye/camera_calibration.h"
 #include "dove_eye/frameset_aggregator.h"
@@ -26,13 +26,19 @@ class Controller : public QObject {
   Q_OBJECT
 
  public:
-  typedef dove_eye::FramesetAggregator<dove_eye::AsyncPolicy<true>>
+  typedef dove_eye::FramesetAggregator<dove_eye::BlockingPolicy>
       Aggregator;
 
   enum Mode {
     kNonexistent,
+
+    /* Just displaying video streams */
     kIdle,
+
+    /* Using video streams for camera calibration */
     kCalibration,
+
+    /* Tracking the video data from FramesetAggregator */
     kTracking
   };
 
@@ -95,8 +101,17 @@ class Controller : public QObject {
 
   void CalibrationDataReady(const dove_eye::CalibrationData);
 
+  void Started();
+  void Paused();
+  void Finished();
+
  public slots:
-  void Start();
+  void Start(bool paused);
+  void Stop();
+
+  void Pause();
+  void Step();
+  void Resume();
 
   void SetMark(const dove_eye::CameraIndex cam, const gui::GuiMark mark);
 
@@ -141,6 +156,8 @@ class Controller : public QObject {
   std::unique_ptr<dove_eye::CameraCalibration> calibration_;
   std::unique_ptr<dove_eye::Tracker> tracker_;
   std::unique_ptr<dove_eye::Localization> localization_;
+
+  bool FramesetLoop();
 
   void DecorateFrameset(dove_eye::Frameset &frameset,
                         const dove_eye::Positset positset);

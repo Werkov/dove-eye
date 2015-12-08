@@ -4,7 +4,7 @@
 #include <thread>
 
 #include "dove_eye/cv_frame_iterator.h"
-#include "dove_eye/frame_iterator/blocking_policy.h"
+#include "dove_eye/frame_iterator/nonblocking_policy.h"
 #include "dove_eye/frame_iterator/fps_policy.h"
 
 namespace dove_eye {
@@ -17,7 +17,7 @@ FileVideoProvider::FileVideoProvider(const std::string &filename)
 
 FrameIterator FileVideoProvider::begin() {
   typedef CvFrameIterator<frame_iterator::FpsPolicy,
-                          frame_iterator::BlockingPolicy> CvIterator;
+                          frame_iterator::NonblockingPolicy> CvIterator;
 
   return FrameIterator(this, new CvIterator(filename_));
 }

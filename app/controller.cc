@@ -22,12 +22,39 @@ using std::unique_ptr;
  *
  * There's currently no stop method, controller is just destroyed
  */
-void Controller::Start() {
+void Controller::Start(bool paused) {
   frameset_iterator_ = aggregator_->begin();
   frameset_end_iterator_ = aggregator_->end();
 
   SetMode(kIdle);
+  if (paused) {
+    emit Paused();
+  } else {
+    timer_.start(0, this);
+    emit Started();
+  }
+}
+
+void Controller::Stop() {
+  timer_.stop();
+  emit Finished();
+}
+
+void Controller::Pause() {
+  timer_.stop();
+  emit Paused();
+}
+
+void Controller::Step() {
+  if (!FramesetLoop()) {
+    emit Finished();
+  }
+}
+
+void Controller::Resume() {
+  // TODO is check that aggregator didn't finish necessary ?
   timer_.start(0, this);
+  emit Started();
 }
 
 void Controller::SetMark(const dove_eye::CameraIndex cam,
@@ -107,16 +134,22 @@ void Controller::SetCalibrationData(const CalibrationData calibration_data) {
   calibration_data_.reset(new_calibration_data);
 }
 
-/** Main capture-track-localize loop
- */
 void Controller::timerEvent(QTimerEvent *event) {
   if (event->timerId() != timer_.timerId()) {
     return;
   }
 
-  if (frameset_iterator_ == frameset_end_iterator_) {
+  if (!FramesetLoop()) {
     timer_.stop();
-    return;
+    emit Finished();
+  }
+}
+
+/** Main capture-track-localize loop
+ */
+bool Controller::FramesetLoop() {
+  if (frameset_iterator_ == frameset_end_iterator_) {
+    return false;
   }
 
   auto frameset = *frameset_iterator_;
@@ -168,6 +201,7 @@ void Controller::timerEvent(QTimerEvent *event) {
   DecorateFrameset(frameset, positset);
 
   ++frameset_iterator_;
+  return true;
 }
 
 void Controller::DecorateFrameset(dove_eye::Frameset &frameset,

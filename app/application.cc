@@ -129,7 +129,8 @@ void Application::Initialize(const VideoProvidersVector &providers) {
   emit SetupPipeline();
 
   /* Asynchronously start new controller. */
-  QMetaObject::invokeMethod(controller_, "Start");
+  QMetaObject::invokeMethod(controller_, "Start",
+                            Q_ARG(bool, false));
 }
 
 void Application::SetCalibrationData(const CalibrationData calibration_data) {

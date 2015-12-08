@@ -8,3 +8,10 @@
 - time calibration (synchronization)
 - RPM package for openSUSE (Tumbleweed?, Leap)
 
+
+- offline video processing and framerate
+  - cannot obtain frames as fast as possible with GStreamer pipeline (hidden in
+    OpenCV's capture)
+  - ref: http://stackoverflow.com/q/10647388
+  - ref: gst_app_sink_pull_sample
+

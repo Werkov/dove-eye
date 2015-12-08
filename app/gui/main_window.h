@@ -15,6 +15,7 @@
 #include "parameters_dialog.h"
 #include "widgets/calibration_status.h"
 #include "widgets/controller_status.h"
+#include "widgets/playback_control.h"
 
 namespace Ui {
 class MainWindow;

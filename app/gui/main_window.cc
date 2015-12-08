@@ -19,6 +19,7 @@ using dove_eye::Parameters;
 using gui::FramesetViewer;
 using widgets::CalibrationStatus;
 using widgets::ControllerStatus;
+using widgets::PlaybackControl;
 using widgets::SceneViewer;
 
 namespace gui {
@@ -101,13 +102,31 @@ void MainWindow::SetupPipeline() {
           ui_->scene_viewer, &SceneViewer::SetLocation);
 #endif
 
-
   connect(this, &MainWindow::SetControllerMode,
           application_->controller(), &Controller::SetMode);
   connect(this, &MainWindow::SetLocalizationActive,
           application_->controller(), &Controller::SetLocalizationActive);
   connect(this, &MainWindow::SetUndistortMode,
           application_->controller(), &Controller::SetUndistortMode);
+
+  /* Controller -> PlaybackControl */
+  connect(application_->controller(), &Controller::Started,
+          ui_->playback_control, &PlaybackControl::Start);
+  connect(application_->controller(), &Controller::Paused,
+          ui_->playback_control, &PlaybackControl::Pause);
+  connect(application_->controller(), &Controller::Finished,
+          ui_->playback_control, &PlaybackControl::Finish);
+
+  /* PlaybackControl -> Controller */
+  connect(ui_->playback_control, &PlaybackControl::Started,
+          application_->controller(), &Controller::Start);
+  connect(ui_->playback_control, &PlaybackControl::Paused,
+          application_->controller(), &Controller::Pause);
+  connect(ui_->playback_control, &PlaybackControl::Resumed,
+          application_->controller(), &Controller::Resume);
+  connect(ui_->playback_control, &PlaybackControl::Stepped,
+          application_->controller(), &Controller::Step);
+
 }
 
 void MainWindow::CalibrationDataReady(const CalibrationData data) {
@@ -226,6 +245,9 @@ void MainWindow::ControllerModeChanged(const Controller::Mode mode) {
   } else {
     statusBar()->removeWidget(calibration_status_);
   }
+
+  /* Update playback control */
+  ui_->playback_control->setEnabled(mode != Controller::kNonexistent);
 }
 
 /** Called to notify status of calibration data (are they ready?)
