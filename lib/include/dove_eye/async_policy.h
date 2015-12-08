@@ -54,13 +54,15 @@ class AsyncPolicy {
   bool GetFrame(Frame *frame, CameraIndex *cam) {
     Lock lock(queue_mtx_);
 
+
+    queue_cv_.wait(lock, [&] {
+                    return queue_.size() > 0 || running_producers_ == 0;
+                   });
+
     if (running_producers_ == 0) {
       return false;
     }
 
-    queue_cv_.wait(lock, [&] {
-                    return queue_.size() > 0;
-                   });
     auto cam_frame = queue_.front();
     queue_.pop();
     queue_cv_.notify_all();
@@ -121,6 +123,7 @@ class AsyncPolicy {
       Lock lock(queue_mtx_);
       assert(running_producers_ > 0);
       running_producers_ -= 1;
+      queue_cv_.notify_all();
     }
   }
 };
