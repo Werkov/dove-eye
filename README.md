@@ -213,7 +213,7 @@ There are several threads running in the application:
   * GUI thread (the initial thread) -- it redraws basic widgets, collects and
     dispatches GUI events,
   * `Controller`'s thread -- it runs the tracking/localization pipeline,
-  * `FramesetController`'s thread -- it (asynchronously) draws frames that it
+  * `FramesetConverter`'s thread -- it (asynchronously) draws frames that it
     obtains via `Controller` from the pipeline,
   * `FramesetAggregator`'s threads -- `FramesetAggregator` runs a single thread
     for each camera, so that it's possible to grab videos from multiple streams
