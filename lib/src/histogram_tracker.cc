@@ -108,6 +108,8 @@ bool HistogramTracker::Search(
   cv::Mat hsv_mask;
   auto data_hue = PreprocessImage(data_roi, hist_data, &hsv_mask);
   const float *prange = hist_data.hrange;
+  log_mat(reinterpret_cast<size_t>(this) * 100 + 1, data_roi);
+  log_mat(reinterpret_cast<size_t>(this) * 100 + 2, hsv_mask);
 
   cv::Mat backproj;
   calcBackProject(&data_hue, 1,
@@ -116,6 +118,7 @@ bool HistogramTracker::Search(
                   backproj,
                   &prange);
 
+  log_mat(reinterpret_cast<size_t>(this) * 100 + 3, backproj);
   /* Apply HSV mask before blurring */
   backproj &= hsv_mask;
 
@@ -132,16 +135,14 @@ bool HistogramTracker::Search(
 
   /* Apply threshold */
   cv::threshold(backproj, backproj, threshold * 255, 255, cv::THRESH_BINARY);
-  log_mat(reinterpret_cast<size_t>(this) * 100 + 1, backproj);
 
   /* Apply (motion) mask */
   if (mask) {
     auto mask_roi = (*mask)(extended_roi);
     backproj &= mask_roi;
-    log_mat(reinterpret_cast<size_t>(this) * 100 + 2, backproj);
   }
 
-  log_mat(reinterpret_cast<size_t>(this) * 100 + 3, backproj);
+  log_mat(reinterpret_cast<size_t>(this) * 100 + 4, backproj);
 
   ContourVector contours;
   cv::findContours(backproj, contours,

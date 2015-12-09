@@ -60,7 +60,8 @@ void Controller::Resume() {
 void Controller::SetMark(const dove_eye::CameraIndex cam,
                          const GuiMark gui_mark) {
   if (!calibration_data_) {
-    return;
+    // TODO remove commented-out return after debuggingb
+    // return;
   }
 
   auto mark = GuiMarkToMark(gui_mark);

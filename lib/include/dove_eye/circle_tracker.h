@@ -54,7 +54,7 @@ class CircleTracker : public SearchingTracker {
     const auto f = search_factor;
     const auto &data = static_cast<const CircleData &>(tracker_data);
 
-    cv::Size new_size(data.radius * f, data.radius * f);
+    cv::Size new_size(2 * data.radius * f, 2 * data.radius * f);
     return cv::Rect(exp - 0.5 * Point2(new_size), new_size);
   }
 

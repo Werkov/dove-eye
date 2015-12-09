@@ -1,6 +1,7 @@
 #include "dove_eye/searching_tracker.h"
 
 
+#include "dove_eye/cv_logging.h"
 #include "dove_eye/logging.h"
 
 namespace dove_eye {
@@ -66,16 +67,23 @@ bool SearchingTracker::Track(const Frame &frame, Posit *result) {
   auto expected = kalman_filter().Predict(frame.timestamp);
   auto velocity = kalman_filter().PredictChange(frame.timestamp);
   const auto roi = DataToRoi(tracker_data(), expected, f);
-  DEBUG("%p->%s, expected: [%f, %f], velociy [%f, %f]",
+  bool moving = (cv::norm(velocity) > min_speed);
+  // TODO temporarily disable motion detection
+  moving = false;
+
+  DEBUG("%p->%s, expected: [%f, %f], velocity [%f, %f], moving: %i",
         this, __func__,
         expected.x, expected.y,
-        velocity.x, velocity.y);
+        velocity.x, velocity.y,
+        moving);
 
   /* Filter movement */
-  bool moving = (cv::norm(velocity) > min_speed);
   cv::Mat fg_mask;
-  /* -1: learn, 0: not learn */
-  bg_subtractor()(frame.data.clone(), fg_mask, moving ? -1 : 0);
+  /* 1: learn, 0: not learn */
+  bg_subtractor()(frame.data.clone(), fg_mask);
+
+  log_mat(reinterpret_cast<size_t>(this) * 1000 + 42, fg_mask);
+
   auto fg_mask_ptr = moving ? &fg_mask : nullptr;
 
   /* Search for object */
