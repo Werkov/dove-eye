@@ -65,5 +65,17 @@ void FramesetViewer::SetImageset(
   }
 }
 
+void FramesetViewer::SetPositset(const dove_eye::Positset positset) {
+  assert(arity_ == positset.Arity());
+
+  for (CameraIndex cam = 0; cam < arity_; ++cam) {
+    if (positset.IsValid(cam)) {
+      viewers_[cam]->SetPosit(positset[cam]);
+    } else {
+      viewers_[cam]->UnsetPosit();
+    }
+  }
+}
+
 } // namespace gui
 

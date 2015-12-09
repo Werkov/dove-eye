@@ -210,6 +210,8 @@ void Application::SetupConverter() {
 
   QObject::connect(controller_, &Controller::FramesetReady,
                    converter_, &FramesetConverter::ProcessFrameset);
+  QObject::connect(controller_, &Controller::PositsetReady,
+                   converter_, &FramesetConverter::ProcessPositset);
   QObject::connect(converter_, &FramesetConverter::MarkCreated,
                    controller_, &Controller::SetMark);
 

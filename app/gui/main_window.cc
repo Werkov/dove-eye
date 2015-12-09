@@ -80,6 +80,8 @@ void MainWindow::SetupPipeline() {
   /* Connect new converter */
   connect(application_->converter(), &FramesetConverter::ImagesetReady,
                    ui_->viewer, &FramesetViewer::SetImageset);
+  connect(application_->converter(), &FramesetConverter::PositsetReady,
+                   ui_->viewer, &FramesetViewer::SetPositset);
 
   /* Connect new controller
    * Note the controller is running its own thread, therefore any communication

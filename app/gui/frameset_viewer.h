@@ -36,6 +36,8 @@ class FramesetViewer : public QWidget {
  public slots:
   void SetImageset(const FramesetConverter::ImageList &image_list);
 
+  void SetPositset(const dove_eye::Positset positset);
+
  private:
   dove_eye::CameraIndex arity_;
   QVector<FrameViewer *> viewers_;

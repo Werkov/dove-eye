@@ -7,6 +7,7 @@
 #include <QResizeEvent>
 #include <QWidget>
 
+#include "dove_eye/positset.h"
 #include "dove_eye/types.h"
 #include "frameset_converter.h"
 
@@ -23,6 +24,7 @@ class FrameViewer : public QWidget {
   explicit FrameViewer(QWidget *parent = nullptr)
       : QWidget(parent),
         undrawn_image_(false),
+        has_posit_(false),
         converter_(nullptr),
         pressed_(false) {
   }
@@ -31,6 +33,8 @@ class FrameViewer : public QWidget {
 
  public slots:
   void SetImage(const QImage &image);
+  void SetPosit(const dove_eye::Posit posit);
+  void UnsetPosit();
 
  protected:
   void paintEvent(QPaintEvent *event) override;
@@ -44,6 +48,10 @@ class FrameViewer : public QWidget {
  private:
   QImage image_;
   bool undrawn_image_;
+  
+  dove_eye::Posit posit_;
+  bool has_posit_;
+
   FramesetConverter *converter_;
   dove_eye::CameraIndex cam_;
 
@@ -55,6 +63,8 @@ class FrameViewer : public QWidget {
   void UpdateMark(QMouseEvent *event);
 
   void DrawMark(QPainter &painter);
+
+  void DrawPosit(QPainter &painter);
 };
 
 } // namespace gui

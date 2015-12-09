@@ -159,9 +159,6 @@ class Controller : public QObject {
 
   bool FramesetLoop();
 
-  void DecorateFrameset(dove_eye::Frameset &frameset,
-                        const dove_eye::Positset positset);
-
   void CalibrationDataToProviders(
       const dove_eye::CalibrationData *calibration_data);
 

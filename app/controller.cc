@@ -79,11 +79,11 @@ void Controller::SetMark(const dove_eye::CameraIndex cam,
 
   positset = tracker_->SetMark(frameset, cam, mark, project_other);
   // TODO this fragment is similar to that in FramesetLoop should be refactored
-  if (positset.ValidCount() >= localization_->PositsRequired()) {
+  if (positset.ValidCount() > 0) {
     SetMode(kTracking);
   }
 
-  DecorateFrameset(frameset, positset);
+  emit PositsetReady(positset);
 }
 
 void Controller::SetMode(const Mode mode) {
@@ -209,28 +209,10 @@ bool Controller::FramesetLoop() {
   }
 
 
-  DecorateFrameset(frameset, positset);
+  emit FramesetReady(*frameset_iterator_);
 
   ++frameset_iterator_;
   return true;
-}
-
-void Controller::DecorateFrameset(dove_eye::Frameset &frameset,
-                                  const dove_eye::Positset positset) {
-  for (CameraIndex cam = 0; cam < frameset.Arity(); ++cam) {
-    if (!frameset.IsValid(cam)) {
-      continue;
-    }
-
-    if (positset.IsValid(cam)) {
-      cv::circle(frameset[cam].data, positset[cam],
-                 parameters_.Get(Parameters::TEMPLATE_RADIUS),
-                 cv::Scalar(0, 0, 255),
-                 3);
-    }
-  }
-
-  emit FramesetReady(*frameset_iterator_);
 }
 
 void Controller::CalibrationDataToProviders(
