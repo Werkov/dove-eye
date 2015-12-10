@@ -40,7 +40,7 @@ bool TemplateTracker::InitTrackerData(const cv::Mat &data, const Mark &mark) {
  */
 bool TemplateTracker::Search(
       const cv::Mat &data,
-      const TrackerData &tracker_data,
+      TrackerData &tracker_data,
       const cv::Rect *roi,
       const cv::Mat *mask,
       const double threshold,

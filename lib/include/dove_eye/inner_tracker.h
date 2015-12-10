@@ -57,6 +57,8 @@ class InnerTracker {
 
   virtual const TrackerData &tracker_data() const = 0;
 
+  virtual TrackerData &tracker_data() = 0;
+
   /** Global initialization from mark
    *
    * Reset internal state of tracker (for stateful trackers).

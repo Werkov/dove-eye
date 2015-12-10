@@ -18,52 +18,7 @@ namespace dove_eye {
 
 bool CircleTracker::InitTrackerData(const cv::Mat &data, const Mark &mark) {
   assert(mark.type == Mark::kCircle);
-  const double inner = 0.707; /* sqrt(0.5) is relative size of inscribed square */
-
-  /* Take data from the inner part of the circle only */
-  Point2 rad(mark.radius, mark.radius);
-  cv::Rect roi(mark.center - rad * inner, mark.center + rad * inner);
- 
-  /* Ensure the size of mark doesn't extend size of the image */
-  cv::Rect boundary(0, 0, data.cols, data.rows);
-  cv::Rect safe_roi = roi & boundary;
-
-  /* Calculate histogram of hue values */
-  cv::Mat hsv;
-  cvtColor(data(safe_roi), hsv, cv::COLOR_BGR2HSV);
-  cv::Mat hsv_components[3];
-  cv::split(hsv, hsv_components);
-
-  minMaxLoc(hsv_components[1], &data_.srange[0], &data_.srange[1]);
-  minMaxLoc(hsv_components[2], &data_.vrange[0], &data_.vrange[1]);
-
-  DEBUG("sat: %f:%f\tval: %f:%f",
-        data_.srange[0],
-        data_.srange[1],
-        data_.vrange[0],
-        data_.vrange[1]);
-
-  cv::Mat hue(hsv.size(), hsv.depth());
-  const float *prange = data_.hrange;
-  cv::calcHist(&hsv_components[0],
-           1, /* no. of images */
-           nullptr, /* channels, can be nullptr when dims == no. of images */
-           cv::Mat(), /* mask */
-           data_.histogram,
-           1, /* dims */
-           &data_.histogram_size,
-           &prange);
-
-  normalize(data_.histogram, data_.histogram, 0, 255, CV_MINMAX);
-
-#ifdef CONFIG_DEBUG_HIGHGUI
-  log_color_hist(reinterpret_cast<size_t>(this) * 100 + 10,
-                 data_.histogram, data_.histogram_size);
-#endif
-
-  /* Mark down the radius */
-  data_.radius = mark.radius;
-  return true;
+  return UpdateData(data_, data, mark);
 }
 
 /** Use Hough transform to find best matching circle
@@ -72,12 +27,13 @@ bool CircleTracker::InitTrackerData(const cv::Mat &data, const Mark &mark) {
  */
 bool CircleTracker::Search(
       const cv::Mat &data,
-      const TrackerData &tracker_data,
+      TrackerData &tracker_data,
       const cv::Rect *roi,
       const cv::Mat *mask,
       const double threshold,
       Mark *result) const {
-  const CircleData &circle_data = static_cast<const CircleData &>(tracker_data);
+  CircleData &circle_data = static_cast<CircleData &>(tracker_data);
+  const double radius_factor = 1.5;
 
   auto extended_roi = cv::Rect(cv::Point(0, 0), data.size());
   if (roi) {
@@ -99,23 +55,75 @@ bool CircleTracker::Search(
                2, // accumulator ratio (to original image resolution)
                data_proc.rows / 2, //minDist between centers of circles
                10, //param1 (Canny threshold)
-               50, //param2 (accumulator threshold)
-               2, //minRadius
-               data_proc.rows / 2); // maxRadius
+               25, //param2 (accumulator threshold)
+               circle_data.radius / radius_factor, //minRadius
+               circle_data.radius * radius_factor); // maxRadius
 
 
   /* (Motion) mask is ignored. */
 
-
-  if (!CirclesToMark(data_proc, circles, result)) {
-    DEBUG("%s no-circles", __func__);
-    return false;
-  }
-
+  auto score = CirclesToMark(data_proc, circles, result);
+  DEBUG("%s score: %f", __func__, score);
+  
   /* Apply ROI offset */
   result->center.x += extended_roi.tl().x;
   result->center.y += extended_roi.tl().y;
 
+  if (score < 1e-9) {
+    DEBUG("%s no-circles", __func__);
+    return false;
+  } else if (score > 0.4) {
+    UpdateData(circle_data, data, *result);
+  }
+
+  return true;
+}
+
+bool CircleTracker::UpdateData(CircleData &circle_data, const cv::Mat &data,
+                  const Mark &mark) const {
+  /* Take data from the inner part of the circle only */
+  Point2 rad(mark.radius, mark.radius);
+  cv::Rect roi(mark.center - rad, mark.center + rad);
+ 
+  /* Ensure the size of mark doesn't extend size of the image */
+  cv::Rect boundary(0, 0, data.cols, data.rows);
+  cv::Rect safe_roi = roi & boundary;
+
+  /* Calculate histogram of hue values */
+  cv::Mat hsv;
+  cvtColor(data(safe_roi), hsv, cv::COLOR_BGR2HSV);
+  cv::Mat hsv_components[3];
+  cv::split(hsv, hsv_components);
+
+  minMaxLoc(hsv_components[1], &circle_data.srange[0], &circle_data.srange[1]);
+  minMaxLoc(hsv_components[2], &circle_data.vrange[0], &circle_data.vrange[1]);
+
+  DEBUG("sat: %f:%f\tval: %f:%f",
+        circle_data.srange[0],
+        circle_data.srange[1],
+        circle_data.vrange[0],
+        circle_data.vrange[1]);
+
+  cv::Mat hue(hsv.size(), hsv.depth());
+  const float *prange = circle_data.hrange;
+  cv::calcHist(&hsv_components[0],
+           1, /* no. of images */
+           nullptr, /* channels, can be nullptr when dims == no. of images */
+           cv::Mat(), /* mask */
+           circle_data.histogram,
+           1, /* dims */
+           &circle_data.histogram_size,
+           &prange);
+
+  normalize(circle_data.histogram, circle_data.histogram, 0, 255, CV_MINMAX);
+
+#ifdef CONFIG_DEBUG_HIGHGUI
+  log_color_hist(reinterpret_cast<size_t>(this) * 100 + 10,
+                 circle_data.histogram, circle_data.histogram_size);
+#endif
+
+  /* Mark down the radius */
+  circle_data.radius = mark.radius;
   return true;
 }
 
@@ -166,7 +174,10 @@ cv::Mat CircleTracker::PreprocessImage(const cv::Mat &data,
   return backproj;
 }
 
-bool CircleTracker::CirclesToMark(
+/**
+ * @return Match score [0, 1] of the best circle (0 for none)
+ */
+double CircleTracker::CirclesToMark(
     const cv::Mat &data,
     const CircleVector &circles,
     Mark *mark) const {
@@ -202,7 +213,10 @@ bool CircleTracker::CirclesToMark(
   }
 
   if (best_idx < 0) {
-    return false;
+#ifdef CONFIG_DEBUG_HIGHGUI
+    log_mat(reinterpret_cast<size_t>(this) * 100 + 3, circ_mat);
+#endif
+    return 0;
   }
 
   /* Compose answer */
@@ -211,11 +225,14 @@ bool CircleTracker::CirclesToMark(
   mark->center = Point2(circle[0], circle[1]);
   mark->radius = circle[2];
 
+
 #ifdef CONFIG_DEBUG_HIGHGUI
   cv::circle(circ_mat, mark->center, mark->radius, cv::Scalar(100, 255, 0), 2);
   log_mat(reinterpret_cast<size_t>(this) * 100 + 3, circ_mat);
 #endif
-  return true;
+
+  /* Normalize score */
+  return best / 255;
 }
 
 } // namespace dove_eye

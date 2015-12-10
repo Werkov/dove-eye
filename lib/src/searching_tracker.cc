@@ -37,7 +37,8 @@ bool SearchingTracker::InitializeTracking(
   const auto thr = parameters().Get(Parameters::SEARCH_THRESHOLD);
 
   Mark match_mark;
-  if (!Search(frame.data, tracker_data, nullptr, &epiline_mask, thr,
+  // TODO Remove non-const cast! Do it properly when projection is working
+  if (!Search(frame.data, (TrackerData &)tracker_data, nullptr, &epiline_mask, thr,
               &match_mark)) {
     return false;
   }

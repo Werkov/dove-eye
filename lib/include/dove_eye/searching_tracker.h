@@ -68,7 +68,7 @@ class SearchingTracker : public InnerTracker {
    */
   virtual bool Search(
       const cv::Mat &data,
-      const TrackerData &tracker_data,
+      TrackerData &tracker_data,
       const cv::Rect *roi,
       const cv::Mat *mask,
       const double threshold,

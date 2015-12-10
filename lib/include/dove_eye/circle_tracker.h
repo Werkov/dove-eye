@@ -36,6 +36,10 @@ class CircleTracker : public SearchingTracker {
     return data_;
   }
  
+  inline TrackerData &tracker_data() override {
+    return data_;
+  }
+
   InnerTracker *Clone() const override {
     assert(!initialized());
 
@@ -47,7 +51,7 @@ class CircleTracker : public SearchingTracker {
 
   bool Search(
       const cv::Mat &data,
-      const TrackerData &tracker_data,
+      TrackerData &tracker_data,
       const cv::Rect *roi,
       const cv::Mat *mask,
       const double threshold,
@@ -73,11 +77,14 @@ class CircleTracker : public SearchingTracker {
 
   CircleData data_;
   
+  bool UpdateData(CircleData &circle_data, const cv::Mat &data,
+                  const Mark &mark) const;
+
   cv::Mat PreprocessImage(const cv::Mat &data,
-                          const CircleData &hist_data,
+                          const CircleData &circle_data,
                           const double threshold) const;
 
-  bool CirclesToMark(const cv::Mat& data,
+  double CirclesToMark(const cv::Mat& data,
                      const CircleVector &circles,
                      Mark *mark) const;
 };

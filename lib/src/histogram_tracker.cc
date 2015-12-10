@@ -78,7 +78,7 @@ bool HistogramTracker::InitTrackerData(const cv::Mat &data, const Mark &mark) {
  */
 bool HistogramTracker::Search(
       const cv::Mat &data,
-      const TrackerData &tracker_data,
+      TrackerData &tracker_data,
       const cv::Rect *roi,
       const cv::Mat *mask,
       const double threshold,

@@ -37,6 +37,10 @@ class HistogramTracker : public SearchingTracker {
     return data_;
   }
  
+  inline TrackerData &tracker_data() override {
+    return data_;
+  }
+ 
   InnerTracker *Clone() const override {
     assert(!initialized());
 
@@ -48,7 +52,7 @@ class HistogramTracker : public SearchingTracker {
 
   bool Search(
       const cv::Mat &data,
-      const TrackerData &tracker_data,
+      TrackerData &tracker_data,
       const cv::Rect *roi,
       const cv::Mat *mask,
       const double threshold,
