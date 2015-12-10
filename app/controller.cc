@@ -65,7 +65,6 @@ void Controller::SetMark(const dove_eye::CameraIndex cam,
   }
 
   auto mark = GuiMarkToMark(gui_mark);
-
   bool project_other = false;
   if (gui_mark.flags & GuiMark::kCtrl) {
     project_other = true;
@@ -244,7 +243,7 @@ InnerTracker::Mark Controller::GuiMarkToMark(const GuiMark &gui_mark) const {
         /* Inscribed circle */
         mark.center.x = gui_mark.TopLeft().x() + gui_mark.Size().width() / 2;
         mark.center.y = gui_mark.TopLeft().y() + gui_mark.Size().height() / 2;
-        mark.radius = std::min(gui_mark.Size().width(), gui_mark.Size().height());
+        mark.radius = std::min(gui_mark.Size().width(), gui_mark.Size().height()) / 2;
       }
       
       return mark;

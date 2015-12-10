@@ -50,8 +50,8 @@ void FramesetConverter::PropagateMark(const dove_eye::CameraIndex cam,
 
   /* Check boundaries, assume zero-based indexing */
   QRect frame_rect(0, 0, frame_size.width(), frame_size.height());
-  if (frame_rect.contains(new_mark.press_pos, true) &&
-      frame_rect.contains(new_mark.release_pos, true)) {
+  if (frame_rect.contains(new_mark.press_pos) &&
+      frame_rect.contains(new_mark.release_pos)) {
     emit MarkCreated(cam, new_mark);
   }
 }
