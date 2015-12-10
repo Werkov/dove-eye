@@ -42,12 +42,18 @@ void FileSelector::SetLabel(const QString &label) {
 
 void FileSelector::ClearClicked() {
   ui_->txt_filename->setText("");
+  ui_->btn_clear->hide();
+  ui_->btn_select->show();
 }
 
 void FileSelector::SelectClicked() {
   auto filename = QFileDialog::getOpenFileName(this, tr("Open file"), "",
                                                tr("All files (*)"));
   ui_->txt_filename->setText(filename);
+  if (!filename.isNull()) {
+    ui_->btn_select->hide();
+    ui_->btn_clear->show();
+  }
 }
 
 } // end namespace widgets
