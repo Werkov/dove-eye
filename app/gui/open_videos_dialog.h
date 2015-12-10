@@ -28,7 +28,8 @@ class OpenVideosDialog : public QDialog {
   void SetProvidersContainer(Application::VideoProvidersVectorOwning *ptr);
 
  signals:
-  void SelectedProviders(const Application::VideoProvidersVector &providers) const;
+  void SelectedProviders(const Application::ProvidersType type,
+                         const Application::VideoProvidersVector &providers) const;
 
  private slots:
   void OnAccepted() const;

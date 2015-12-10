@@ -3,16 +3,23 @@
 #include <QMetaObject>
 #include <QtDebug>
 
+#include "dove_eye/aggregator.h"
+#include "dove_eye/async_policy.h"
+#include "dove_eye/blocking_policy.h"
 #include "dove_eye/camera_calibration.h"
 #include "dove_eye/camera_video_provider.h"
 #include "dove_eye/circle_tracker.h"
 #include "dove_eye/chessboard_pattern.h"
 #include "dove_eye/frameset.h"
+#include "dove_eye/frameset_aggregator.h"
 #include "dove_eye/histogram_tracker.h"
 #include "dove_eye/template_tracker.h"
 #include "dove_eye/tracker.h"
 #include "metatypes.h"
 
+using dove_eye::Aggregator;
+using dove_eye::AsyncPolicy;
+using dove_eye::BlockingPolicy;
 using dove_eye::CalibrationData;
 using dove_eye::CameraCalibration;
 using dove_eye::CameraIndex;
@@ -87,6 +94,7 @@ Application::VideoProvidersVector Application::AvailableVideoProviders() {
 }
 
 void Application::InitializeEmpty() {
+  providers_type_ = kNoProviders;
   available_providers_.clear();
 
   arity_ = 0;
@@ -96,8 +104,9 @@ void Application::InitializeEmpty() {
   emit SetupPipeline();
 }
 
-void Application::Initialize(const VideoProvidersVector &providers) {
-  VideoProvidersContainer used_providers;
+void Application::Initialize(const ProvidersType type,
+                             const VideoProvidersVector &providers) {
+  providers_type_ = type;
 
   /*
    * We should obtain a subset of providers that exist in available_providers_.
@@ -105,6 +114,7 @@ void Application::Initialize(const VideoProvidersVector &providers) {
    * dispose remaining providers (by clearing available_providers_).
    *
    */
+  VideoProvidersContainer used_providers;
   for (auto provider : providers) {
     bool released = false;
     for (auto &provider_owner : available_providers_) {
@@ -123,14 +133,15 @@ void Application::Initialize(const VideoProvidersVector &providers) {
   /* Setup components */
   arity_ = used_providers.size();
 
-  SetupController(std::move(used_providers));
+  SetupController(type, std::move(used_providers));
   SetupConverter();
 
   emit SetupPipeline();
 
   /* Asynchronously start new controller. */
+  bool paused = (type != kCameras);
   QMetaObject::invokeMethod(controller_, "Start",
-                            Q_ARG(bool, false));
+                            Q_ARG(bool, paused));
 }
 
 void Application::SetCalibrationData(const CalibrationData calibration_data) {
@@ -168,10 +179,25 @@ void Application::MoveToThread(QObject* object, QThread* thread) {
 }
 
 
-void Application::SetupController(VideoProvidersContainer &&providers) {
+void Application::SetupController(const ProvidersType type,
+                                  VideoProvidersContainer &&providers) {
   assert(providers.size() > 0);
 
-  auto aggregator = new Controller::Aggregator(std::move(providers), parameters_);
+  Aggregator *aggregator = nullptr;
+  switch (type) {
+    case kCameras:
+      aggregator = new dove_eye::FramesetAggregator<AsyncPolicy<true>>(
+          std::move(providers), parameters_);
+      break;
+    case kVideoFiles:
+      aggregator = new dove_eye::FramesetAggregator<BlockingPolicy>(
+          std::move(providers), parameters_);
+      break;
+    case kNoProviders:
+      assert(false);
+      break;
+  }
+
 
   auto pattern = new ChessboardPattern(
       parameters_.Get(Parameters::CALIBRATION_ROWS),

@@ -21,7 +21,8 @@ class CamerasSetupDialog : public QDialog {
   ~CamerasSetupDialog() override;
 
  signals:
-  void SelectedProviders(const Application::VideoProvidersVector &providers) const;
+  void SelectedProviders(const Application::ProvidersType type,
+                         const Application::VideoProvidersVector &providers) const;
 
  public slots:
   void SetProviders(const Application::VideoProvidersVector &providers);

@@ -73,7 +73,7 @@ void CamerasSetupDialog::OnAccepted() const {
     }
   }
 
-  emit SelectedProviders(result);
+  emit SelectedProviders(Application::kCameras, result);
 }
 
 } // end namespace gui

@@ -10,6 +10,7 @@
 #include <QThread>
 
 #include "controller.h"
+#include "dove_eye/aggregator.h"
 #include "dove_eye/calibration_data.h"
 #include "dove_eye/parameters.h"
 #include "dove_eye/localization.h"
@@ -29,7 +30,13 @@ class Application : public QObject {
   typedef std::vector<dove_eye::VideoProvider *> VideoProvidersVector;
   typedef std::vector<std::unique_ptr<dove_eye::VideoProvider>>
       VideoProvidersVectorOwning;
-  typedef Controller::Aggregator::ProvidersContainer VideoProvidersContainer;
+  typedef dove_eye::Aggregator::ProvidersContainer VideoProvidersContainer;
+
+  enum ProvidersType {
+    kNoProviders,
+    kCameras,
+    kVideoFiles
+  };
 
   Application();
 
@@ -37,6 +44,10 @@ class Application : public QObject {
 
   inline dove_eye::CameraIndex Arity() const {
     return arity_;
+  }
+
+  inline ProvidersType providers_type() const {
+    return providers_type_;
   }
 
   inline dove_eye::Parameters &parameters() {
@@ -79,13 +90,15 @@ class Application : public QObject {
 
   void InitializeEmpty();
 
-  void Initialize(const VideoProvidersVector &providers);
+  void Initialize(const ProvidersType type,
+                  const VideoProvidersVector &providers);
 
   void SetCalibrationData(const dove_eye::CalibrationData calibration_data);
 
  private:
   dove_eye::CameraIndex arity_;
   dove_eye::Parameters parameters_;
+  ProvidersType providers_type_;
   VideoProvidersVectorOwning available_providers_;
   std::unique_ptr<dove_eye::CalibrationData> calibration_data_;
 
@@ -102,7 +115,8 @@ class Application : public QObject {
   void MoveToNewThread(QObject* object);
   void MoveToThread(QObject* object, QThread* thread);
 
-  void SetupController(VideoProvidersContainer &&providers);
+  void SetupController(const ProvidersType type,
+                       VideoProvidersContainer &&providers);
   void TeardownController();
   void SetupConverter();
   void TeardownConverter();

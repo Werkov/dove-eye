@@ -249,7 +249,9 @@ void MainWindow::ControllerModeChanged(const Controller::Mode mode) {
   }
 
   /* Update playback control */
-  ui_->playback_control->setEnabled(mode != Controller::kNonexistent);
+  ui_->playback_control->setEnabled(
+      application_->providers_type() == Application::kVideoFiles
+      && mode != Controller::kNonexistent);
 }
 
 /** Called to notify status of calibration data (are they ready?)

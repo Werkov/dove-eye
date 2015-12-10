@@ -90,7 +90,7 @@ void OpenVideosDialog::OnAccepted() const {
   }
 
   if (!has_error && !result.empty()) {
-    emit SelectedProviders(result);
+    emit SelectedProviders(Application::kVideoFiles, result);
   }
   /*
    * If we don't emit, providers are still stored in application's owning

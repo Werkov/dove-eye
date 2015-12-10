@@ -7,10 +7,9 @@
 #include <QObject>
 #include <QPoint>
 
-#include "dove_eye/blocking_policy.h"
+#include "dove_eye/aggregator.h"
 #include "dove_eye/calibration_data.h"
 #include "dove_eye/camera_calibration.h"
-#include "dove_eye/frameset_aggregator.h"
 #include "dove_eye/localization.h"
 #include "dove_eye/parameters.h"
 #include "dove_eye/tracker.h"
@@ -26,9 +25,6 @@ class Controller : public QObject {
   Q_OBJECT
 
  public:
-  typedef dove_eye::FramesetAggregator<dove_eye::BlockingPolicy>
-      Aggregator;
-
   enum Mode {
     kNonexistent,
 
@@ -57,7 +53,7 @@ class Controller : public QObject {
    * @note Controller takes ownership of all ctor arguments given by pointer
    */
   Controller(dove_eye::Parameters &parameters,
-             Aggregator *aggregator,
+             dove_eye::Aggregator *aggregator,
              dove_eye::CameraCalibration *calibration,
              dove_eye::Tracker *tracker,
              dove_eye::Localization *localization)
@@ -149,10 +145,10 @@ class Controller : public QObject {
 
 
   QBasicTimer timer_;
-  Aggregator::Iterator frameset_iterator_;
-  Aggregator::Iterator frameset_end_iterator_;
+  dove_eye::Aggregator::Iterator frameset_iterator_;
+  dove_eye::Aggregator::Iterator frameset_end_iterator_;
 
-  std::unique_ptr<Aggregator> aggregator_;
+  std::unique_ptr<dove_eye::Aggregator> aggregator_;
   std::unique_ptr<dove_eye::CameraCalibration> calibration_;
   std::unique_ptr<dove_eye::Tracker> tracker_;
   std::unique_ptr<dove_eye::Localization> localization_;
