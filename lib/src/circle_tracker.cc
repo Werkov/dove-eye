@@ -37,6 +37,11 @@ bool CircleTracker::InitTrackerData(const cv::Mat &data, const Mark &mark) {
   minMaxLoc(hsv_components[1], &data_.srange[0], &data_.srange[1]);
   minMaxLoc(hsv_components[2], &data_.vrange[0], &data_.vrange[1]);
 
+  DEBUG("sat: %f:%f\tval: %f:%f",
+        data_.srange[0],
+        data_.srange[1],
+        data_.vrange[0],
+        data_.vrange[1]);
 
   cv::Mat hue(hsv.size(), hsv.depth());
   const float *prange = data_.hrange;
@@ -101,15 +106,6 @@ bool CircleTracker::Search(
 
   /* (Motion) mask is ignored. */
 
-#ifdef CONFIG_DEBUG_HIGHGUI
-  auto circ_mat = data_roi.clone();
-  for (auto circle : circles) {
-    Point2 center(circle[0], circle[1]);
-    double radius(circle[2]);
-    cv::circle(circ_mat, center, radius, cv::Scalar(255, 100, 0), 2);
-  }
-  log_mat(reinterpret_cast<size_t>(this) * 100 + 3, circ_mat);
-#endif
 
   if (!CirclesToMark(data_proc, circles, result)) {
     DEBUG("%s no-circles", __func__);
@@ -155,6 +151,16 @@ cv::Mat CircleTracker::PreprocessImage(const cv::Mat &data,
                   backproj,
                   &prange);
 
+  /* Crop it with to known boundaries only */
+  cv::Mat mask;
+  cv::inRange(hsv,
+        Scalar(circle_data.hrange[0], circle_data.srange[0],
+               circle_data.vrange[0]),
+        Scalar(circle_data.hrange[1], circle_data.srange[1],
+               circle_data.vrange[1]),
+        mask);
+  backproj &= mask;
+
   /* Denoise */
   cv::GaussianBlur(backproj, backproj, blur_size, 0);
   return backproj;
@@ -164,6 +170,10 @@ bool CircleTracker::CirclesToMark(
     const cv::Mat &data,
     const CircleVector &circles,
     Mark *mark) const {
+
+#ifdef CONFIG_DEBUG_HIGHGUI
+  auto circ_mat = data.clone();
+#endif
 
   /*
    * If there are multiple cirles detected, use the one whose area has biggest
@@ -185,6 +195,10 @@ bool CircleTracker::CirclesToMark(
       best = mean[0];
       best_idx = i;
     }
+#ifdef CONFIG_DEBUG_HIGHGUI
+    DEBUG("%s: circle mean: %f", __func__, mean[0]);
+    cv::circle(circ_mat, center, radius, cv::Scalar(255, 100, 0), 2);
+#endif
   }
 
   if (best_idx < 0) {
@@ -197,6 +211,10 @@ bool CircleTracker::CirclesToMark(
   mark->center = Point2(circle[0], circle[1]);
   mark->radius = circle[2];
 
+#ifdef CONFIG_DEBUG_HIGHGUI
+  cv::circle(circ_mat, mark->center, mark->radius, cv::Scalar(100, 255, 0), 2);
+  log_mat(reinterpret_cast<size_t>(this) * 100 + 3, circ_mat);
+#endif
   return true;
 }
 

@@ -12,7 +12,7 @@ namespace dove_eye {
 class CircleTracker : public SearchingTracker {
  public:
   struct CircleData : public TrackerData {
-    const int histogram_size = 16;
+    const int histogram_size = 32;
     /* Hue range is float because of calcBackProject API */
     float hrange[2];
     double srange[2];
