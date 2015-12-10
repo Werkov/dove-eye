@@ -12,11 +12,20 @@ namespace dove_eye {
 class CircleTracker : public SearchingTracker {
  public:
   struct CircleData : public TrackerData {
-    double hrange[2];
+    const int histogram_size = 16;
+    /* Hue range is float because of calcBackProject API */
+    float hrange[2];
     double srange[2];
     double vrange[2];
 
+    cv::Mat histogram;
     double radius;
+
+    CircleData() {
+      /* Because of MSVC bug with error C2536, use struct ctor. */
+      hrange[0] = 0;
+      hrange[1] = 180;
+    }
   };
 
   explicit CircleTracker(const Parameters &parameters)
@@ -68,7 +77,8 @@ class CircleTracker : public SearchingTracker {
                           const CircleData &hist_data,
                           const double threshold) const;
 
-  bool CirclesToMark(const CircleVector &contours,
+  bool CirclesToMark(const cv::Mat& data,
+                     const CircleVector &circles,
                      Mark *mark) const;
 };
 
