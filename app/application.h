@@ -86,7 +86,8 @@ class Application : public QObject {
   void CalibrationDataReady(const dove_eye::CalibrationData);
 
  public slots:
-  VideoProvidersVector AvailableVideoProviders();
+  VideoProvidersVector ScanCameraProviders();
+  void ReleaseAvailableProviders();
 
   void InitializeEmpty();
 

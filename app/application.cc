@@ -58,7 +58,7 @@ Application::~Application() {
   }
 }
 
-Application::VideoProvidersVector Application::AvailableVideoProviders() {
+Application::VideoProvidersVector Application::ScanCameraProviders() {
   InitializeEmpty();
 
   assert(available_providers_.size() == 0);
@@ -91,6 +91,11 @@ Application::VideoProvidersVector Application::AvailableVideoProviders() {
     result.push_back(provider.get());
   }
   return result;
+}
+
+void Application::ReleaseAvailableProviders() {
+  InitializeEmpty();
+  available_providers_.clear();
 }
 
 void Application::InitializeEmpty() {

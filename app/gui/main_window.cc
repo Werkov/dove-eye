@@ -48,6 +48,8 @@ MainWindow::MainWindow(Application *application, QWidget *parent)
   /* Dialog connections */
   connect(cameras_setup_dialog_, &CamerasSetupDialog::SelectedProviders,
           application_, &Application::Initialize);
+  connect(cameras_setup_dialog_, &CamerasSetupDialog::rejected,
+          application_, &Application::ReleaseAvailableProviders);
   connect(open_videos_dialog_, &OpenVideosDialog::SelectedProviders,
           application_, &Application::Initialize);
 
@@ -198,6 +200,7 @@ void MainWindow::SceneClearTrajectory() {
 }
 
 void MainWindow::OpenVideoFiles() {
+  application_->InitializeEmpty();
   open_videos_dialog_->SetMaxArity(Frameset::kMaxArity);
   open_videos_dialog_->SetProvidersContainer(application_->ProvidersContainer());
   open_videos_dialog_->show();
@@ -227,7 +230,7 @@ void MainWindow::ParametersSave() {
 }
 
 void MainWindow::SetupCameras() {
-  cameras_setup_dialog_->SetProviders(application_->AvailableVideoProviders());
+  cameras_setup_dialog_->SetProviders(application_->ScanCameraProviders());
   cameras_setup_dialog_->show();
 }
 
