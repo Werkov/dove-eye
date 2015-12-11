@@ -60,8 +60,7 @@ void Controller::Resume() {
 void Controller::SetMark(const dove_eye::CameraIndex cam,
                          const GuiMark gui_mark) {
   if (!calibration_data_) {
-    // TODO remove commented-out return after debuggingb
-    // return;
+    return;
   }
 
   auto mark = GuiMarkToMark(gui_mark);
@@ -74,16 +73,9 @@ void Controller::SetMark(const dove_eye::CameraIndex cam,
     return;
   }
 
-  auto frameset = *frameset_iterator_;
-  dove_eye::Positset positset(Arity());
-
-  positset = tracker_->SetMark(frameset, cam, mark, project_other);
-  // TODO this fragment is similar to that in FramesetLoop should be refactored
-  if (positset.ValidCount() > 0) {
-    SetMode(kTracking);
-  }
-
-  emit PositsetReady(positset);
+  auto positset = tracker_->SetMark(*frameset_iterator_,
+                                    cam, mark, project_other);
+  FramesetLoopTracking(positset);
 }
 
 void Controller::SetMode(const Mode mode) {
@@ -164,7 +156,6 @@ bool Controller::FramesetLoop() {
   }
 
   auto frameset = *frameset_iterator_;
-  dove_eye::Positset positset(Arity());
 
   switch (mode_) {
     case kIdle:
@@ -191,16 +182,7 @@ bool Controller::FramesetLoop() {
 
       break;
     case kTracking: {
-      positset = tracker_->Track(frameset);
-      emit PositsetReady(positset);
-
-      if (localization_active_) {
-        Location location;
-        if (localization_->Locate(positset, &location)) {
-          DEBUG("loc: %f %f %f", location.x, location.y, location.z);
-          emit LocationReady(location);
-        }
-      }
+      FramesetLoopTracking(tracker_->Track(frameset));
       break;
     }
     case kNonexistent:
@@ -213,6 +195,22 @@ bool Controller::FramesetLoop() {
 
   ++frameset_iterator_;
   return true;
+}
+
+void Controller::FramesetLoopTracking(const dove_eye::Positset positset) {
+  if (mode_ != kTracking && positset.ValidCount() > 0) {
+    SetMode(kTracking);
+  }
+
+  emit PositsetReady(positset);
+
+  if (localization_active_) {
+    Location location;
+    if (localization_->Locate(positset, &location)) {
+      DEBUG("loc: %f %f %f", location.x, location.y, location.z);
+      emit LocationReady(location);
+    }
+  }
 }
 
 void Controller::CalibrationDataToProviders(

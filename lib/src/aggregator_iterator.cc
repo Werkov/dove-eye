@@ -52,6 +52,7 @@ AggregatorIterator &AggregatorIterator::operator++() {
     if (frame.timestamp > window_start_ + window_size) {
       window_start_ = frame.timestamp - window_size;
       frameset_created = PrepareFrameset();
+      frameset_.sequence_no += 1;
     }
   } while (!frameset_created);
 

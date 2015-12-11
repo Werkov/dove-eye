@@ -20,7 +20,6 @@ namespace dove_eye {
 template<class FramePolicy>
 class FramesetAggregator : public Aggregator {
  public:
-
   /**
    * @note FramesetAggregator takes ownership of contained video providers
    */
@@ -31,6 +30,10 @@ class FramesetAggregator : public Aggregator {
 
   }
 
+ private:
+  /* Policy must follow Aggregator::parameters_ (because of destruction order) */
+  FramePolicy frame_policy_;
+
   virtual void Start() override {
     frame_policy_.Start();
   }
@@ -38,10 +41,6 @@ class FramesetAggregator : public Aggregator {
   virtual bool GetFrame(Frame *frame, CameraIndex *cam) override {
     return frame_policy_.GetFrame(frame, cam);
   }
-
- private:
-  /* Policy must follow Aggregator::parameters_ (because of destruction order) */
-  FramePolicy frame_policy_;
 
 };
 

@@ -5,6 +5,7 @@
 #include "controller.h"
 #include "dove_eye/calibration_data.h"
 #include "dove_eye/frameset.h"
+#include "dove_eye/positset.h"
 #include "dove_eye/localization.h"
 #include "dove_eye/types.h"
 #include "frameset_converter.h"
@@ -24,6 +25,8 @@ void RegisterMetaTypes() {
   qRegisterMetaType<FramesetConverter::ImageList>("ImageList");
 
   qRegisterMetaType<dove_eye::Frameset>();
+  qRegisterMetaType<dove_eye::Positset>();
+
   qRegisterMetaType<gui::GuiMark>();
   qRegisterMetaType<gui::GuiMark>("GuiMark");
 

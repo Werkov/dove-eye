@@ -19,6 +19,7 @@ namespace dove_eye {
 
 class Aggregator {
  public:
+  friend class AggregatorIterator;
   typedef std::vector<VideoProvider *> ProvidersContainer;
   typedef AggregatorIterator Iterator;
 
@@ -59,14 +60,14 @@ class Aggregator {
     return parameters_;
   }
 
-  virtual void Start() = 0;
-
-  virtual bool GetFrame(Frame *frame, CameraIndex *cam) = 0;
-
  private:
   CameraIndex arity_;
   const Parameters &parameters_;
   ProvidersContainer providers_;
+
+  virtual void Start() = 0;
+
+  virtual bool GetFrame(Frame *frame, CameraIndex *cam) = 0;
 
 };
 

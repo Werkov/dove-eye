@@ -24,19 +24,22 @@ class Tuple {
   typedef const T *const_iterator;
 
   static const CameraIndex kMaxArity = CONFIG_MAX_ARITY;
+  size_t sequence_no;
 
   /*
    * Because of the const member arity_ we have to provide the Big Five
    * methods for copying/moving.
    */
-  explicit Tuple(const CameraIndex size = 0)
-      : arity_(size),
+  explicit Tuple(const CameraIndex size = 0, const size_t sequence_no = 0)
+      : sequence_no(sequence_no),
+        arity_(size),
         validity_() {
     assert(arity_ <= kMaxArity);
   }
 
   Tuple(const Tuple &other)
-      : arity_(other.arity_) {
+      : sequence_no(other.sequence_no),
+        arity_(other.arity_) {
     assert(arity_ == other.arity_);
 
     for (CameraIndex cam = 0; cam < arity_; ++cam) {
@@ -46,7 +49,8 @@ class Tuple {
   }
 
   Tuple(Tuple &&other)
-      : arity_(other.arity_) {
+      : sequence_no(other.sequence_no),
+        arity_(other.arity_) {
     assert(arity_ == other.arity_);
 
     for (CameraIndex cam = 0; cam < arity_; ++cam) {
@@ -64,6 +68,7 @@ class Tuple {
   inline Tuple &operator=(Tuple &&rhs) {
     assert(arity_ == rhs.arity_);
 
+    std::swap(sequence_no, rhs.sequence_no);
     std::swap(items_, rhs.items_);
     std::swap(validity_, rhs.validity_);
 
