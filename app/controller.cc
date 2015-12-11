@@ -122,7 +122,7 @@ void Controller::SetUndistortMode(const UndistortMode undistort_mode) {
   }
 }
 
-void Controller::SetTrackerMarkType(const TrackerMarkType mark_type) {
+void Controller::SetTrackerMarkType(const InnerTracker::Mark::Type mark_type) {
   tracker_mark_type_ = mark_type;
 }
 
@@ -233,7 +233,7 @@ void Controller::UndistortToProviders(const bool undistort) {
 
 InnerTracker::Mark Controller::GuiMarkToMark(const GuiMark &gui_mark) const {
   switch (tracker_mark_type_) {
-    case kCircle: {
+    case InnerTracker::Mark::kCircle: {
       InnerTracker::Mark mark(InnerTracker::Mark::kCircle);
       if (gui_mark.Size().isEmpty()) {
         mark.center.x = gui_mark.release_pos.x();
@@ -249,7 +249,7 @@ InnerTracker::Mark Controller::GuiMarkToMark(const GuiMark &gui_mark) const {
       return mark;
     }
 
-    case kRectangle: {
+    case InnerTracker::Mark::kRectangle: {
       InnerTracker::Mark mark(InnerTracker::Mark::kRectangle);
       mark.top_left.x = gui_mark.TopLeft().x();
       mark.top_left.y = gui_mark.TopLeft().y();
@@ -258,10 +258,13 @@ InnerTracker::Mark Controller::GuiMarkToMark(const GuiMark &gui_mark) const {
 
       return mark;
     }
-
-    default:
+    case InnerTracker::Mark::kInvalid:
       assert(false);
+      break;
   }
+
+  /* A hint for GCC so that it doesn't warn about no return */
+  assert(false);
 }
 
 

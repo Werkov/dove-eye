@@ -101,6 +101,8 @@ class InnerTracker {
    */
   virtual InnerTracker *Clone() const = 0;
 
+  virtual Mark::Type PreferredMarkType() const = 0;
+
  protected:
   cv::Mat EpilineToMask(const cv::Size size, const int thickness,
                         const Epiline epiline) const;

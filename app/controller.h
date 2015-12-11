@@ -10,6 +10,7 @@
 #include "dove_eye/aggregator.h"
 #include "dove_eye/calibration_data.h"
 #include "dove_eye/camera_calibration.h"
+#include "dove_eye/inner_tracker.h"
 #include "dove_eye/localization.h"
 #include "dove_eye/parameters.h"
 #include "dove_eye/tracker.h"
@@ -44,11 +45,6 @@ class Controller : public QObject {
     kUndistortVideo
   };
 
-  enum TrackerMarkType {
-    kCircle,
-    kRectangle
-  };
-
   /**
    * @note Controller takes ownership of all ctor arguments given by pointer
    */
@@ -61,7 +57,7 @@ class Controller : public QObject {
         parameters_(parameters),
         mode_(kIdle),
         undistort_mode_(kIgnoreDistortion),
-        tracker_mark_type_(kCircle),
+        tracker_mark_type_(dove_eye::InnerTracker::Mark::kCircle),
         localization_active_(false),
         arity_(aggregator->Arity()),
         frameset_iterator_(aggregator->Arity()),
@@ -115,7 +111,7 @@ class Controller : public QObject {
 
   void SetUndistortMode(const UndistortMode undistort_mode);
 
-  void SetTrackerMarkType(const TrackerMarkType mark_type);
+  void SetTrackerMarkType(const dove_eye::InnerTracker::Mark::Type mark_type);
 
   void SetLocalizationActive(const bool value);
 
@@ -129,7 +125,7 @@ class Controller : public QObject {
 
   Mode mode_;
   UndistortMode undistort_mode_;
-  TrackerMarkType tracker_mark_type_;
+  dove_eye::InnerTracker::Mark::Type tracker_mark_type_;
   bool localization_active_;
 
   const dove_eye::CameraIndex arity_;

@@ -48,6 +48,10 @@ class TemplateTracker : public SearchingTracker {
     return new TemplateTracker(*this);
   }
 
+  inline InnerTracker::Mark::Type PreferredMarkType() const {
+    return InnerTracker::Mark::kCircle;
+  }
+
  protected:
   bool InitTrackerData(const cv::Mat &data, const Mark &mark) override;
 

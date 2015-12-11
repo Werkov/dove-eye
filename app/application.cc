@@ -218,8 +218,7 @@ void Application::SetupController(const ProvidersType type,
 
   auto new_controller = new Controller(parameters_, aggregator, calibration,
                                        tracker, localization);
-  new_controller->SetTrackerMarkType(Controller::kCircle);
-  //new_controller->SetTrackerMarkType(Controller::kRectangle);
+  new_controller->SetTrackerMarkType(inner_tracker.PreferredMarkType());
 
   connect(new_controller, &Controller::CalibrationDataReady,
           this, &Application::SetCalibrationData);

@@ -46,6 +46,10 @@ class CircleTracker : public SearchingTracker {
     return new CircleTracker(*this);
   }
 
+  inline InnerTracker::Mark::Type PreferredMarkType() const {
+    return InnerTracker::Mark::kCircle;
+  }
+
  protected:
   bool InitTrackerData(const cv::Mat &data, const Mark &mark) override;
 

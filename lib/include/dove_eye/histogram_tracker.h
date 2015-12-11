@@ -47,6 +47,10 @@ class HistogramTracker : public SearchingTracker {
     return new HistogramTracker(*this);
   }
 
+  inline InnerTracker::Mark::Type PreferredMarkType() const {
+    return InnerTracker::Mark::kRectangle;
+  }
+
  protected:
   bool InitTrackerData(const cv::Mat &data, const Mark &mark) override;
 
