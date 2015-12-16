@@ -12,6 +12,8 @@ object with multiple consumer-grade webcams and reconstruct its 3D location.
 the image. Location denotes 3D coordinates of the object in the world.
 Detection of position and location is tracking and localization respectively.*
 
+## Cameras
+
   1. First setup your cameras so that they capture your scene of interest.
 
   2. Then start `dove-eye` and in menu choose **Providers**, there you set up
@@ -49,6 +51,21 @@ Detection of position and location is tracking and localization respectively.*
       object is lost, localization would output nonsensical results.
     * TODO format of output data
 
+## Video files
+
+  1. Capture videos of your scene, beginning should contain calibration pattern
+     if you don't have cameras calibrated previously (assuming videos are
+     time-synchronized).
+
+  2. In menu **Providers** choose **Video file(s)**, choose your video files
+     (must be valid videos, other fails cause crash :-).
+
+  3. You won't see the videos playing, click **Step** few times, you should see
+     first frames of the videos.
+
+  4. The rest is similar as work with cameras. Video playback is currently
+     intended for step-by-step processing only, **Play** button doesn't
+     implement FPS correctly.
 
 ## Sample calibration
 
@@ -121,7 +138,7 @@ With local version of libQGLViewer you need to set cmake accordingly
 
 Other libraries can be installed from packages: TODO (note -dev versions).
 
-### Gothas in openSUSE
+### Gotchas in openSUSE
 
 These packages are required:
 
@@ -250,6 +267,11 @@ background subtraction from `dove_eye::SearchingTracker`.
 Currently, the selection of the tracker is done at compile time and the
 application is compiled with `dove_eye::HistogramTracker` by default. It
 experimentally proved to be more stable.
+
+Third tracker is `dove_eye::CircleTracker`, that uses similar hue filtering as
+the `HistogramTracker`, however, it doesn't detect blobs but circles of the
+given color. In the end, it is subjectively as (un)stable as the
+`HistograTracker`.
 
 ### Tracking quality
 
