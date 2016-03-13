@@ -264,14 +264,43 @@ background subtraction from `dove_eye::SearchingTracker`.
 [1]: http://docs.opencv.org/doc/tutorials/imgproc/histograms/back_projection/back_projection.html?highlight=backprojection
 [2]: http://docs.opencv.org/doc/tutorials/imgproc/histograms/template_matching/template_matching.html?highlight=template
 
-Currently, the selection of the tracker is done at compile time and the
-application is compiled with `dove_eye::HistogramTracker` by default. It
+Currently, the selection of the tracker is done at compile time (in
+`Application::SetupController`) and the application is compiled with
+<del>`dove_eye::HistogramTracker`</del>`dove_eye::CircleTracker` by default. It
 experimentally proved to be more stable.
 
 Third tracker is `dove_eye::CircleTracker`, that uses similar hue filtering as
 the `HistogramTracker`, however, it doesn't detect blobs but circles of the
 given color. In the end, it is subjectively as (un)stable as the
 `HistograTracker`.
+
+### Tracker tuning
+
+(See `lib/src/parameters.cc` for source.)
+
+  * `track.template.radius`
+    * used as radius of Gauss kernel for denoising (`CircleTracker`, `HistogramTracker`)
+    * (experimental, obsolete) used as epiline thickness when predicing on epiline
+  * `track.search.factor`
+    * size of searched area in terms of previously matched pattern (i.e. you
+      track a circle with radius `r`, however, on the next frame ROI is 
+      `factor * r` (optimization to avoid searching all image)
+    * used by all trackers (that inherit from `SearchingTracker`)
+  * `track.search.threshold`
+    * [0, 1] value specifying required quality of tracking
+    * `TemplateTracker` (1 = accept only good match)
+    * `HistogramTracker` (1 = accept only strongest histogram backprojection)
+    * `CircleTracker` *unused*
+  * `track.search.min_speed`
+    * minimum speed to apply background subtraction
+    * *currently unused*
+  * `track.search.kf.proc_v`
+    * process variation for prediction Kalman filter
+  * `track.search.kf.obs_v`
+    * observation variation for observation Kalman filter
+    * consider ratio over `track.search.kf.proc_v` -- when it's large
+      observation are taken into account with small weight only, as result
+      prediction can be delayed behind actual state.
 
 ### Tracking quality
 
