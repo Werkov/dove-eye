@@ -1,0 +1,45 @@
+body {
+	color: #333;
+	font-family: sans;
+}
+
+article {
+	padding-left: 2em;
+	padding-right: 2em;
+}
+
+a {
+	color: #26f;
+	text-decoration: none;
+}
+
+a:visited {
+	color: #029;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+code, pre {
+	background-color: #eee;
+	padding: 0.2em;
+}
+
+blockquote {
+	font-style: italic;
+}
+
+h1, h2, h3 {
+	border-bottom: 1px solid #aaa;
+}
+
+.page-link {
+	margin-left: 1em;
+}
+
+footer {
+	text-align: center;
+	font-size: 70%;
+	margin-top: 10em;
+}
