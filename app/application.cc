@@ -15,7 +15,9 @@
 #include "dove_eye/histogram_tracker.h"
 #include "dove_eye/template_tracker.h"
 #include "dove_eye/tracker.h"
+#include "tld_tracker.h"
 #include "metatypes.h"
+
 
 using dove_eye::Aggregator;
 using dove_eye::AsyncPolicy;
@@ -212,7 +214,8 @@ void Application::SetupController(const ProvidersType type,
 
   //TemplateTracker inner_tracker(parameters_);
   //HistogramTracker inner_tracker(parameters_);
-  CircleTracker inner_tracker(parameters_);
+  //CircleTracker inner_tracker(parameters_);
+  dove_eye::TldTracker inner_tracker(parameters_);
   auto tracker = new Tracker(arity_, inner_tracker);
   auto localization = new Localization(arity_);
 
