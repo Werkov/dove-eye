@@ -127,8 +127,11 @@ void FrameViewer::DrawPosit(QPainter &painter) {
 
   DEBUG("%s: %f,%f", __func__, posit_.x, posit_.y);
 
+  QRect originalRect = QRect(posit_.x - rectWidth / 2, posit_.y, rectWidth, rectHeight);
+  QRect intersection = image_.rect() & originalRect;
   painter.setPen(draw_pen);
-  painter.drawRect(posit_.x - rectWidth / 2, posit_.y, rectWidth, rectHeight);
+
+  painter.drawRect(intersection);
   //painter.drawEllipse(posit_.x - radius, posit_.y - radius, 2*radius, 2*radius);
 
   painter.setPen(pen);

@@ -183,7 +183,7 @@ void FramesetConverter::ProcessPositsetInternal(const dove_eye::Positset positse
     result[cam] = scale * positset[cam];
     result.SetValid(cam, true);
   }
-
+  
   emit PositsetReady(result);
 }
 

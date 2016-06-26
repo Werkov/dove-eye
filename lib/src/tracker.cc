@@ -38,6 +38,7 @@ Positset Tracker::SetMark(const Frameset &frameset, const CameraIndex cam,
   auto tracker = trackers_[cam].get();
   auto success = tracker->InitializeTracking(frameset[cam], mark, &positset_[cam]);
   positset_.SetValid(cam, success);
+
   DEBUG("%i, %i init", cam, success);
   if (success) {
     trackstates_[cam] = kTracking;
@@ -48,12 +49,15 @@ Positset Tracker::SetMark(const Frameset &frameset, const CameraIndex cam,
       if (o_cam == cam) {
         continue;
       }
+	  std::cout << "calculating epiline. \n";
       auto epiline = CalculateEpiline(positset_[cam], cam, o_cam);
       auto &tracker_data = trackers_[cam]->tracker_data();
+	  std::cout << "initializing tracking from epiline. \n";
       auto o_success = trackers_[o_cam]->InitializeTracking(frameset[o_cam],
                                                             epiline,
                                                             tracker_data,
                                                             &positset_[o_cam]);
+	  std::cout << "initializing tracking from epiline done. \n";
       positset_.SetValid(o_cam, o_success);
       DEBUG("%i, %i init", o_cam, o_success);
       if (o_success) {
@@ -79,6 +83,8 @@ Positset Tracker::Track(const Frameset &frameset) {
 }
 
 bool Tracker::TrackSingle(const CameraIndex cam, const Frame &frame) {
+		//std::cout << "tracking camera " << cam << " state " << trackstates_[cam] << "\n";
+	
   auto tracker = trackers_[cam].get();
 
   //DEBUG("%s(%i) entry state: %i", __func__, cam, trackstates_[cam]);
@@ -95,6 +101,7 @@ bool Tracker::TrackSingle(const CameraIndex cam, const Frame &frame) {
         DEBUG("tracker(%i) lost", cam);
         positset_.SetValid(cam, false);
       }
+	 // std::cout << "tracking done!" << "\n";
       break;
     }
 
@@ -139,6 +146,7 @@ bool Tracker::TrackSingle(const CameraIndex cam, const Frame &frame) {
        * Lastly try global search on the frame
        */
       if (tracker->ReinitializeTracking(frame, &positset_[cam])) {
+		  std::cout << "lost tracking for camera " << cam << "\n";
         trackstates_[cam] = kTracking;
         DEBUG("tracker(%i) found from global search", cam);
         positset_.SetValid(cam, true);
