@@ -13,11 +13,13 @@ namespace dove_eye {
 		struct TldData : public TrackerData {
 			bool reuseFrameOnce;
 			bool skipProcessingOnce;
+			double threshold;
 			cv::Mat grey;
 
 			TldData() {
 				reuseFrameOnce = true;
 				skipProcessingOnce = true;
+				threshold = 0.4;
 			}
 		};
 
@@ -63,14 +65,15 @@ namespace dove_eye {
 			return ReinitializeTracking(frame, result);
 		}
 
-		InnerTracker *Clone() const override;
+		InnerTracker *Clone() const override {
+			assert(!initialized());
+
+			return new TldTracker(*this);
+		}
 
 		inline InnerTracker::Mark::Type PreferredMarkType() const {
 			return InnerTracker::Mark::kRectangle;
 		}
-
-	protected:
-		~TldTracker();
 
 	private:
 		bool initialized_;
@@ -93,7 +96,7 @@ namespace dove_eye {
 			initialized_ = value;
 		}
 
-		void RunTracking(const Frame &frame, Posit *result);
+		bool RunTracking(const Frame &frame, Posit *result);
 	};
 
 }
