@@ -31,7 +31,6 @@ class Aggregator {
       : arity_(providers.size()),
         parameters_(parameters),
         providers_(providers) {
-
   }
 
   virtual ~Aggregator() {
@@ -68,7 +67,6 @@ class Aggregator {
   virtual void Start() = 0;
 
   virtual bool GetFrame(Frame *frame, CameraIndex *cam) = 0;
-
 };
 
 } // namespace dove_eye

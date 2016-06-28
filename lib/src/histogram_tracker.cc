@@ -203,7 +203,7 @@ void HistogramTracker::ContoursToMark(
   double max_area = 0;
   const Contour *best_contour;
 
-  for (auto &contour: contours) {
+  for (auto &contour : contours) {
     auto area = cv::contourArea(contour);
     if (area < max_area) {
       continue;

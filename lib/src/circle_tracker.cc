@@ -64,7 +64,7 @@ bool CircleTracker::Search(
 
   auto score = CirclesToMark(data_proc, circles, result);
   DEBUG("%s score: %f", __func__, score);
-  
+
   /* Apply ROI offset */
   result->center.x += extended_roi.tl().x;
   result->center.y += extended_roi.tl().y;
@@ -84,7 +84,7 @@ bool CircleTracker::UpdateData(CircleData &circle_data, const cv::Mat &data,
   /* Take data from the inner part of the circle only */
   Point2 rad(mark.radius, mark.radius);
   cv::Rect roi(mark.center - rad, mark.center + rad);
- 
+
   /* Ensure the size of mark doesn't extend size of the image */
   cv::Rect boundary(0, 0, data.cols, data.rows);
   cv::Rect safe_roi = roi & boundary;

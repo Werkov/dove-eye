@@ -10,6 +10,9 @@ syntax on
 
 nmap <F5> :!./cscope.sh<Return> :cs r<Return><Return>
 
+" no EOL whitespace
+autocmd FileType c,cc,h,hpp,cpp autocmd BufWritePre <buffer> :%s/\s\+$//e
+
 " Detect if the current file type is a C-like language.
 au BufNewFile,BufRead *.h,*.cc,*.cpp call SetupForCLang()
 

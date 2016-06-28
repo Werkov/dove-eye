@@ -8,4 +8,4 @@ Frame Frame::Clone() const {
   return result;
 }
 
-} // namespace dove_eve
+} // namespace dove_eye

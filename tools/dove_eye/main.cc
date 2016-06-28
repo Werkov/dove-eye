@@ -13,7 +13,6 @@ using std::string;
 using std::vector;
 
 int main(int argc, char* argv[]) {
-
   vector<string> args(argv + 1, argv + argc);
 
   QApplication app(argc, argv);

@@ -13,7 +13,7 @@ class CvKalmanFilter {
   CvKalmanFilter()
       : kalman_filter_(4, 2, 0),
         prediction_valid_(false) {
-  };
+  }
 
   CvKalmanFilter(const CvKalmanFilter &other);
 
@@ -37,7 +37,6 @@ class CvKalmanFilter {
   cv::Mat CreateTransition(const double delta) const;
 
   void RefreshPrediction();
-
 };
 
 } // namespace dove_eye

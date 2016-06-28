@@ -12,7 +12,7 @@
 #define DEBUG(...) do {              \
   fprintf(stderr , __VA_ARGS__);     \
   fprintf(stderr, "\n");             \
-} while(false)
+} while (false)
 #else
 #define DEBUG(...) /* empty */
 #endif
@@ -20,7 +20,7 @@
 #define ERROR(...) do {              \
   fprintf(stderr , __VA_ARGS__);     \
   fprintf(stderr, "\n");             \
-} while(false)
+} while (false)
 
 #endif // DOVE_EYE_LOGGING_H_
 

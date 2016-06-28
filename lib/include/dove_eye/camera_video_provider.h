@@ -1,5 +1,5 @@
-#ifndef DOVE_EY_CAMERA_VIDEO_PROVIDER_H_
-#define DOVE_EY_CAMERA_VIDEO_PROVIDER_H_
+#ifndef DOVE_EYE_CAMERA_VIDEO_PROVIDER_H_
+#define DOVE_EYE_CAMERA_VIDEO_PROVIDER_H_
 
 #include <string>
 #include <vector>
@@ -14,7 +14,7 @@ class CameraVideoProvider : public VideoProvider {
     size_t width;
     size_t height;
 
-    Resolution(size_t w = 0, size_t h = 0) : width(w), height(h) {
+    explicit Resolution(size_t w = 0, size_t h = 0) : width(w), height(h) {
     }
   };
 
@@ -53,10 +53,9 @@ class CameraVideoProvider : public VideoProvider {
   std::string id_;
   /** 0x0 means default (unmodified) size */
   Resolution resolution_;
-
 };
 
 } // namespace dove_eye
 
-#endif // DOVE_EY_CAMERA_VIDEO_PROVIDER_H_
+#endif // DOVE_EYE_CAMERA_VIDEO_PROVIDER_H_
 

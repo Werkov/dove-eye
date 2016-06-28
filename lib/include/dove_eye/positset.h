@@ -16,7 +16,6 @@ typedef Point2 Posit;
 
 /** Positset represents general aggregated output of tracker */
 typedef Tuple<Point2> Positset;
-;
 
 } // namespace dove_eye
 

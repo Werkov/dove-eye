@@ -26,7 +26,7 @@ bool SearchingTracker::InitializeTracking(
     const Epiline epiline,
     const TrackerData &tracker_data,
     Posit *result) {
-  
+
   // FIXME Possibly use diffent parameters to specify epiline mask
   auto thickness = parameters().Get(Parameters::TEMPLATE_RADIUS) *
       parameters().Get(Parameters::SEARCH_FACTOR);

@@ -153,7 +153,7 @@ bool TemplateTracker::Search(
   result->type = Mark::kCircle;
   result->center = match_point;
   result->radius = tpl.radius;
-  
+
   DEBUG("%p->%s matched (%f/%f)", this, __func__, value, threshold);
   return true;
 }

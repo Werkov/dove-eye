@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include <opencv2/opencv.hpp>
@@ -36,7 +37,7 @@ class CameraCalibration {
   }
 
   double CameraProgress(const CameraIndex cam) const;
- 
+
   double PairProgress(const CameraIndex index) const;
 
   inline const CalibrationData &Data() const {
@@ -45,7 +46,7 @@ class CameraCalibration {
 
     return data_;
   }
- 
+
   // TODO remove this cache...
   const CameraPair::PairArray &pairs() const {
     return pairs_;

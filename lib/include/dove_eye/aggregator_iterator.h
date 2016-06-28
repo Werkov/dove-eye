@@ -18,7 +18,6 @@ class Aggregator;
  * FramesetAggregator.
  */
 class AggregatorIterator {
-
  public:
   explicit AggregatorIterator(Aggregator *aggregator = nullptr,
                               const bool valid = true);
@@ -50,7 +49,6 @@ class AggregatorIterator {
   Frameset frameset_;
 
   bool PrepareFrameset();
-
 }; // end class AggregatorIterator
 
 

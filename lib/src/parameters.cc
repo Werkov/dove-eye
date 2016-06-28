@@ -16,32 +16,32 @@ namespace dove_eye {
 
 const Parameters::Parameter Parameters::parameters[] = {
   DEFINE_PARAM(
-      TEMPLATE_RADIUS,        "track.template.radius",  45,       "px", 2, 100 ),
+      TEMPLATE_RADIUS,        "track.template.radius",    45,       "px", 2, 100),
   DEFINE_PARAM(
-      SEARCH_FACTOR,          "track.search.factor",     3,         "",    2, 10 ),
+      SEARCH_FACTOR,          "track.search.factor",       3,         "",    2, 10),
   DEFINE_PARAM(
-      SEARCH_THRESHOLD,       "track.search.threshold",0.5,         "",    0, 1 ),
+      SEARCH_THRESHOLD,       "track.search.threshold",  0.5,         "",    0, 1),
   DEFINE_PARAM(
-      SEARCH_MIN_SPEED,       "track.search.min_speed",  1,      "px/f",   0.1, 10 ),
+      SEARCH_MIN_SPEED,       "track.search.min_speed",    1,     "px/f",   0.1, 10),
   DEFINE_PARAM(
-      SEARCH_KF_PROC_V,       "track.search.kf.proc_v",1e-2,     "px?",    1e-4, 1 ),
+      SEARCH_KF_PROC_V,       "track.search.kf.proc_v",  1e-2,     "px?",    1e-4, 1),
   DEFINE_PARAM(
-      SEARCH_KF_OBS_V,        "track.search.kf.obs_v",  1,       "px?",    1e-2, 10 ),
+      SEARCH_KF_OBS_V,        "track.search.kf.obs_v",      1,     "px?",    1e-2, 10),
   DEFINE_PARAM(
-      AGGREGATOR_WINDOW,      "aggregator.window",     0.1,        "s",   0, 5 ),
+      AGGREGATOR_WINDOW,      "aggregator.window",       0.1,        "s",   0, 5),
   DEFINE_PARAM_ARRAY(
-      CAM_OFFSET,             "aggregator.offset",       0,        "s",   0, 5 ),
+      CAM_OFFSET,             "aggregator.offset",         0,        "s",   0, 5),
   DEFINE_PARAM(
-      CALIBRATION_ROWS,       "calibration.rows",        6,         "",    1, 10 ),
+      CALIBRATION_ROWS,       "calibration.rows",          6,         "",    1, 10),
   DEFINE_PARAM(
-      CALIBRATION_COLS,       "calibration.cols",        9,         "",    1, 10 ),
+      CALIBRATION_COLS,       "calibration.cols",          9,         "",    1, 10),
   DEFINE_PARAM(
-      CALIBRATION_SIZE,       "calibration.size",    0.026,        "m", 1e-2, 1e-1 ),
+      CALIBRATION_SIZE,       "calibration.size",      0.026,        "m", 1e-2, 1e-1),
   DEFINE_PARAM(
-      CALIBRATION_FRAMES,     "calibration.frames",     10, "frame(s)",   10, 100 ),
+      CALIBRATION_FRAMES,     "calibration.frames",       10, "frame(s)",   10, 100),
   DEFINE_PARAM(
-      CALIBRATION_SKIP,       "calibration.skip",       15, "frame(s)",    0, 50  ),
-  
+      CALIBRATION_SKIP,       "calibration.skip",         15, "frame(s)",    0, 50),
+
   {Parameters::_MAX_KEY, Parameters::_MAX_KEY}
 };
 
@@ -71,7 +71,7 @@ Parameters::Parameters() {
 
 bool Parameters::Set(const Key key, const double value) {
   assert(key < _MAX_KEY);
-  
+
   std::lock_guard<std::mutex> lock(parameters_mtx_);
   if (value < parameters_[key].min_value ||
       value > parameters_[key].max_value) {
@@ -84,7 +84,7 @@ bool Parameters::Set(const Key key, const double value) {
 
 double Parameters::Get(const Key key) const {
   assert(key < _MAX_KEY);
-  
+
   /* Alas in C++11, no shared_lock available... */
   std::lock_guard<std::mutex> lock(parameters_mtx_);
   return parameters_[key].value;

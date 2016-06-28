@@ -96,7 +96,6 @@ class AsyncPolicy {
 
   void ReadProvider(const CameraIndex cam) {
     for (auto frame : *providers_[cam]) {
-
       /* Note the lock is released on every iteration */
       Lock lock(queue_mtx_);
 

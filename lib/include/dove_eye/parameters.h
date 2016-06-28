@@ -1,5 +1,5 @@
-#ifndef DOVE_EYE_PARAMS_H_
-#define DOVE_EYE_PARAMS_H_
+#ifndef DOVE_EYE_PARAMETERS_H_
+#define DOVE_EYE_PARAMETERS_H_
 
 #include <array>
 #include <cassert>
@@ -74,7 +74,7 @@ class Parameters {
   };
 
   /** Parameter definitions */
-  const static Parameter parameters[];
+  static const Parameter parameters[];
 
   Parameters();
 
@@ -100,4 +100,4 @@ class Parameters {
 
 } // namespace dove_eye
 
-#endif // DOVE_EYE_PARAMS_H_
+#endif // DOVE_EYE_PARAMETERS_H_

@@ -70,7 +70,7 @@ class CalibrationData {
   inline const cv::Mat &rotation() const {
     return rotation_;
   }
-  
+
   inline CameraIndex Arity() const {
     return arity_;
   }
@@ -104,7 +104,7 @@ class CalibrationData {
 
     return projections_[cam];
   }
- 
+
  private:
   typedef std::vector<cv::Mat> CvMatVector;
 

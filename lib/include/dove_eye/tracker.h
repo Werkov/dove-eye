@@ -62,7 +62,7 @@ class Tracker {
   typedef std::vector<InnerTrackerPtr> TrackerVector;
 
   const CameraIndex arity_;
-  
+
   /** Output */
   Positset positset_;
 
@@ -87,7 +87,6 @@ class Tracker {
       const CameraIndex cam) const;
 
   Point2 ReprojectLocation(const Location location, const CameraIndex cam) const;
-
 };
 
 } // namespace dove_eye

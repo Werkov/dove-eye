@@ -17,7 +17,6 @@ CvKalmanFilter::CvKalmanFilter(const CvKalmanFilter &other)
 }
 
 void CvKalmanFilter::Init(const double process_var, const double observation_var) {
-  
   kalman_filter_.transitionMatrix = *(cv::Mat_<MatType>(4, 4) <<
                                       1, 0, 1, 0,
                                       0, 1, 0, 1,

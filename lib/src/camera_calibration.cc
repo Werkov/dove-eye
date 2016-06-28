@@ -151,7 +151,7 @@ void CameraCalibration::Reset() {
   frames_to_collect_ = parameters_.Get(Parameters::CALIBRATION_FRAMES);
   frames_skip_ = parameters_.Get(Parameters::CALIBRATION_SKIP);
   frame_no_ = 0;
-  
+
   image_points_ = decltype(image_points_)(arity_);
   image_points_pair_ = decltype(image_points_pair_)(CameraPair::Pairity(arity_));
   camera_states_ = decltype(camera_states_)(arity_, kUnitialized);

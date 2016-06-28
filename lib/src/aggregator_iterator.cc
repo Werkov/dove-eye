@@ -78,7 +78,6 @@ bool AggregatorIterator::PrepareFrameset() {
     } else {
       frameset_.SetValid(cam, false);
     }
-
   }
 
   return frameset_created;

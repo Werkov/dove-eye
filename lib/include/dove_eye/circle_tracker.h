@@ -35,7 +35,7 @@ class CircleTracker : public SearchingTracker {
   inline const TrackerData &tracker_data() const override {
     return data_;
   }
- 
+
   inline TrackerData &tracker_data() override {
     return data_;
   }
@@ -80,7 +80,7 @@ class CircleTracker : public SearchingTracker {
   typedef std::vector<Circle> CircleVector;
 
   CircleData data_;
-  
+
   bool UpdateData(CircleData &circle_data, const cv::Mat &data,
                   const Mark &mark) const;
 

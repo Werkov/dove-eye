@@ -21,7 +21,6 @@ class FileVideoProvider : public VideoProvider {
 
  private:
   const std::string filename_;
-
 };
 
 } // namespace dove_eye

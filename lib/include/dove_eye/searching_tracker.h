@@ -25,7 +25,7 @@ class SearchingTracker : public InnerTracker {
       const Epiline epiline,
       const TrackerData &tracker_data,
       Posit *result) override;
- 
+
   bool Track(const Frame &frame, Posit *result) override;
 
   // FIXME override other ReinitializeTracking overloads

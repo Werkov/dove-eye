@@ -36,11 +36,11 @@ class HistogramTracker : public SearchingTracker {
   inline const TrackerData &tracker_data() const override {
     return data_;
   }
- 
+
   inline TrackerData &tracker_data() override {
     return data_;
   }
- 
+
   InnerTracker *Clone() const override {
     assert(!initialized());
 
@@ -81,7 +81,7 @@ class HistogramTracker : public SearchingTracker {
   typedef std::vector<Contour> ContourVector;
 
   HistogramData data_;
-  
+
   cv::Mat PreprocessImage(const cv::Mat &data,
                           const HistogramData &hist_data,
                           cv::Mat *mask) const;

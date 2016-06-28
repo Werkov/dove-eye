@@ -27,21 +27,19 @@ class FramesetAggregator : public Aggregator {
                      const dove_eye::Parameters &parameters)
       : Aggregator(providers, parameters),
         frame_policy_(providers) {
-
   }
 
  private:
   /* Policy must follow Aggregator::parameters_ (because of destruction order) */
   FramePolicy frame_policy_;
 
-  virtual void Start() override {
+  void Start() override {
     frame_policy_.Start();
   }
 
-  virtual bool GetFrame(Frame *frame, CameraIndex *cam) override {
+  bool GetFrame(Frame *frame, CameraIndex *cam) override {
     return frame_policy_.GetFrame(frame, cam);
   }
-
 };
 
 } // namespace dove_eye

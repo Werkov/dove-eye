@@ -37,11 +37,11 @@ class TemplateTracker : public SearchingTracker {
   inline const TrackerData &tracker_data() const override {
     return data_;
   }
- 
+
   inline TrackerData &tracker_data() override {
     return data_;
   }
- 
+
   InnerTracker *Clone() const override {
     assert(!initialized());
 
@@ -78,7 +78,6 @@ class TemplateTracker : public SearchingTracker {
 
  private:
   TemplateData data_;
-  
 };
 
 } // namespace dove_eye

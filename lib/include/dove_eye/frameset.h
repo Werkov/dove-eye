@@ -7,7 +7,6 @@
 namespace dove_eye {
 
 typedef Tuple<Frame> Frameset;
-;
 
 } // namespace dove_eye
 

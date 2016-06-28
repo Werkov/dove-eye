@@ -18,7 +18,7 @@ typedef std::vector<Point3> Point3Vector;
 
 typedef int CameraIndex;
 
-};
+}; // namespace dove_eye
 
 #ifdef HAVE_GUI
 /*

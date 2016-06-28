@@ -28,7 +28,7 @@ cv::Mat InnerTracker::EpilineToMask(const cv::Size size,
     p2.y = size.height;
     p2.x = (epiline[1] * p2.y + epiline[2]) / -epiline[0];
   }
-  
+
   cv::Mat mask(size, CV_8U);
   mask.setTo(cv::Scalar(0, 0, 0));
 

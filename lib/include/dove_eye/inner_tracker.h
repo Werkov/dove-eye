@@ -39,7 +39,7 @@ class InnerTracker {
     Point2 top_left;
     Point2 size;
 
-    Mark(const Type type = kInvalid)
+    explicit Mark(const Type type = kInvalid)
         : type(type) {
     }
   };
@@ -65,7 +65,7 @@ class InnerTracker {
    */
   virtual bool InitializeTracking(const Frame &frame, const Mark mark,
                                   Posit *result) = 0;
-  
+
   /** Epiline initialization on epiline with other tracker's data
    *
    * Reset internal state of tracker (for stateful trackers).
