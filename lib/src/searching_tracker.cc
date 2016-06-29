@@ -80,10 +80,7 @@ bool SearchingTracker::Track(const Frame &frame, Posit *result) {
 
   /* Filter movement */
   cv::Mat fg_mask;
-  /* 1: learn, 0: not learn */
-  bg_subtractor()(frame.data.clone(), fg_mask);
-
-  log_mat(reinterpret_cast<size_t>(this) * 1000 + 42, fg_mask);
+  // TODO background subtraction
 
   auto fg_mask_ptr = moving ? &fg_mask : nullptr;
 
@@ -106,12 +103,8 @@ bool SearchingTracker::ReinitializeTracking(const Frame &frame, Posit *result) {
 
   // FIXME Would be expectation be of any use here?
 
-  /* Assume object is moving, i.e. applying foreground mask */
-  cv::Mat fg_mask;
-  bg_subtractor()(frame.data.clone(), fg_mask, -1);
-
   Mark match_mark;
-  if (!Search(frame.data, tracker_data(), nullptr, &fg_mask, thr, &match_mark)) {
+  if (!Search(frame.data, tracker_data(), nullptr, nullptr, thr, &match_mark)) {
     /* Fallback without mask */
     if (!Search(frame.data, tracker_data(), nullptr, nullptr, thr, &match_mark)) {
       return false;

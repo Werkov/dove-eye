@@ -42,10 +42,6 @@ class SearchingTracker : public InnerTracker {
     return kalman_filter_;
   }
 
-  inline cv::BackgroundSubtractor &bg_subtractor() {
-    return bg_subtractor_;
-  }
-
 
   /** Initialize tracker data
    * @return  false when initialization failed
@@ -82,7 +78,6 @@ class SearchingTracker : public InnerTracker {
  private:
   bool initialized_;
   KalmanFilterT kalman_filter_;
-  cv::BackgroundSubtractorMOG bg_subtractor_;
 
   inline void initialized(const bool value) {
     initialized_ = value;
