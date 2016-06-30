@@ -25,4 +25,3 @@ find_path(OpenTLD_INCLUDE_DIR
 
 set(OpenTLD_INCLUDE_DIRS ${OpenTLD_INCLUDE_DIR})
 set(OpenTLD_LIBS ${OpenTLD_LIB};${cvblobs_LIB})
-message("f: ${OpenTLD_LIBS} and ${OpenTLD_INCLUDE_DIRS}")
