@@ -84,7 +84,7 @@ class TldTracker : public InnerTracker {
 
   TldData data_;
 
-  bool InitTrackerData(const cv::Mat &data, const Mark &mark);
+  bool InitTrackerData(const cv::Mat &data);
 
   inline Posit MarkToPosit(const Mark &mark) const {
     assert(mark.type == Mark::kRectangle);

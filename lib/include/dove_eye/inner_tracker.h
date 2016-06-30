@@ -39,7 +39,7 @@ class InnerTracker {
     Point2 top_left;
     Point2 size;
 
-    explicit Mark(const Type type = kInvalid)
+    explicit Mark(const Type type)
         : type(type) {
     }
   };

@@ -36,7 +36,7 @@ bool SearchingTracker::InitializeTracking(
   // FIXME Use different threshold for foreign search data?
   const auto thr = parameters().Get(Parameters::SEARCH_THRESHOLD);
 
-  Mark match_mark;
+  Mark match_mark(Mark::kInvalid);
   // TODO Remove non-const cast! Do it properly when projection is working
   if (!Search(frame.data, (TrackerData &)tracker_data, nullptr, &epiline_mask, thr,
               &match_mark)) {
@@ -85,7 +85,7 @@ bool SearchingTracker::Track(const Frame &frame, Posit *result) {
   auto fg_mask_ptr = moving ? &fg_mask : nullptr;
 
   /* Search for object */
-  Mark match_mark;
+  Mark match_mark(Mark::kInvalid);
   if (!Search(frame.data, tracker_data(), &roi, fg_mask_ptr, thr, &match_mark)) {
     return false;
   }
@@ -103,7 +103,7 @@ bool SearchingTracker::ReinitializeTracking(const Frame &frame, Posit *result) {
 
   // FIXME Would be expectation be of any use here?
 
-  Mark match_mark;
+  Mark match_mark(Mark::kInvalid);
   if (!Search(frame.data, tracker_data(), nullptr, nullptr, thr, &match_mark)) {
     /* Fallback without mask */
     if (!Search(frame.data, tracker_data(), nullptr, nullptr, thr, &match_mark)) {
