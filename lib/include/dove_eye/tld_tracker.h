@@ -1,9 +1,13 @@
 #ifndef DOVE_EYE_TLD_TRACKER_H_
 #define DOVE_EYE_TLD_TRACKER_H_
-#include "E:\diplomka\dove-eye\lib\include\dove_eye\inner_tracker.h"
-#include "dove_eye/inner_tracker.h"
+
 #include "dove_eye/cv_kalman_filter.h"
-#include "tld.h"
+#include "dove_eye/inner_tracker.h"
+
+namespace tld {
+/* Forward */
+class TLD;
+} // namespace tld
 
 namespace dove_eye {
 

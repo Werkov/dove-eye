@@ -8,14 +8,14 @@
 #include "dove_eye/blocking_policy.h"
 #include "dove_eye/camera_calibration.h"
 #include "dove_eye/camera_video_provider.h"
-#include "dove_eye/circle_tracker.h"
 #include "dove_eye/chessboard_pattern.h"
+#include "dove_eye/circle_tracker.h"
 #include "dove_eye/frameset.h"
 #include "dove_eye/frameset_aggregator.h"
 #include "dove_eye/histogram_tracker.h"
 #include "dove_eye/template_tracker.h"
+#include "dove_eye/tld_tracker.h"
 #include "dove_eye/tracker.h"
-#include "tld_tracker.h"
 #include "metatypes.h"
 
 

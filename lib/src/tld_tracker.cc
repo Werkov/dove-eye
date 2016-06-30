@@ -1,5 +1,6 @@
-#include "tld_tracker.h"
-#include "TLDUtil.h"
+#include "dove_eye/tld_tracker.h"
+
+#include <tld/TLD.h>
 
 namespace dove_eye {
 	bool TldTracker::InitTrackerData(const cv::Mat &data, const Mark &mark) {
@@ -26,14 +27,7 @@ namespace dove_eye {
 		tld->detectorCascade->imgHeight = data_.grey.rows;
 		tld->detectorCascade->imgWidthStep = data_.grey.step;
 
-		int *initialBB = new int[4];
-
-		initialBB[0] = mark.top_left.x;
-		initialBB[1] = mark.top_left.y;
-		initialBB[2] = mark.size.x;
-		initialBB[3] = mark.size.y;
-		cv::Rect bb = tld::tldArrayToRect(initialBB);
-
+		cv::Rect bb(mark.top_left, mark.size);
 		tld->selectObject(data_.grey, &bb);
 
 		*result = MarkToPosit(mark);
