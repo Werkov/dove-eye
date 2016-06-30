@@ -8,7 +8,7 @@ title: Compile
 The `dove-eye` requires some 3rd party libraries: 
 
   * [libQGLViewer](http://www.libqglviewer.com/), OpenGL,
-  * OpenCV,
+  * OpenCV (2.4),
   * Qt5.
 
 When you have the libraries installed, `dove-eye` is built using `cmake`.
@@ -23,12 +23,7 @@ Please note that the snippet above assumes, you have all libraries installed in
 system paths. (You may alternatively use `cmake` parameter
 `-DQGLViewer_ROOT=<path to your installation of libQGLViewer>`.)
 
-### Gotchas in Ubuntu
-
-libQGLViewer that is packaged in Ubuntu (14.\*, 15.04) is linked agaist Qt4 --
-you might build `dove-eye`, however, it'll segfault during ABI
-incompatibilities! Thus it is recommended to compile libQGLViewer locally with
-Qt5 libraries.
+### libQGLViewer compilation
 
   * download libQGLViewer sources,
   * make sure you have `qt5-qmake` installed and in `$PATH` (check `qmake --version`),
@@ -40,15 +35,19 @@ Qt5 libraries.
 
 With local version of libQGLViewer you need to set cmake accordingly
 
-    $ cmake -DQGLViewer_ROOT=<path to dir where libQGLViewer/libQGLViewer.so is found>
+    $ cmake -DQGLViewer_ROOT=<path to dir where QGLViewer/libQGLViewer.so is found>
 
-Other libraries can be installed from packages: TODO (note -dev versions).
+#### Gotchas in Ubuntu
 
-### Gotchas in openSUSE
+libQGLViewer that is packaged in Ubuntu (14.\*, 15.04) is linked agaist Qt4 --
+despite you can build `dove-eye`, it'll segfault due to ABI incompatibilities!
+Thus it is recommended to compile libQGLViewer locally with Qt5 libraries.
+
+#### Gotchas in openSUSE
 
 These packages are required:
 
-  * opencv-qt5-devel (must -qt5- vesion),
+  * opencv-qt5-devel (must use opencv compiled against Qt5),
   * libqt5-qtbase-devel.
 
 libQGLViewer has to be manually compiled with Qt5.
