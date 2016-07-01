@@ -103,7 +103,7 @@ void FrameViewer::UpdateMark(QMouseEvent *event) {
 void FrameViewer::DrawMark(QPainter &painter) {
   auto brush = painter.brush();
 
-  QColor color(51, 102, 255, 64);
+  QColor color(32, 32, 32, 128);
   painter.setBrush(color);
 
   painter.drawRect(QRect(mark_.TopLeft(), mark_.Size()));
@@ -115,24 +115,18 @@ void FrameViewer::DrawPosit(QPainter &painter) {
   /* This method could be later extracted to a separate class (when Posit will
    * become more complex. */
   const int radius = 8;
-  const int width = 2;
+  const int width = 3;
   auto pen = painter.pen();
 
-  QColor color(51, 102, 255, 128);
+  QColor color(255, 0, 0);
   QPen draw_pen(color);
   draw_pen.setWidth(width);
 
-  int rectWidth = mark_.Size().width();
-  int rectHeight = mark_.Size().height();
-
   DEBUG("%s: %f,%f", __func__, posit_.x, posit_.y);
 
-  QRect originalRect = QRect(posit_.x - rectWidth / 2, posit_.y, rectWidth, rectHeight);
-  QRect intersection = image_.rect() & originalRect;
   painter.setPen(draw_pen);
 
-  painter.drawRect(intersection);
-  //painter.drawEllipse(posit_.x - radius, posit_.y - radius, 2*radius, 2*radius);
+  painter.drawEllipse(posit_.x - radius, posit_.y - radius, 2*radius, 2*radius);
 
   painter.setPen(pen);
 }
