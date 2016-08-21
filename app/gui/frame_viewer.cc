@@ -122,12 +122,8 @@ void FrameViewer::DrawPosit(QPainter &painter) {
   QPen draw_pen(color);
   draw_pen.setWidth(width);
 
-  DEBUG("%s: %f,%f", __func__, posit_.x, posit_.y);
-
   painter.setPen(draw_pen);
-
   painter.drawEllipse(posit_.x - radius, posit_.y - radius, 2*radius, 2*radius);
-
   painter.setPen(pen);
 }
 
