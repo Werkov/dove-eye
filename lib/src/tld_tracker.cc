@@ -73,6 +73,7 @@ namespace dove_eye {
   }
 
   bool TldTracker::RunTracking(const Frame &frame, Posit *result) {
+    const auto thr = parameters().Get(Parameters::SEARCH_THRESHOLD);
     if (!data_.reuseFrameOnce) {
       cvtColor(frame.data, data_.grey, CV_BGR2GRAY);
     } else {
@@ -85,7 +86,7 @@ namespace dove_eye {
       data_.skipProcessingOnce = false;
     }
 
-    if (tld_->currConf < data_.threshold) {
+    if (tld_->currConf < thr) {
       return false;
     }
 

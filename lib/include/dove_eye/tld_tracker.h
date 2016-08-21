@@ -18,13 +18,11 @@ class TldTracker : public InnerTracker {
   struct TldData : public TrackerData {
     bool reuseFrameOnce;
     bool skipProcessingOnce;
-    double threshold;
     cv::Mat grey;
 
     TldData() {
       reuseFrameOnce = true;
       skipProcessingOnce = true;
-      threshold = 0.4;
     }
   };
 
