@@ -1,6 +1,8 @@
 #ifndef DOVE_EYE_TLD_TRACKER_H_
 #define DOVE_EYE_TLD_TRACKER_H_
 
+#include <memory>
+
 #include "dove_eye/cv_kalman_filter.h"
 #include "dove_eye/inner_tracker.h"
 
@@ -26,10 +28,11 @@ class TldTracker : public InnerTracker {
     }
   };
 
-  explicit TldTracker(const Parameters &parameters)
-    : InnerTracker(parameters),
-    initialized_(false) {
-  }
+  explicit TldTracker(const Parameters &parameters);
+
+  TldTracker(const TldTracker &other);
+
+  ~TldTracker() override;
 
   inline const TrackerData &tracker_data() const override {
     return data_;
@@ -80,7 +83,7 @@ class TldTracker : public InnerTracker {
 
  private:
   bool initialized_;
-  tld::TLD *tld;
+  std::unique_ptr<tld::TLD> tld_;
 
   TldData data_;
 

@@ -3,8 +3,25 @@
 #include <tld/TLD.h>
 
 namespace dove_eye {
+  TldTracker::TldTracker(const Parameters &parameters)
+      : InnerTracker(parameters),
+        initialized_(false) {
+  }
+
+  TldTracker::TldTracker(const TldTracker &other)
+      : InnerTracker(other),
+        initialized_(other.initialized_),
+        tld_(nullptr),
+        data_(other.data_) {
+    /* We can copy unitialized object only, without allocated TLD object */
+    assert(!other.initialized());
+  }
+
+  TldTracker::~TldTracker() {
+  }
+
   bool TldTracker::InitTrackerData(const cv::Mat &data) {
-    tld = new tld::TLD();
+    tld_.reset(new tld::TLD());
     tracker_data();
     data_.grey = cv::Mat(data.rows, data.cols, CV_8UC1);
 
@@ -22,12 +39,12 @@ namespace dove_eye {
 
     cvtColor(frame.data, data_.grey, CV_BGR2GRAY);
 
-    tld->detectorCascade->imgWidth = data_.grey.cols;
-    tld->detectorCascade->imgHeight = data_.grey.rows;
-    tld->detectorCascade->imgWidthStep = data_.grey.step;
+    tld_->detectorCascade->imgWidth = data_.grey.cols;
+    tld_->detectorCascade->imgHeight = data_.grey.rows;
+    tld_->detectorCascade->imgWidthStep = data_.grey.step;
 
     cv::Rect bb(mark.top_left, mark.size);
-    tld->selectObject(data_.grey, &bb);
+    tld_->selectObject(data_.grey, &bb);
 
     *result = MarkToPosit(mark);
 
@@ -63,16 +80,17 @@ namespace dove_eye {
     }
 
     if (!data_.skipProcessingOnce) {
-      tld->processImage(frame.data);
+      tld_->processImage(frame.data);
     } else {
       data_.skipProcessingOnce = false;
     }
 
-    if (tld->currConf < data_.threshold) {
+    if (tld_->currConf < data_.threshold) {
       return false;
     }
 
-    *result = (tld->currBB->tl() + tld->currBB->br()) / 2;
+    *result = (tld_->currBB->tl() + tld_->currBB->br()) / 2;
     return true;
   }
+
 } // namespace dove_eye
