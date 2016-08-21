@@ -43,7 +43,7 @@ namespace dove_eye {
     tld_->detectorCascade->imgHeight = data_.grey.rows;
     tld_->detectorCascade->imgWidthStep = data_.grey.step;
 
-    cv::Rect bb(mark.top_left, mark.size);
+    cv::Rect bb(mark.top_left, mark.top_left + mark.size);
     tld_->selectObject(data_.grey, &bb);
 
     *result = MarkToPosit(mark);
