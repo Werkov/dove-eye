@@ -21,5 +21,7 @@ Currently, [there are builds][pkg] for Ubuntu 14.04 Trusty and Ubuntu 15.04 Vivi
 
 ## Windows
 
-TODO
+32b version build, with OpenTLD tracker, [punk package][win] (sha1: `f86fde54e9d409fd382b4c72d7c0df5dd5dd4410`)
+
+[win]: https://github.com/Werkov/dove-eye/releases/download/v0.1-tld-1/ReleaseTLD.zip
 
