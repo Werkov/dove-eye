@@ -90,7 +90,7 @@ namespace dove_eye {
       return false;
     }
 
-    *result = (tld_->currBB->tl() + tld_->currBB->br()) / 2;
+    *result = 0.5 * (tld_->currBB->tl() + tld_->currBB->br());
     return true;
   }
 
