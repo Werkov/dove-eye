@@ -47,6 +47,7 @@ class MainWindow : public QMainWindow {
   void CalibrationSave();
   void LocalizationStart();
   void LocalizationStop();
+  void LocalizationSave();
   void GroupDistortion(QAction *action);
   void GroupTrackers(QAction *action);
   void SceneShowCameras();

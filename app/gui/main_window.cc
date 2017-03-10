@@ -10,6 +10,7 @@
 #include "dove_eye/frameset.h"
 #include "dove_eye/types.h"
 #include "frameset_viewer.h"
+#include "io/localization_data_storage.h"
 #include "ui_main_window.h"
 
 using dove_eye::CalibrationData;
@@ -185,6 +186,17 @@ void MainWindow::LocalizationStop() {
   ui_->action_localization_stop->setVisible(false);
 }
 
+void MainWindow::LocalizationSave() {
+    auto filename = QFileDialog::getSaveFileName(this, tr("Save localization data"), "",
+                                                 tr("OpenCV data files (*.xml *.yaml)"));
+    if (filename.isNull()) {
+        return;
+    }
+
+    io::LocalizationDataStorage storage(ui_->scene_viewer);
+    storage.SaveToFile(filename);
+}
+
 void MainWindow::GroupDistortion(QAction *action) {
   if (action == ui_->action_distortion_ignore) {
     emit SetUndistortMode(Controller::kIgnoreDistortion);
@@ -333,6 +345,8 @@ void MainWindow::SetupMenu() {
           this, &MainWindow::LocalizationStart);
   connect(ui_->action_localization_stop, &QAction::triggered,
           this, &MainWindow::LocalizationStop);
+  connect(ui_->action_localization_save, &QAction::triggered,
+          this, &MainWindow::LocalizationSave);
   connect(ui_->action_open_video_files, &QAction::triggered,
           this, &MainWindow::OpenVideoFiles);
   connect(ui_->action_parameters_modify, &QAction::triggered,

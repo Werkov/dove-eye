@@ -29,6 +29,10 @@ class SceneViewer : public QGLViewer {
 
   void TrajectoryClear();
 
+  inline QVector<dove_eye::Location> getLocalizationData() {
+    return trajectory_;
+  }
+
  protected:
   void init() override;
   void draw() override;
