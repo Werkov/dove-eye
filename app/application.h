@@ -99,6 +99,7 @@ class Application : public QObject {
  private:
   dove_eye::CameraIndex arity_;
   dove_eye::Parameters parameters_;
+  std::unique_ptr<dove_eye::InnerTracker> inner_tracker;
   ProvidersType providers_type_;
   VideoProvidersVectorOwning available_providers_;
   std::unique_ptr<dove_eye::CalibrationData> calibration_data_;
@@ -120,6 +121,7 @@ class Application : public QObject {
                        VideoProvidersContainer &&providers);
   void TeardownController();
   void SetupConverter();
+  std::unique_ptr<dove_eye::InnerTracker> SetupTracker(int i);
   void TeardownConverter();
 
   template<typename T>

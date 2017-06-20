@@ -54,6 +54,7 @@ class MainWindow : public QMainWindow {
   void ParametersLoad();
   void ParametersSave();
   void SetupCameras();
+  void SetTracker();
   void ControllerModeChanged(const Controller::Mode mode);
   void SetCalibration(const bool value);
 
@@ -66,12 +67,14 @@ class MainWindow : public QMainWindow {
   ParametersDialog *parameters_dialog_;
   CamerasSetupDialog *cameras_setup_dialog_;
   OpenVideosDialog *open_videos_dialog_;
+  QActionGroup *trackingOptions;
 
   widgets::ControllerStatus *controller_status_;
   widgets::CalibrationStatus *calibration_status_;
 
   void SetupStatusBar();
   void SetupMenu();
+  void SetupTrackingMenu();
 };
 
 } // end namespace gui

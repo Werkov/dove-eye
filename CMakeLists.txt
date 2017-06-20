@@ -27,7 +27,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 if(WIN32)
 	# TODO add warnings switch
 else()
-	add_definitions("-std=c++11 -Wall -Wno-sign-compare")
+	add_definitions("-std=c++14 -Wall -Wno-sign-compare")
 endif()
 
 

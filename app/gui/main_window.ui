@@ -78,7 +78,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>19</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_parameters">
@@ -135,11 +135,21 @@
     <addaction name="action_scene_show_cameras"/>
     <addaction name="action_scene_clear_trajectory"/>
    </widget>
+   <widget class="QMenu" name="menuTracking">
+    <property name="title">
+     <string>Tracking</string>
+    </property>
+    <addaction name="actionHistogram_Tracker"/>
+    <addaction name="actionCircle_Tracker"/>
+    <addaction name="actionTemplate_Tracker"/>
+    <addaction name="actionOpenTLD_Tracker"/>
+   </widget>
    <addaction name="menu_providers"/>
    <addaction name="menu_calibration"/>
    <addaction name="menu_localization"/>
    <addaction name="menu_parameters"/>
    <addaction name="menu_scene_viewer"/>
+   <addaction name="menuTracking"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_parameters_modify">
@@ -241,6 +251,52 @@
   <action name="action_scene_clear_trajectory">
    <property name="text">
     <string>Clear trajectory</string>
+   </property>
+  </action>
+  <action name="actionHistogram_Tracker">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Histogram Tracker</string>
+   </property>
+  </action>
+  <action name="actionCircle_Tracker">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Circle Tracker</string>
+   </property>
+  </action>
+  <action name="actionOpenTld_Tracker">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>OpenTld Tracker</string>
+   </property>
+  </action>
+  <action name="actionTemplate_Tracker">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Template Tracker</string>
+   </property>
+  </action>
+  <action name="actionOpenTLD_Tracker">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>OpenTLD Tracker</string>
    </property>
   </action>
  </widget>
