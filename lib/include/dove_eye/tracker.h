@@ -50,6 +50,8 @@ class Tracker {
     calibration_data_ = value;
   }
 
+  InnerTracker::Mark::Type PreferredMarkType() const;
+
  private:
   enum TrackState {
     kUninitialized,

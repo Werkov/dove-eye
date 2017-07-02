@@ -34,6 +34,7 @@ class MainWindow : public QMainWindow {
   void SetControllerMode(const Controller::Mode mode);
   void SetLocalizationActive(const bool value);
   void SetUndistortMode(const Controller::UndistortMode undistort_mode);
+  void SetTrackerType(const Application::InnerTrackerType type);
 
  public slots:
   void SetupPipeline();
@@ -47,6 +48,7 @@ class MainWindow : public QMainWindow {
   void LocalizationStart();
   void LocalizationStop();
   void GroupDistortion(QAction *action);
+  void GroupTrackers(QAction *action);
   void SceneShowCameras();
   void SceneClearTrajectory();
   void OpenVideoFiles();
@@ -67,7 +69,8 @@ class MainWindow : public QMainWindow {
   ParametersDialog *parameters_dialog_;
   CamerasSetupDialog *cameras_setup_dialog_;
   OpenVideosDialog *open_videos_dialog_;
-  QActionGroup *trackingOptions;
+  QActionGroup *action_group_trackers_;
+  QAction *action_default_tracker_;
 
   widgets::ControllerStatus *controller_status_;
   widgets::CalibrationStatus *calibration_status_;

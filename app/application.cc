@@ -33,6 +33,7 @@ using dove_eye::HistogramTracker;
 using dove_eye::Localization;
 using dove_eye::Parameters;
 using dove_eye::TemplateTracker;
+using dove_eye::TldTracker;
 using dove_eye::Tracker;
 using std::unique_ptr;
 
@@ -40,6 +41,12 @@ Application::Application()
     : QObject(),
       arity_(0),
       parameters_(),
+      available_trackers_({
+        {kTrackerCircle, "CircleTracker"},
+        {kTrackerHistogram, "HistogramTracker"},
+        {kTrackerTemplate, "TemplateTracker"},
+        {kTrackerTld, "TldTracker"}
+      }),
       parameters_storage_(parameters_),
       controller_(nullptr),
       converter_(nullptr) {
@@ -58,6 +65,10 @@ Application::~Application() {
   for (auto thread : threads_) {
     thread->wait();
   }
+}
+
+const Application::TrackerNamesMap &Application::available_trackers() const {
+  return available_trackers_;
 }
 
 Application::VideoProvidersVector Application::ScanCameraProviders() {
@@ -141,6 +152,7 @@ void Application::Initialize(const ProvidersType type,
   arity_ = used_providers.size();
 
   SetupController(type, std::move(used_providers));
+  SetTrackerType(kTrackerCircle);
   SetupConverter();
 
   emit SetupPipeline();
@@ -166,6 +178,28 @@ void Application::SetCalibrationData(const CalibrationData calibration_data) {
   emit CalibrationDataReady(calibration_data);
 }
 
+void Application::SetTrackerType(const InnerTrackerType type) {
+  unique_ptr<dove_eye::InnerTracker> inner_tracker;
+  switch(type) {
+  case kTrackerCircle:
+      inner_tracker.reset(new CircleTracker(parameters_));
+      break;
+  case kTrackerHistogram:
+      inner_tracker.reset(new HistogramTracker(parameters_));
+      break;
+  case kTrackerTemplate:
+      inner_tracker.reset(new TemplateTracker(parameters_));
+      break;
+  case kTrackerTld:
+      inner_tracker.reset(new TldTracker(parameters_));
+      break;
+  }
+
+  /* Signal receiver will take ownership of the created Tracker */
+  auto tracker = new Tracker(arity_, *inner_tracker);
+  emit ChangedTracker(tracker);
+}
+
 void Application::MoveToNewThread(QObject* object) {
 #ifndef CONFIG_SINGLE_THREADED
   QThread* thread = new QThread(this);
@@ -184,20 +218,6 @@ void Application::MoveToThread(QObject* object, QThread* thread) {
   objects_in_threads_ << object;
 #endif
 }
-
-unique_ptr<dove_eye::InnerTracker> Application::SetupTracker(int i){
-    switch(i) {
-    case 0:
-        return std::make_unique<dove_eye::TldTracker>(parameters_);
-    case 1:
-        return std::make_unique<CircleTracker>(parameters_);
-    case 2:
-        return std::make_unique<HistogramTracker>(parameters_);
-    case 3:
-        return std::make_unique<TemplateTracker>(parameters_);
-    }
-}
-
 
 void Application::SetupController(const ProvidersType type,
                                   VideoProvidersContainer &&providers) {
@@ -225,23 +245,17 @@ void Application::SetupController(const ProvidersType type,
       parameters_.Get(Parameters::CALIBRATION_SIZE));
   auto calibration = new CameraCalibration(parameters_, arity_, pattern);
 
-// ******************
-  //  std::unique_ptr<dove_eye::InnerTracker> inner_tracker;
-  unique_ptr<dove_eye::InnerTracker> inner_tracker = SetupTracker(0);
-
-// ******************
-
-  auto tracker = new Tracker(arity_, *inner_tracker);
   auto localization = new Localization(arity_);
 
   auto new_controller = new Controller(parameters_, aggregator, calibration,
-                                       tracker, localization);
-  new_controller->SetTrackerMarkType(inner_tracker->PreferredMarkType());
+                                       localization);
 
   connect(new_controller, &Controller::CalibrationDataReady,
           this, &Application::SetCalibrationData);
   connect(this, &Application::CalibrationDataReady,
           new_controller, &Controller::SetCalibrationData);
+  connect(this, &Application::ChangedTracker,
+          new_controller, &Controller::SetTracker);
 
   SwapAndDestroy(&controller_, new_controller);
 }

@@ -27,16 +27,24 @@
 class Application : public QObject {
   Q_OBJECT
  public:
-  typedef std::vector<dove_eye::VideoProvider *> VideoProvidersVector;
-  typedef std::vector<std::unique_ptr<dove_eye::VideoProvider>>
-      VideoProvidersVectorOwning;
-  typedef dove_eye::Aggregator::ProvidersContainer VideoProvidersContainer;
-
   enum ProvidersType {
     kNoProviders,
     kCameras,
     kVideoFiles
   };
+
+  enum InnerTrackerType {
+    kTrackerCircle,
+    kTrackerHistogram,
+    kTrackerTemplate,
+    kTrackerTld
+  };
+
+  typedef std::vector<dove_eye::VideoProvider *> VideoProvidersVector;
+  typedef std::vector<std::unique_ptr<dove_eye::VideoProvider>>
+      VideoProvidersVectorOwning;
+  typedef dove_eye::Aggregator::ProvidersContainer VideoProvidersContainer;
+  typedef std::map<InnerTrackerType, std::string> TrackerNamesMap;
 
   Application();
 
@@ -80,10 +88,13 @@ class Application : public QObject {
     return &available_providers_;
   }
 
+  const TrackerNamesMap &available_trackers() const;
+
  signals:
   void SetupPipeline();
   // TODO implement loading from file
   void CalibrationDataReady(const dove_eye::CalibrationData);
+  void ChangedTracker(dove_eye::Tracker *);
 
  public slots:
   VideoProvidersVector ScanCameraProviders();
@@ -95,6 +106,7 @@ class Application : public QObject {
                   const VideoProvidersVector &providers);
 
   void SetCalibrationData(const dove_eye::CalibrationData calibration_data);
+  void SetTrackerType(const InnerTrackerType type);
 
  private:
   dove_eye::CameraIndex arity_;
@@ -103,6 +115,7 @@ class Application : public QObject {
   ProvidersType providers_type_;
   VideoProvidersVectorOwning available_providers_;
   std::unique_ptr<dove_eye::CalibrationData> calibration_data_;
+  TrackerNamesMap available_trackers_;
 
   io::ParametersStorage parameters_storage_;
   io::CalibrationDataStorage calibration_data_storage_;
@@ -163,5 +176,6 @@ class Application : public QObject {
   }
 };
 
+Q_DECLARE_METATYPE(Application::InnerTrackerType);
 
 #endif // APPLICATION_H_

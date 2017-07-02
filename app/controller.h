@@ -51,7 +51,6 @@ class Controller : public QObject {
   Controller(dove_eye::Parameters &parameters,
              dove_eye::Aggregator *aggregator,
              dove_eye::CameraCalibration *calibration,
-             dove_eye::Tracker *tracker,
              dove_eye::Localization *localization)
       : QObject(),
         parameters_(parameters),
@@ -64,7 +63,6 @@ class Controller : public QObject {
         frameset_end_iterator_(aggregator->Arity()),
         aggregator_(aggregator),
         calibration_(calibration),
-        tracker_(tracker),
         localization_(localization) {
   }
 
@@ -111,11 +109,11 @@ class Controller : public QObject {
 
   void SetUndistortMode(const UndistortMode undistort_mode);
 
-  void SetTrackerMarkType(const dove_eye::InnerTracker::Mark::Type mark_type);
-
   void SetLocalizationActive(const bool value);
 
   void SetCalibrationData(const dove_eye::CalibrationData calibration_data);
+
+  void SetTracker(dove_eye::Tracker *tracker);
 
  protected:
   void timerEvent(QTimerEvent *event) override;

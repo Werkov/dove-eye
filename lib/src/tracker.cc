@@ -27,6 +27,10 @@ Tracker::Tracker(const CameraIndex arity, const InnerTracker &inner_tracker)
   }
 }
 
+InnerTracker::Mark::Type Tracker::PreferredMarkType() const {
+  assert(trackers_[0]);
+  return trackers_[0]->PreferredMarkType();
+}
 
 /**
  * @return  true when mark is accepted, false otherwise

@@ -114,10 +114,6 @@ void Controller::SetUndistortMode(const UndistortMode undistort_mode) {
   }
 }
 
-void Controller::SetTrackerMarkType(const InnerTracker::Mark::Type mark_type) {
-  tracker_mark_type_ = mark_type;
-}
-
 void Controller::SetLocalizationActive(const bool value) {
   localization_active_ = value;
 }
@@ -135,6 +131,15 @@ void Controller::SetCalibrationData(const CalibrationData calibration_data) {
   CalibrationDataToProviders(new_calibration_data);
 
   calibration_data_.reset(new_calibration_data);
+}
+
+void Controller::SetTracker(dove_eye::Tracker *tracker) {
+  tracker_.reset(tracker);
+  tracker_mark_type_ = tracker->PreferredMarkType();
+
+  /* Pass state kept in controller to the new tracker */
+  tracker_->calibration_data(calibration_data_.get());
+  // TODO undistort mode too?
 }
 
 void Controller::timerEvent(QTimerEvent *event) {
@@ -243,7 +248,7 @@ InnerTracker::Mark Controller::GuiMarkToMark(const GuiMark &gui_mark) const {
         mark.center.y = gui_mark.TopLeft().y() + gui_mark.Size().height() / 2;
         mark.radius = std::min(gui_mark.Size().width(), gui_mark.Size().height()) / 2;
       }
-      
+
       return mark;
     }
 

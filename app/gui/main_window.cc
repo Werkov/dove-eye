@@ -53,8 +53,8 @@ MainWindow::MainWindow(Application *application, QWidget *parent)
   connect(open_videos_dialog_, &OpenVideosDialog::SelectedProviders,
           application_, &Application::Initialize);
 
-  SetupMenu();
   SetupTrackingMenu();
+  SetupMenu();
 
   /* Initialization */
   SetupPipeline();
@@ -77,6 +77,8 @@ void MainWindow::SetupPipeline() {
 
   ControllerModeChanged(application_->controller()->mode());
   controller_status_->ModeChanged(application_->controller()->mode());
+
+  GroupTrackers(action_default_tracker_);
 
   ui_->viewer->SetConverter(application_->converter());
 
@@ -113,6 +115,8 @@ void MainWindow::SetupPipeline() {
           application_->controller(), &Controller::SetLocalizationActive);
   connect(this, &MainWindow::SetUndistortMode,
           application_->controller(), &Controller::SetUndistortMode);
+  connect(this, &MainWindow::SetTrackerType,
+          application_, &Application::SetTrackerType);
 
   /* Controller -> PlaybackControl */
   connect(application_->controller(), &Controller::Started,
@@ -189,6 +193,10 @@ void MainWindow::GroupDistortion(QAction *action) {
   } else if (action == ui_->action_distortion_data) {
     emit SetUndistortMode(Controller::kUndistortData);
   }
+}
+
+void MainWindow::GroupTrackers(QAction *action) {
+  emit SetTrackerType(static_cast<Application::InnerTrackerType>(action->data().toInt()));
 }
 
 void MainWindow::SceneShowCameras() {
@@ -285,14 +293,24 @@ void MainWindow::SetupStatusBar() {
 }
 
 void MainWindow::SetupTrackingMenu() {
+  action_group_trackers_ = new QActionGroup(this);
+  action_default_tracker_ = nullptr;
+  for (auto p : application_->available_trackers()) {
+    auto action = new QAction(this);
+    action->setText(QString::fromStdString(p.second));
+    action->setCheckable(true);
+    action->setChecked(false);
+    action->setData(static_cast<int>(p.first));
 
-    trackingOptions = new QActionGroup(this);
-    trackingOptions->addAction(ui_->actionCircle_Tracker);
-    trackingOptions->addAction(ui_->actionHistogram_Tracker);
-    trackingOptions->addAction(ui_->actionOpenTLD_Tracker);
-    trackingOptions->addAction(ui_->actionTemplate_Tracker);
-    ui_->actionOpenTLD_Tracker->setChecked(true);
+    ui_->menu_tracker->addAction(action);
+    action->setActionGroup(action_group_trackers_);
 
+    if (!action_default_tracker_) {
+      action_default_tracker_ = action;
+      action->setChecked(true);
+    }
+  }
+  // TODO set checked in accordance with initial settings
 }
 
 void MainWindow::SetupMenu() {
@@ -331,17 +349,8 @@ void MainWindow::SetupMenu() {
           this, &MainWindow::SceneShowCameras);
   connect(ui_->action_scene_clear_trajectory, &QAction::triggered,
           this, &MainWindow::SceneClearTrajectory);
-
-  // Tracking menu
-  connect(ui_->actionCircle_Tracker, &QAction::triggered,
-          this, &MainWindow::SetTracker);
-  connect(ui_->actionHistogram_Tracker, &QAction::triggered,
-          this, &MainWindow::SetTracker);
-  connect(ui_->actionTemplate_Tracker, &QAction::triggered,
-          this, &MainWindow::SetTracker);
-  connect(ui_->actionOpenTLD_Tracker, &QAction::triggered,
-          this, &MainWindow::SetTracker);
-
+  connect(action_group_trackers_, &QActionGroup::triggered,
+          this, &MainWindow::GroupTrackers);
 
   /* Synchronize stateful menus */
   SceneShowCameras();

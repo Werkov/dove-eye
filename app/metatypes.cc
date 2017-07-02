@@ -2,6 +2,7 @@
 
 #include <QMetaObject>
 
+#include "application.h"
 #include "controller.h"
 #include "dove_eye/calibration_data.h"
 #include "dove_eye/frameset.h"
@@ -33,5 +34,7 @@ void RegisterMetaTypes() {
   qRegisterMetaType<dove_eye::Location>("dove_eye::Location");
   qRegisterMetaType<Controller::Mode>();
   qRegisterMetaType<Controller::UndistortMode>();
+
+  qRegisterMetaType<Application::InnerTrackerType>();
 }
 
