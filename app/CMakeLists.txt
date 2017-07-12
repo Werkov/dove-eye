@@ -44,7 +44,7 @@ target_link_libraries(gui
 	${QGLViewer_LIBS}
 	dove-eye)
 set_target_properties(gui PROPERTIES
-	CXX_STANDARD 14)
+	CXX_STANDARD ${CXX_STANDARD})
 
 
 

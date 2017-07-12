@@ -6,9 +6,11 @@ find_package(OpenCV REQUIRED)
 find_package(Qt5Widgets)
 
 add_executable(dove-eye_exec main.cc)
-set_target_properties(dove-eye_exec PROPERTIES OUTPUT_NAME dove-eye)
 target_link_libraries(dove-eye_exec dove-eye gui Qt5::Widgets)
 
+set_target_properties(dove-eye_exec PROPERTIES OUTPUT_NAME dove-eye)
+set_target_properties(dove-eye_exec PROPERTIES
+	CXX_STANDARD ${CXX_STANDARD})
 
 include_directories(${CMAKE_SOURCE_DIR}/app)
 include_directories(${CMAKE_SOURCE_DIR}/lib/include)

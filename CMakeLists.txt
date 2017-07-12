@@ -8,6 +8,7 @@ set(CMAKE_PREFIX_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 #
 include(CMakeDependentOption)
 
+set(CXX_STANDARD 14)
 set(CONFIG_MAX_ARITY 3)
 
 option(CONFIG_DEBUG_HIGHGUI "Use OpenCV highgui for debugging outputs" off)

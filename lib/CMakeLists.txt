@@ -17,6 +17,8 @@ else()
 	target_link_libraries(dove-eye pthread)
 endif()
 
+set_target_properties(dove-eye PROPERTIES
+	CXX_STANDARD ${CXX_STANDARD})
 
 include_directories(./include)
 include_directories(${OpenTLD_INCLUDE_DIRS})
