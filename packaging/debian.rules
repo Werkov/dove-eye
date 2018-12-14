@@ -1,0 +1,9 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+MK_FILE := $(abspath $(lastword $(MAKEFILE_LIST)))
+MK_DIR := $(patsubst %/,%,$(dir $(MK_FILE)))
+SRC_DIR := $(MK_DIR)/../dove-eye
+
+%:
+	dh --buildsystem=cmake --sourcedirectory=$(SRC_DIR) $@
