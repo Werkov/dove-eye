@@ -262,12 +262,12 @@ InnerTracker::Mark Controller::GuiMarkToMark(const GuiMark &gui_mark) const {
       return mark;
     }
     case InnerTracker::Mark::kInvalid:
-      assert(false);
       break;
   }
 
-  /* A hint for GCC so that it doesn't warn about no return */
+  /* A hint for compiler but it does not help so return an invalid mark */
   assert(false);
+  return InnerTracker::Mark(InnerTracker::Mark::kInvalid);
 }
 
 
