@@ -8,7 +8,7 @@ if(WIN32)
 		PATHS ${QGLViewer_ROOT}/QGLViewer/release)
 else()
 	find_library(QGLViewer_LIB
-		NAMES QGLViewer
+		NAMES QGLViewer-qt5 QGLViewer
 		PATHS ${QGLViewer_ROOT}/QGLViewer)
 endif()
 
