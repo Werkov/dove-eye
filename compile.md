@@ -8,7 +8,7 @@ title: Compile
 The `dove-eye` requires some 3rd party libraries: 
 
   * [libQGLViewer](http://www.libqglviewer.com/), OpenGL,
-  * OpenCV (2.4),
+  * OpenCV 3 (2.4 worked as well),
   * Qt5.
 
 When you have the libraries installed, `dove-eye` is built using `cmake`.
@@ -37,22 +37,19 @@ With local version of libQGLViewer you need to set cmake accordingly
 
     $ cmake -DQGLViewer_ROOT=<path to dir where QGLViewer/libQGLViewer.so is found>
 
-#### Gotchas in Ubuntu
+#### Packages in Ubuntu
 
-libQGLViewer that is packaged in Ubuntu (14.\*, 15.04) is linked agaist Qt4 --
-despite you can build `dove-eye`, it'll segfault due to ABI incompatibilities!
-Thus it is recommended to compile libQGLViewer locally with Qt5 libraries.
+Ubuntu since 18.04 ships the libQGLViewer as package `libqglviewer-dev-qt5`.
+(libQGLViewer that is packaged in earlier versions is linked agaist Qt4 --
+despite you can build `dove-eye`, it'll segfault due to ABI incompatibilities!)
 
-#### Gotchas in openSUSE
+#### Packages in openSUSE
 
-These packages are required:
+You can use a user-built RPMs from [`home:mkoutny:dove-eye/libQGLViewer`][viewer]
 
-  * opencv-qt5-devel (must use opencv compiled against Qt5),
-  * libqt5-qtbase-devel.
+[viewer]: https://build.opensuse.org/package/show/home:mkoutny:dove-eye/libQGLViewer
 
-libQGLViewer has to be manually compiled with Qt5.
-
-## Windows
+## Windows (applies to dove-eye 0.1)
 
 Download and install compiled binaries for OpenCV 2.4 (not 3.0),
 do the same for Qt framework, version 5.
